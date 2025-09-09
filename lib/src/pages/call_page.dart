@@ -1,31 +1,30 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/calls_model.dart';
-import 'package:siprix_voip_sdk/cdrs_model.dart';
 import 'package:siprix_voip_sdk/devices_model.dart';
 import 'package:siprix_voip_sdk/logs_model.dart';
 import 'package:siprix_voip_sdk/siprix_voip_sdk.dart';
 import 'package:siprix_voip_sdk/video.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../main.dart';
 import '../models/call_model.dart';
 import '../providers/layout_provider.dart';
 import '../widget/dialpad_widget.dart';
 
-class IncommingCallScreen extends StatefulWidget {
-  IncommingCallScreen({super.key});
+enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
+
+class CallPage extends StatefulWidget {
+  const CallPage({super.key});
 
   @override
-  State<IncommingCallScreen> createState() => _IncommingCallWidgetState();
+  State<CallPage> createState() => _CallPageState();
 }
 
-class _IncommingCallWidgetState extends State<IncommingCallScreen> {
+class _CallPageState extends State<CallPage> {
   Timer? _callDurationTimer;
-  LayoutProvider? _layoutProvider;
 
   void _toggleDurationTimer(AppCallsModel calls) {
     if (calls.isEmpty) {
@@ -41,24 +40,11 @@ class _IncommingCallWidgetState extends State<IncommingCallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<LayoutProvider>(context, listen: false);
     final calls = context.watch<AppCallsModel>();
     CallModel? switchedCall = calls.switchedCall();
     _toggleDurationTimer(calls);
-    // final mCardModel = context.watch<CdrsModel>();
 
     if (calls.isEmpty) return DialpadWidget(false);
-
-    // if (!calls.isEmpty) {
-    //   provider.UpdateCallToLogList(context, mCardModel, calls);
-    //   if (calls.callItems[0].state == CallState.ringing) {
-    //     provider.playRingtone();
-    //   } else {
-    //     provider.stopRingtone();
-    //   }
-    // } else {
-    //   provider.stopRingtone();
-    // }
 
     return Column(
       children: [
@@ -68,8 +54,7 @@ class _IncommingCallWidgetState extends State<IncommingCallScreen> {
           padding: const EdgeInsets.all(0.0),
           itemCount: calls.length,
           scrollDirection: Axis.vertical,
-          separatorBuilder:
-              (BuildContext context, int index) => const Divider(height: 1),
+          separatorBuilder: (BuildContext context, int index) => const Divider(height: 1),
           itemBuilder: (BuildContext context, int index) {
             return ListenableBuilder(
               listenable: calls[index],
@@ -81,46 +66,23 @@ class _IncommingCallWidgetState extends State<IncommingCallScreen> {
         ),
         const Divider(height: 1),
         if (switchedCall != null)
-          Expanded(
-            child: SwitchedCallWidget(
-              switchedCall,
-              key: ValueKey(switchedCall.myCallId),
-            ),
-          ),
+          Expanded(child: SwitchedCallWidget(switchedCall, key: ValueKey(switchedCall.myCallId))),
       ],
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _layoutProvider = Provider.of<LayoutProvider>(context, listen: false);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _layoutProvider?.stopRingtone();
-    _layoutProvider?.EventBusforUpdateCallLog(true);
-  }
+  } //build
 
   ListTile _callModelRowTile(AppCallsModel calls, int index) {
     final call = calls[index];
-    final bool isSwitched =
-        (calls.switchedCallId == call.myCallId) || calls.confModeStarted;
+    final bool isSwitched = (calls.switchedCallId == call.myCallId);
 
     return ListTile(
       selected: isSwitched,
       selectedColor: Colors.black,
       selectedTileColor: Theme.of(context).secondaryHeaderColor,
-      leading: Icon(
-        call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded,
-      ),
+      leading: Icon(call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded),
       title: Text(
         call.nameAndExt,
-        style: TextStyle(
-          fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal),
-        ),
+        style: TextStyle(fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal)),
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(call.state.name),
@@ -138,6 +100,8 @@ class _IncommingCallWidgetState extends State<IncommingCallScreen> {
   }
 }
 
+
+//SwitchedCallWidget - provides controls for manipulating current/switched call
 class SwitchedCallWidget extends StatefulWidget {
   const SwitchedCallWidget(this.myCall, {super.key});
 
@@ -151,38 +115,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   final SiprixVideoRenderer _localRenderer = SiprixVideoRenderer();
   final SiprixVideoRenderer _remoteRenderer = SiprixVideoRenderer();
   static const double eIconSize = 30;
+  bool _isRecording = false;
+
+  EventTaxi eventBus = EventTaxiImpl.singleton();
 
   bool _sendDtmfMode = false;
-  late String _transferTarget;
+
+  bool shouldShowSupportTicket = false;
 
   @override
   void initState() {
     super.initState();
-    _localRenderer.init(
-      SiprixVoipSdk.kLocalVideoCallId,
-      context.read<LogsModel>(),
-    );
+    _localRenderer.init(SiprixVoipSdk.kLocalVideoCallId, context.read<LogsModel>());
     _remoteRenderer.init(widget.myCall.myCallId, context.read<LogsModel>());
-
-    /*This is used to Focus on Top of App*/
-    if (Platform.isWindows) {
-      WindowManager.instance.setAlwaysOnTop(true);
-      WindowManager.instance.focus();
-      Future.delayed(Duration(seconds: 2), () {
-        WindowManager.instance.setAlwaysOnTop(false);
-      });
-    } else if (Platform.isMacOS) {
-      // MacOs specific code here
-      bringWindowToFront();
-    }
-  }
-
-  Future<void> bringWindowToFront() async {
-    await windowManager.show(); // In case the window is hidden
-    await windowManager.focus(); // Bring it to the front
-    await windowManager.setAlwaysOnTop(true); // Temporarily set on top
-    await Future.delayed(Duration(milliseconds: 100)); // Small delay
-    await windowManager.setAlwaysOnTop(false); // Remove always on top
   }
 
   @override
@@ -204,16 +149,14 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
               child: Column(
                 children: [
                   const Spacer(),
-                  _buildNameExtText(),
-                  _buildStateAccCallIdText(),
+                  _buildCallStateText(),
+                  _buildFromToText(),
                   _buildCallDuration(),
                   const Spacer(),
                   ..._buildCallControls(),
                   const Spacer(),
-                  if (widget.myCall.state == CallState.ringing)
-                    _buildIncomingCallAcceptReject(),
-                  if (widget.myCall.state != CallState.ringing)
-                    _buildHangupButton(),
+                  if (widget.myCall.state == CallState.ringing) _buildIncomingCallAcceptReject(),
+                  if (widget.myCall.state != CallState.ringing) _buildHangupButton(),
                   const Spacer(),
                 ],
               ),
@@ -224,26 +167,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     );
   } //build
 
-  Text _buildNameExtText() {
-    return Text(
-      widget.myCall.nameAndExt,
-      style: Theme.of(context).textTheme.titleLarge,
-    );
+  Text _buildCallStateText() {
+    return Text(widget.myCall.nameAndExt, style: Theme.of(context).textTheme.titleLarge);
   }
 
-  Widget _buildStateAccCallIdText() {
+  Widget _buildFromToText() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          'State: ${widget.myCall.state.name}',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        Text('Acc: ${widget.myCall.accUri}'),
-        Text('CallId: ${widget.myCall.myCallId}'),
-
-        if (widget.myCall.receivedDtmf.isNotEmpty)
-          Text('DTMF: ${widget.myCall.receivedDtmf}'),
+        Text('${widget.myCall.state.name}', style: Theme.of(context).textTheme.titleMedium),
+        SizedBox(height: 10),
       ],
     );
   }
@@ -255,13 +188,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       children.add(Center(child: SiprixVideoView(_remoteRenderer)));
 
       //Camera preview
-      children.add(
-        SizedBox(
-          width: 130,
-          height: 100,
-          child: SiprixVideoView(_localRenderer),
-        ),
-      );
+      children.add(SizedBox(width: 130, height: 100, child: SiprixVideoView(_localRenderer)));
 
       //Button 'Mute camera'
       children.add(
@@ -269,9 +196,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           onPressed: _muteCam,
           iconSize: eIconSize,
           icon: Icon(
-            widget.myCall.isCamMuted
-                ? Icons.videocam_off_outlined
-                : Icons.videocam_outlined,
+            widget.myCall.isCamMuted ? Icons.videocam_off_outlined : Icons.videocam_outlined,
           ),
         ),
       );
@@ -309,19 +234,13 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
                     ? const Icon(Icons.mic_off_rounded)
                     : const Icon(Icons.mic_rounded),
           ),
-
           IconButton.filledTonal(
             iconSize: eIconSize,
             onPressed: isCallConnected ? _toggleSendDtmfMode : null,
             icon: const Icon(Icons.dialpad_rounded),
           ),
-
           MenuAnchor(
-            builder: (
-              BuildContext context,
-              MenuController controller,
-              Widget? child,
-            ) {
+            builder: (BuildContext context, MenuController controller, Widget? child) {
               return IconButton.filledTonal(
                 icon: const Icon(Icons.volume_up),
                 iconSize: eIconSize,
@@ -353,92 +272,50 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
             onPressed: _showAddCallPage,
             icon: const Icon(Icons.add),
           ),
-
           IconButton.filledTonal(
             iconSize: eIconSize,
-            onPressed:
-                (widget.myCall.state == CallState.holding) ? null : _holdCall,
-            icon: Icon(
-              widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause,
-            ),
+            onPressed: (widget.myCall.state == CallState.holding) ? null : _holdCall,
+            icon: Icon(widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause),
           ),
+          IconButton.filledTonal(
+            tooltip: "Record call",
+            color: _isRecording ? Colors.green : null,
+            iconSize: eIconSize,
+            onPressed: isCallConnected ? _handleRecord : null,
+            icon:
+                _isRecording
+                    ? const Icon(Icons.fiber_manual_record)
+                    : const Icon(Icons.fiber_manual_record_outlined),
+          ),
+        ],
+      ),
+    );
 
-          MenuAnchor(
-            builder: (
-              BuildContext context,
-              MenuController controller,
-              Widget? child,
-            ) {
-              return IconButton.filledTonal(
-                icon: const Icon(Icons.more_horiz),
-                iconSize: eIconSize,
-                onPressed: () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
-                  }
-                },
-              );
-            },
-            menuChildren: [
-              MenuItemButton(
-                leadingIcon: Icon(
-                  widget.myCall.isFilePlaying ? Icons.stop : Icons.play_arrow,
-                ),
-                onPressed: isCallConnected ? _playFile : null,
-                child: Text(
-                  widget.myCall.isFilePlaying ? "Stop playing" : 'Play file',
-                ),
-              ),
-
-              MenuItemButton(
-                leadingIcon: Icon(
-                  Icons.radio_button_checked,
-                  color: widget.myCall.isRecStarted ? Colors.red : null,
-                ),
-                onPressed: isCallConnected ? _recordFile : null,
-                child: Text(
-                  widget.myCall.isRecStarted ? 'Stop record' : 'Record',
-                ),
-              ),
-
-              MenuItemButton(
-                leadingIcon: Icon(
-                  Icons.wifi_calling_3,
-                  color: widget.myCall.isRecStarted ? Colors.white : null,
-                ),
-                onPressed: isCallConnected ? _makeConference : null,
-                child: Text(
-                  widget.myCall.isRecStarted ? 'Conference' : 'Conference',
-                ),
-              ),
-
-              if (_sendDtmfMode)
-                MenuItemButton(
-                  leadingIcon: Icon(
-                    Icons.keyboard_arrow_down,
-                    color: widget.myCall.isRecStarted ? Colors.white : null,
-                  ),
-                  onPressed: _toggleSendDtmfMode,
-                  child: Text(
-                    'back',
-                  ),
-                )
-              else
-                MenuItemButton(
-                  leadingIcon: Icon(
-                    Icons.phone_forwarded,
-                    color: widget.myCall.isRecStarted ? Colors.white : null,
-                  ),
-                  onPressed: isCallConnected
-                      ? () => _openCallTransferPopup(context)
-                      : null,
-                  // onPressed: _openCallTransferPopup(context),
-                  child: Text(widget.myCall.isRecStarted ? 'Transfer' : 'Transfer',
-                  ),
-                )
-            ],
+    children.add(const SizedBox(height: 10));
+    children.add(
+      Wrap(
+        spacing: 25,
+        runSpacing: 15,
+        crossAxisAlignment: WrapCrossAlignment.start,
+        children: [
+          if (shouldShowSupportTicket)
+            IconButton.filledTonal(
+              tooltip: "Create Ticket",
+              iconSize: eIconSize,
+              onPressed: isCallConnected ? _handleCreateTicket : null,
+              icon: const Icon(Icons.create_new_folder_outlined),
+            ),
+          IconButton.filledTonal(
+            tooltip: "Transfer Call",
+            iconSize: eIconSize,
+            onPressed: isCallConnected ? () => _openCallTransferPopup(context) : null,
+            icon: const Icon(Icons.forward_outlined),
+          ),
+          IconButton.filledTonal(
+            tooltip: "Make Conference",
+            iconSize: eIconSize,
+            onPressed: isCallConnected ? _makeConference : null,
+            icon: const Icon(Icons.group_outlined),
           ),
         ],
       ),
@@ -448,109 +325,61 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   void _openCallTransferPopup(BuildContext context) {
-    final callsModel = Provider.of<AppCallsModel>(context, listen: false);
+    final callsModel = context.read<AppCallsModel>();
     TextEditingController _transferController = TextEditingController();
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Transfer Call',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Transfer Blind",
-                    style: TextStyle(
-                      color: Colors.blue,
-                    )),
-                TextField(
-                  controller: _transferController,
-                  onSubmitted: (value) {
-                    _transferBlind(value);
-                    Navigator.of(context).pop();
-                    // Get.back();
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Extension number",
-                    suffix: IconButton(
-                        tooltip: "Transer Blind",
-                        onPressed: () {
-                          _transferBlind(_transferController.text);
-                          Navigator.of(context).pop();
-                          // Get.back();
-                        },
-                        icon: const Icon(Icons.arrow_right_alt)),
-                  ),
-                ),
-                if (callsModel.hasConnectedFewCalls())
-                  const SizedBox(height: 20),
-                if (callsModel.hasConnectedFewCalls())
-                  Text("Transfer to existing call",
-                      style: TextStyle(
-                        color: Colors.blue,
-                      )),
-                for (int i = 0; i < callsModel.length; i++)
-                  if (callsModel[i].myCallId != widget.myCall.myCallId &&
-                      callsModel[i].state == CallState.connected)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(callsModel[i].nameAndExt),
-                      trailing: IconButton(
-                          onPressed: () {
-                            _transferAttended(callsModel[i].myCallId);
-                            Navigator.of(context).pop();
-                            // Get.back();
-                          },
-                          icon: Icon(Icons.arrow_right_alt)),
-                    ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancel')),
-            ],
-          );
-        });
-  }
-
-  void _handleTransfer() {
-    showDialog<void>(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Enter target to transfer.'),
-          content: TextField(
-            onChanged: (String text) {
-              setState(() {
-                _transferTarget = text;
-              });
-            },
-            decoration: InputDecoration(
-              hintText: 'URI or Username',
-            ),
-            textAlign: TextAlign.center,
+          title: Text('Transfer Call', style: Theme.of(context).textTheme.titleMedium),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Transfer Blind", style: TextStyle(color: Colors.blue)),
+              TextField(
+                controller: _transferController,
+                onSubmitted: (value) {
+                  _transferBlind(value);
+                  Navigator.of(context).pop();
+                },
+                decoration: InputDecoration(
+                  hintText: "Extension number",
+                  suffix: IconButton(
+                    tooltip: "Transer Blind",
+                    onPressed: () {
+                      _transferBlind(_transferController.text);
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.arrow_right_alt),
+                  ),
+                ),
+              ),
+              if (callsModel.hasConnectedFewCalls()) const SizedBox(height: 20),
+              if (callsModel.hasConnectedFewCalls())
+                Text("Transfer to existing call", style: TextStyle(color: Colors.blue)),
+              for (int i = 0; i < callsModel.length; i++)
+                if (callsModel[i].myCallId != widget.myCall.myCallId &&
+                    callsModel[i].state == CallState.connected)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(callsModel[i].nameAndExt),
+                    trailing: IconButton(
+                      onPressed: () {
+                        _transferAttended(callsModel[i].myCallId);
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.arrow_right_alt),
+                    ),
+                  ),
+            ],
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
-              child: Text('Ok'),
               onPressed: () {
-                _transferBlind(_transferTarget);
                 Navigator.of(context).pop();
               },
-            ),
-            TextButton(
               child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
           ],
         );
@@ -558,23 +387,55 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     );
   }
 
+  _handleRecord() async {
+    if (!_isRecording) {
+      widget.myCall.recordFile('${widget.myCall.myCallId}.wav');
+    } else {
+      widget.myCall.stopRecordFile();
+    }
+
+    // widget.myCall.getSipHeader(headerName)
+    // if (widget.myCall.isRecStarted) {
+    //   widget.myCall.stopRecordFile().catchError(showSnackBar);
+    // } else {
+    //   String pathToFile = await MyApp.getRecFilePathName(
+    //     widget.myCall.myCallId,
+    //   );
+    //   widget.myCall.recordFile(pathToFile).catchError(showSnackBar);
+    // }
+
+    widget.myCall.sendDtmf('*');
+    _isRecording = !_isRecording;
+    Future.delayed(const Duration(milliseconds: 100), () {
+      widget.myCall.sendDtmf('1');
+    });
+  }
+
+  void _handleCreateTicket() async {
+    // ApiResponse<String> apiResponse = await TeamlocusRepository.getCurrentCallLog({
+    //   'ext_no': widget.myCall.isIncoming ? widget.myCall.remoteExt : box.read('extensionNo'),
+    //   'dest_no': widget.myCall.isIncoming ? box.read('extensionNo') : widget.myCall.remoteExt,
+    // });
+    // if (apiResponse.status == 'ok') {
+    //   Get.find<LayoutController>().goToCreateSupportTicket(apiResponse.response);
+    // }
+  }
+
   Text _buildCallDuration() {
     String label;
     switch (widget.myCall.state) {
       case CallState.connected:
         label = widget.myCall.durationStr;
+        break;
       case CallState.held:
         label = "On Hold (${widget.myCall.holdState.name})";
+        break;
       default:
         label = "-:-";
     }
     return Text(
       label,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Colors.green,
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.green),
     );
   }
 
@@ -591,7 +452,6 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
             foregroundColor: Colors.white,
           ),
         ),
-
         IconButton.filledTonal(
           onPressed: _acceptCall,
           icon: const Icon(Icons.call),
@@ -609,16 +469,14 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     return IconButton.filledTonal(
       iconSize: eIconSize,
       icon: const Icon(Icons.call_end),
-      style: OutlinedButton.styleFrom(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
+      style: OutlinedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
       onPressed: enabled ? _hangUpCall : null,
       color: Colors.red,
     );
   }
 
   void showSnackBar(dynamic err) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
   }
 
@@ -679,26 +537,28 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     if (widget.myCall.isRecStarted) {
       widget.myCall.stopRecordFile().catchError(showSnackBar);
     } else {
-      String pathToFile = await MyApp.getRecFilePathName(
-        widget.myCall.myCallId,
-      );
+      String pathToFile = await MyApp.getRecFilePathName(widget.myCall.myCallId);
       widget.myCall.recordFile(pathToFile).catchError(showSnackBar);
     }
   }
 
   void _playFile() async {
-    if (widget.myCall.isFilePlaying) {
-      widget.myCall.stopPlayFile().catchError(showSnackBar);
-    } else {
-      //write 'asset/music.mp3' to temp folder
-      String pathToFile = await MyApp.writeAssetAndGetFilePath("music.mp3");
-      widget.myCall.playFile(pathToFile).catchError(showSnackBar);
-    }
+    String pathToFile = await MyApp.writeAssetAndGetFilePath(
+      "music.mp3",
+    ); //write 'asset/music.mp3' to temp folder
+    widget.myCall.playFile(pathToFile).catchError(showSnackBar);
   }
 
   void _makeConference() {
     final calls = context.read<AppCallsModel>();
-    calls.makeConference().catchError(showSnackBar);
+    // final calls = context.read<CallsModel>();
+    if (calls.hasConnectedFewCalls()) {
+      calls.makeConference().catchError(showSnackBar);
+
+      showSnackBar("Conference started");
+    } else {
+      showSnackBar("Should have at least 2 connected calls to make conference");
+    }
   }
 
   void _transferBlind(String ext) async {
@@ -712,9 +572,9 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   void _showAddCallPage() {
+    Navigator.of(context).pushNamed(DialpadWidget.routeName);
     final mprovider = Provider.of<LayoutProvider>(context, listen: false);
     mprovider.goToDialPad();
-    Navigator.of(context).pushNamed(DialpadWidget.routeName);
   }
 
   void _toggleSendDtmfMode() {
@@ -824,10 +684,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ],
         ),
         const SizedBox(height: spacing),
-        IconButton.filledTonal(
-          onPressed: _toggleSendDtmfMode,
-          icon: const Icon(Icons.close),
-        ),
+        IconButton.filledTonal(onPressed: _toggleSendDtmfMode, icon: const Icon(Icons.close)),
       ],
     );
   }

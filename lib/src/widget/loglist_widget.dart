@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/cdrs_model.dart';
 
 import '../api_response/call_log_response.dart';
+import '../event/PlaceCallEvent.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
@@ -232,244 +233,16 @@ class _LogScreenState extends State<LogListScreen> {
               }
 
               return Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: provider.logList.length + (provider.hasMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (provider.hasMore && index == provider.logList.length) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    bool isMobile = constraints.maxWidth < 600; // 📱 breakpoint
 
-                    final cdrs = provider.logList[index];
                     return Container(
-                      key: ValueKey(cdrs.did),
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color:
-                        Theme
-                            .of(context)
-                            .brightness == Brightness.dark
-                            ? Colors.black
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          children: [
-
-                            _getCdrIconsAndCall(cdrs),
-
-                            SizedBox(width: 10),
-                            Container(
-                              width: 90,
-
-                              // child: Text(
-                              //   callLogs[index].getFormattedCallStatus(myExtensionNo),
-                              //   style: TextStyle(
-                              //     fontSize: 12,
-                              //     color: callLogs[index].getCallLogColor(),
-                              //   ),
-                              // ),
-                              child: InkWell(
-                                onTap: () {
-                                  if (cdrs.src == mExtentionNumber) {
-                                    mCallProvider.phoneNumbCtrl.text =
-                                        cdrs.dst.toString();
-                                  } else {
-                                    mCallProvider.phoneNumbCtrl.text =
-                                        cdrs.src.toString();
-                                  }
-                                },
-                                child: Text(
-                                  cdrs.src == mExtentionNumber
-                                      ? cdrs.dst
-                                      : "${cdrs.cnam} (${cdrs.src})",
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 20),
-                            Container(
-                              width: 110,
-                              child: Text(
-                                provider.getFormattedCallStatusName(cdrs),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: provider.getCallLogColor(cdrs),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Column(
-                              spacing: 2,
-                              children: [
-                                Text(
-                                  provider.convertDateFormat(cdrs.calldate),
-                                  style: TextStyle(
-                                    color:
-                                    Theme
-                                        .of(context)
-                                        .brightness ==
-                                        Brightness.dark
-                                        ? Colors.white.withOpacity(1)
-                                        : Colors.black.withOpacity(0.7),
-                                  ),
-                                ),
-
-                                Visibility(
-                                  visible: cdrs.disposition == "ANSWERED" ? true : false,
-                                  child: Text(
-                                    "Duration: ${formatDuration(cdrs.duration)}",
-                                    style: TextStyle(
-                                      color:
-                                      Theme
-                                          .of(context)
-                                          .brightness ==
-                                          Brightness.dark
-                                          ? Colors.white.withOpacity(0.7)
-                                          : Colors.black.withOpacity(0.7),
-                                    ),
-                                  ),
-                                ),
-
-                                // if (cdrs.statusCode != 0)
-                                //   Text(
-                                //     "Status code: ${cdrs.statusCode}",
-                                //     style: TextStyle(
-                                //       color:
-                                //       Theme
-                                //           .of(context)
-                                //           .brightness ==
-                                //           Brightness.dark
-                                //           ? Colors.white.withOpacity(0.7)
-                                //           : Colors.black.withOpacity(0.7),
-                                //     ),
-                                //   ),
-
-                                // if (cdrs.hasVideo!)
-                                //   const Icon(
-                                //     Icons.videocam_outlined,
-                                //     color: Colors.grey,
-                                //     size: 18,
-                                //   ),
-                              ],
-                            ),
-
-                            /*Todo:Additional Functionality:-For added Caller name and Extension Number After Date*/
-                            // SizedBox(width: 15),
-                            // if (cdrs.src == mExtentionNumber)
-                            //   InkWell(
-                            //     onTap: () {
-                            //       eventBus.fire(PlaceCallEvent(cdrs.dst));
-                            //     },
-                            //     child: Text(
-                            //       provider.getCallDestinationName(cdrs),
-                            //       style: TextStyle(
-                            //         fontSize: 14,
-                            //         fontWeight: FontWeight.bold,
-                            //       ),
-                            //     ),
-                            //   )
-                            // else
-                            //   InkWell(
-                            //     onTap: () {
-                            //       eventBus.fire(
-                            //         PlaceCallEvent(
-                            //           cdrs.src == mExtentionNumber
-                            //               ? cdrs.dst
-                            //               : cdrs.src,
-                            //         ),
-                            //       );
-                            //     },
-                            //     child: Text(
-                            //       '${cdrs.src} - ${cdrs.cnam}',
-                            //       style: TextStyle(
-                            //         fontSize: 14,
-                            //         fontWeight: FontWeight.bold,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // Spacer(),
-                            /*End Era*/
-
-                            // call button
-                            SizedBox(width: 10),
-                            if (cdrs.recordingfile != '')
-                              IconButton(
-                                tooltip: 'Recording',
-                                onPressed: () {
-                                  if (player.state == PlayerState.playing) {
-                                    player.stop();
-                                    isPlaying = false;
-                                    recordingFile = '';
-                                  } else {
-                                    player.play(
-                                      UrlSource(cdrs.getRecordingFile()),
-                                    );
-                                    player.getDuration();
-                                    isPlaying = true;
-                                    recordingFile =
-                                        cdrs.getRecordingFile();
-                                  }
-                                },
-                                icon: Icon(
-                                  isPlaying &&
-                                      recordingFile ==
-                                          cdrs.getRecordingFile()
-                                      ? Icons.stop
-                                      : Icons.play_arrow,
-                                ),
-                              )
-
-                            /*TODO: Delete Record*/
-                            // SizedBox(width: 10),
-                            // _getCdrRowTrailing(cdrs, index, provider),
-
-                            // create ticket button
-                            // if (callLogs[index].supportTicketMaster ==
-                            //     null)
-                            //   ElevatedButton(
-                            //     style: ElevatedButton.styleFrom(
-                            //       backgroundColor: Colors.grey.shade900,
-                            //       foregroundColor:
-                            //       Colors.white.withOpacity(0.5),
-                            //     ),
-                            //     onPressed: () {
-                            //       Get.find<LayoutController>()
-                            //           .goToCreateSupportTicket(
-                            //           callLogs[index].uniqueid);
-                            //     },
-                            //     child: Text('Create Ticket'),
-                            //   ),
-                            // if (callLogs[index].supportTicketMaster !=
-                            //     null)
-                            // ElevatedButton(
-                            //   style: ElevatedButton.styleFrom(
-                            //     backgroundColor: Colors.green,
-                            //     foregroundColor: Colors.black,
-                            //   ),
-                            //   onPressed: () {
-                            //     Get.dialog(
-                            //       SupportTicketDetailModal(
-                            //         supportTicketMaster: callLogs[index]
-                            //             .supportTicketMaster!,
-                            //       ),
-                            //     );
-                            //   },
-                            //   child: Text(
-                            //       '#${callLogs[index].supportTicketMaster?.ticket_id}'),
-                            // ),
-                          ]
-                          ,
-                        )
-                        ,
-                      )
-                      ,
+                      height: isMobile ? null : 500,
+                      width: double.infinity,
+                      child: isMobile
+                          ? _buildMobileLayout(context, provider, mCallProvider)
+                          : _buildDesktopLayout(context, provider, mCallProvider),
                     );
                   },
                 ),
@@ -477,6 +250,494 @@ class _LogScreenState extends State<LogListScreen> {
             }
         ),
       ],
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context, LayoutProvider provider,
+      CallProvider mCallProvider) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: provider.logList.length + (provider.hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (provider.hasMore && index == provider.logList.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final cdrs = provider.logList[index];
+        return Container(
+          key: ValueKey(cdrs.did),
+          margin: EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color:
+            Theme
+                .of(context)
+                .brightness == Brightness.dark
+                ? Colors.black
+                : Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+
+                _getCdrIconsAndCall(cdrs),
+
+                SizedBox(width: 10),
+                Container(
+                  width: 90,
+
+                  // child: Text(
+                  //   callLogs[index].getFormattedCallStatus(myExtensionNo),
+                  //   style: TextStyle(
+                  //     fontSize: 12,
+                  //     color: callLogs[index].getCallLogColor(),
+                  //   ),
+                  // ),
+                  child: InkWell(
+                    onTap: () {
+                      if (cdrs.src == mExtentionNumber) {
+                        mCallProvider.phoneNumbCtrl.text =
+                            cdrs.dst.toString();
+                      } else {
+                        mCallProvider.phoneNumbCtrl.text =
+                            cdrs.src.toString();
+                      }
+                    },
+                    child: Text(
+                      cdrs.src == mExtentionNumber
+                          ? cdrs.dst
+                          : "${cdrs.cnam} (${cdrs.src})",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Container(
+                  width: 110,
+                  child: Text(
+                    provider.getFormattedCallStatusName(cdrs),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: provider.getCallLogColor(cdrs),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 15),
+                Column(
+                  spacing: 2,
+                  children: [
+                    Text(
+                      provider.convertDateFormat(cdrs.calldate),
+                      style: TextStyle(
+                        color:
+                        Theme
+                            .of(context)
+                            .brightness ==
+                            Brightness.dark
+                            ? Colors.white.withOpacity(1)
+                            : Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+
+                    Visibility(
+                      visible: cdrs.disposition == "ANSWERED" ? true : false,
+                      child: Text(
+                        "Duration: ${formatDuration(cdrs.duration)}",
+                        style: TextStyle(
+                          color:
+                          Theme
+                              .of(context)
+                              .brightness ==
+                              Brightness.dark
+                              ? Colors.white.withOpacity(0.7)
+                              : Colors.black.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+
+                    // if (cdrs.statusCode != 0)
+                    //   Text(
+                    //     "Status code: ${cdrs.statusCode}",
+                    //     style: TextStyle(
+                    //       color:
+                    //       Theme
+                    //           .of(context)
+                    //           .brightness ==
+                    //           Brightness.dark
+                    //           ? Colors.white.withOpacity(0.7)
+                    //           : Colors.black.withOpacity(0.7),
+                    //     ),
+                    //   ),
+
+                    // if (cdrs.hasVideo!)
+                    //   const Icon(
+                    //     Icons.videocam_outlined,
+                    //     color: Colors.grey,
+                    //     size: 18,
+                    //   ),
+                  ],
+                ),
+
+                /*Todo:Additional Functionality:-For added Caller name and Extension Number After Date*/
+                // SizedBox(width: 15),
+                // if (cdrs.src == mExtentionNumber)
+                //   InkWell(
+                //     onTap: () {
+                //       eventBus.fire(PlaceCallEvent(cdrs.dst));
+                //     },
+                //     child: Text(
+                //       provider.getCallDestinationName(cdrs),
+                //       style: TextStyle(
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   )
+                // else
+                //   InkWell(
+                //     onTap: () {
+                //       eventBus.fire(
+                //         PlaceCallEvent(
+                //           cdrs.src == mExtentionNumber
+                //               ? cdrs.dst
+                //               : cdrs.src,
+                //         ),
+                //       );
+                //     },
+                //     child: Text(
+                //       '${cdrs.src} - ${cdrs.cnam}',
+                //       style: TextStyle(
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // Spacer(),
+                /*End Era*/
+
+                // call button
+                SizedBox(width: 10),
+                if (cdrs.recordingfile != '')
+                  IconButton(
+                    tooltip: 'Recording',
+                    onPressed: () {
+                      if (player.state == PlayerState.playing) {
+                        player.stop();
+                        isPlaying = false;
+                        recordingFile = '';
+                      } else {
+                        player.play(
+                          UrlSource(cdrs.getRecordingFile()),
+                        );
+                        player.getDuration();
+                        isPlaying = true;
+                        recordingFile =
+                            cdrs.getRecordingFile();
+                      }
+                    },
+                    icon: Icon(
+                      isPlaying &&
+                          recordingFile ==
+                              cdrs.getRecordingFile()
+                          ? Icons.stop
+                          : Icons.play_arrow,
+                    ),
+                  )
+
+                /*TODO: Delete Record*/
+                // SizedBox(width: 10),
+                // _getCdrRowTrailing(cdrs, index, provider),
+
+                // create ticket button
+                // if (callLogs[index].supportTicketMaster ==
+                //     null)
+                //   ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: Colors.grey.shade900,
+                //       foregroundColor:
+                //       Colors.white.withOpacity(0.5),
+                //     ),
+                //     onPressed: () {
+                //       Get.find<LayoutController>()
+                //           .goToCreateSupportTicket(
+                //           callLogs[index].uniqueid);
+                //     },
+                //     child: Text('Create Ticket'),
+                //   ),
+                // if (callLogs[index].supportTicketMaster !=
+                //     null)
+                // ElevatedButton(
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.green,
+                //     foregroundColor: Colors.black,
+                //   ),
+                //   onPressed: () {
+                //     Get.dialog(
+                //       SupportTicketDetailModal(
+                //         supportTicketMaster: callLogs[index]
+                //             .supportTicketMaster!,
+                //       ),
+                //     );
+                //   },
+                //   child: Text(
+                //       '#${callLogs[index].supportTicketMaster?.ticket_id}'),
+                // ),
+              ]
+              ,
+            )
+            ,
+          )
+          ,
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context, LayoutProvider provider,
+      CallProvider mCallProvider) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: provider.logList.length + (provider.hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (provider.hasMore && index == provider.logList.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final cdrs = provider.logList[index];
+        return Container(
+          key: ValueKey(cdrs.did),
+          margin: EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color:
+            Theme
+                .of(context)
+                .brightness == Brightness.dark
+                ? Colors.black
+                : Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+
+                _getCdrIconsAndCall(cdrs),
+
+                SizedBox(width: 10),
+                Container(
+                  // width: 90,
+                  child: InkWell(
+                    onTap: () {
+                      if (cdrs.src == mExtentionNumber) {
+                        mCallProvider.phoneNumbCtrl.text =
+                            cdrs.dst.toString();
+                        eventBus.fire(PlaceCallEvent(cdrs.dst));
+                      } else {
+                        mCallProvider.phoneNumbCtrl.text =
+                            cdrs.src.toString();
+                        eventBus.fire(PlaceCallEvent(cdrs.src));
+                      }
+                    },
+                    child: Text(
+                      cdrs.src == mExtentionNumber
+                          ? cdrs.dst
+                          : "${cdrs.cnam}\n(${cdrs.src})",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Container(
+                  // width: 110,
+                  child: Text(
+                    provider.getFormattedCallStatusName(cdrs),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: provider.getCallLogColor(cdrs),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 15),
+                Expanded(
+                    flex: 3,
+                    child: Column(
+                      spacing: 2,
+                      children: [
+                        Text(
+                          provider.convertDateFormat(cdrs.calldate),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color:
+                            Theme
+                                .of(context)
+                                .brightness ==
+                                Brightness.dark
+                                ? Colors.white.withOpacity(1)
+                                : Colors.black.withOpacity(0.7),
+                          ),
+                        ),
+
+                        Visibility(
+                          visible: cdrs.disposition == "ANSWERED" ? true : false,
+                          child: Text(
+                            "Duration: ${formatDuration(cdrs.duration)}",
+                            style: TextStyle(
+                              color:
+                              Theme
+                                  .of(context)
+                                  .brightness ==
+                                  Brightness.dark
+                                  ? Colors.white.withOpacity(0.7)
+                                  : Colors.black.withOpacity(0.7),
+                            ),
+                          ),
+                        ),
+
+                        // if (cdrs.statusCode != 0)
+                        //   Text(
+                        //     "Status code: ${cdrs.statusCode}",
+                        //     style: TextStyle(
+                        //       color:
+                        //       Theme
+                        //           .of(context)
+                        //           .brightness ==
+                        //           Brightness.dark
+                        //           ? Colors.white.withOpacity(0.7)
+                        //           : Colors.black.withOpacity(0.7),
+                        //     ),
+                        //   ),
+
+                        // if (cdrs.hasVideo!)
+                        //   const Icon(
+                        //     Icons.videocam_outlined,
+                        //     color: Colors.grey,
+                        //     size: 18,
+                        //   ),
+                      ],
+                    )),
+
+                /*Todo:Additional Functionality:-For added Caller name and Extension Number After Date*/
+                // SizedBox(width: 15),
+                // if (cdrs.src == mExtentionNumber)
+                //   InkWell(
+                //     onTap: () {
+                //       eventBus.fire(PlaceCallEvent(cdrs.dst));
+                //     },
+                //     child: Text(
+                //       provider.getCallDestinationName(cdrs),
+                //       style: TextStyle(
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   )
+                // else
+                //   InkWell(
+                //     onTap: () {
+                //       eventBus.fire(
+                //         PlaceCallEvent(
+                //           cdrs.src == mExtentionNumber
+                //               ? cdrs.dst
+                //               : cdrs.src,
+                //         ),
+                //       );
+                //     },
+                //     child: Text(
+                //       '${cdrs.src} - ${cdrs.cnam}',
+                //       style: TextStyle(
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // Spacer(),
+                /*End Era*/
+
+                // call button
+                SizedBox(width: 10),
+                if (cdrs.recordingfile != '')
+                  IconButton(
+                    tooltip: 'Recording',
+                    onPressed: () {
+                      if (player.state == PlayerState.playing) {
+                        player.stop();
+                        isPlaying = false;
+                        recordingFile = '';
+                      } else {
+                        player.play(
+                          UrlSource(cdrs.getRecordingFile()),
+                        );
+                        player.getDuration();
+                        isPlaying = true;
+                        recordingFile =
+                            cdrs.getRecordingFile();
+                      }
+                    },
+                    icon: Icon(
+                      isPlaying &&
+                          recordingFile ==
+                              cdrs.getRecordingFile()
+                          ? Icons.stop
+                          : Icons.play_arrow,
+                    ),
+                  )
+
+                /*TODO: Delete Record*/
+                // SizedBox(width: 10),
+                // _getCdrRowTrailing(cdrs, index, provider),
+
+                // create ticket button
+                // if (callLogs[index].supportTicketMaster ==
+                //     null)
+                //   ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: Colors.grey.shade900,
+                //       foregroundColor:
+                //       Colors.white.withOpacity(0.5),
+                //     ),
+                //     onPressed: () {
+                //       Get.find<LayoutController>()
+                //           .goToCreateSupportTicket(
+                //           callLogs[index].uniqueid);
+                //     },
+                //     child: Text('Create Ticket'),
+                //   ),
+                // if (callLogs[index].supportTicketMaster !=
+                //     null)
+                // ElevatedButton(
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.green,
+                //     foregroundColor: Colors.black,
+                //   ),
+                //   onPressed: () {
+                //     Get.dialog(
+                //       SupportTicketDetailModal(
+                //         supportTicketMaster: callLogs[index]
+                //             .supportTicketMaster!,
+                //       ),
+                //     );
+                //   },
+                //   child: Text(
+                //       '#${callLogs[index].supportTicketMaster?.ticket_id}'),
+                // ),
+              ]
+              ,
+            )
+            ,
+          )
+          ,
+        );
+      },
     );
   }
 

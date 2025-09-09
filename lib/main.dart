@@ -15,6 +15,7 @@ import 'package:callingproject/src/splash_screen.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
+import 'package:callingproject/src/widget/dialpad_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +23,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
-import 'package:siprix_voip_sdk/calls_model.dart';
 import 'package:siprix_voip_sdk/cdrs_model.dart';
 import 'package:siprix_voip_sdk/devices_model.dart';
 import 'package:siprix_voip_sdk/logs_model.dart';
@@ -134,6 +134,8 @@ class _MyAppState extends State<MyApp> {
     '/domain': ([Object? arguments]) => Domainscreen(),
     '/login': ([Object? arguments]) => LoginScreen(),
     '/callscreen': ([Object? arguments]) => CallScreenWidget(),
+    DialpadWidget.routeName: ([Object? arguments]) =>
+    const DialpadWidget(true),
   };
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {

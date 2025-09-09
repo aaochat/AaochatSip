@@ -17,6 +17,8 @@ class Constants {
   static const String EXTENSION_NUMBER = "extension_number";
   static const String SIP_USERNAME = "sip_username";
   static const String SIP_PASSWORD = "sip_password";
+  static const String SIP_RECORDING_DEVICE = "recordingDevice";
+  static const String SIP_PLAYOUT_DEVICE = "playoutDevice";
 
   static const String SIP_SERVER_ID = "sip_server_id";
   static const String SIP_SERVER_NAME = "sip_servername";

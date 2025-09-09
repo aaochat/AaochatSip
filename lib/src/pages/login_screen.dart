@@ -266,11 +266,11 @@ class _LoginscreenState extends State<LoginScreen> {
 
       provider.clearMyText();
 
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (_) => CallScreenWidget(),
-        ),
+          builder: (_) => CallScreenWidget()
+        ), (Route<dynamic> route) => false,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -406,6 +406,7 @@ class _LoginscreenState extends State<LoginScreen> {
     );
   }
 
+  bool _obscureText = true;
   Widget _loginForm(BuildContext context, LoginProvider mLoginProvider,
       OutlineInputBorder border, OutlineInputBorder focusBorder) {
     return Column(
@@ -425,18 +426,37 @@ class _LoginscreenState extends State<LoginScreen> {
             enabledBorder: border,
             focusedBorder: focusBorder,
           ),
+          onSubmitted: (_) => _onSubmit(mLoginProvider),
         ),
         const SizedBox(height: 16),
         TextField(
           controller: mLoginProvider.mPasswordController,
-          obscureText: true,
+          obscureText: _obscureText,
+          autocorrect: false,
+          textInputAction: TextInputAction.done,
           cursorColor: Colors.blueAccent,
           decoration: InputDecoration(
             floatingLabelStyle: const TextStyle(color: Colors.blueAccent),
             labelText: "Password",
             enabledBorder: border,
             focusedBorder: focusBorder,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            ),
           ),
+          onSubmitted: (_) => _onSubmit(mLoginProvider),
         ),
         const SizedBox(height: 24),
         Consumer<LoginProvider>(

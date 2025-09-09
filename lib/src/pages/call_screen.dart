@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:callingproject/src/pages/call_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,6 @@ import 'incomming_call_screen.dart';
 
 class CallScreenWidget extends StatefulWidget {
   const CallScreenWidget({super.key});
-
-  static const routeName = "/addCall";
 
   @override
   State<CallScreenWidget> createState() => _CallScreenWidgetState();
@@ -38,9 +37,6 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
 
   @override
   void initState() {
-    super.initState();
-    // windowManager.addListener(this);
-
     Future.microtask(() {
       final provider = Provider.of<CallProvider>(context, listen: false);
       provider.AddData(context, _account);
@@ -55,8 +51,14 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
     });
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
-      _selectedPageIndex = 0;
+      setState(() {
+        _selectedPageIndex = 0;
+      });
     });
+    super.initState();
+    // windowManager.addListener(this);
+
+
 
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   var callProvider = Provider.of<CallProvider>(context, listen: false);
@@ -276,7 +278,7 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
                     // color: Colors.grey.withOpacity(0.1),
                     padding: const EdgeInsets.all(10),
                     constraints: BoxConstraints(maxWidth: 400),
-                    child: IncommingCallScreen()),
+                    child: CallPage()),
                 Expanded(
                     child: Container(
                         decoration: BoxDecoration(
@@ -294,7 +296,7 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
     } else {
       return IndexedStack(
         index: _selectedPageIndex,
-        children: [IncommingCallScreen(), LogListScreen()],
+        children: [CallPage(), LogListScreen()],
       );
     }
   }
