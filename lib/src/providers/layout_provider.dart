@@ -228,7 +228,39 @@ class LayoutProvider extends ChangeNotifier {
       DateTime dateTime = DateTime.parse(dateString).toLocal();
 
       // Step 2: Desired output format
-      String desiredFormat = "MMM dd yyyy, hh:mm:ss a";
+      String desiredFormat = "d-M-yyyy, hh:mm a";
+      DateFormat outputFormat = DateFormat(desiredFormat);
+
+      return outputFormat.format(dateTime);
+    } catch (e) {
+      print('Error during date format conversion: $e');
+      return dateString; // fallback
+    }
+  }
+
+  String convertOnlyDateFormat(String dateString) {
+    try {
+      // Step 1: Parse ISO date string into DateTime object
+      DateTime dateTime = DateTime.parse(dateString).toLocal();
+
+      // Step 2: Desired output format
+      String desiredFormat = "dd MMM yyyy";
+      DateFormat outputFormat = DateFormat(desiredFormat);
+
+      return outputFormat.format(dateTime);
+    } catch (e) {
+      print('Error during date format conversion: $e');
+      return dateString; // fallback
+    }
+  }
+
+  String convertTimeFormat(String dateString) {
+    try {
+      // Step 1: Parse ISO date string into DateTime object
+      DateTime dateTime = DateTime.parse(dateString).toLocal();
+
+      // Step 2: Desired output format
+      String desiredFormat = "hh:mm a";
       DateFormat outputFormat = DateFormat(desiredFormat);
 
       return outputFormat.format(dateTime);
@@ -283,7 +315,7 @@ class LayoutProvider extends ChangeNotifier {
         final newItems = response.data ?? [];
         _logList.addAll(newItems);
         _page++;
-        _hasMore = newItems.length >= 1;
+        _hasMore = false;
       } else {
         _error = response.message ?? "Something went wrong";
       }

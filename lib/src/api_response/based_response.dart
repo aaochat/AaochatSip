@@ -43,14 +43,14 @@ class BasedResponse<T> {
     return {'message': message, 'status': status};
   }
 
-  // factory BasedResponse.fromMap(Map<String, dynamic> map) {
-  //   return BasedResponse<T>(message: map['message'], status: map['status']);
-  // }
+  factory BasedResponse.fromMap(Map<String, dynamic> map) {
+    return BasedResponse<T>(message: map['message'], status: map['status']);
+  }
 
-  // String toJson() => json.encode(toMap());
+  String toJsonn() => json.encode(toMap());
 
-  // factory BasedResponse.fromJsonString(String source) =>
-  //     BasedResponse.fromMap(json.decode(source));
+  factory BasedResponse.fromJsonn(String source) =>
+      BasedResponse.fromMap(json.decode(source));
 
   BasedResponse<T> copyWith({T? data, String? message, String? status}) {
     return BasedResponse<T>(

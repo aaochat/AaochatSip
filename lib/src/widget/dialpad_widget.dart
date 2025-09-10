@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:event_taxi/event_taxi.dart';
@@ -14,8 +16,6 @@ import '../models/telephone_master.dart';
 import '../pages/SettingsPage.dart';
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
-import '../utils/shared_prefs.dart';
-import 'action_button.dart';
 
 class DialpadWidget extends StatefulWidget {
   const DialpadWidget(this.popUpMode, {super.key});
@@ -131,16 +131,16 @@ class _DialpadscreenState extends State<DialpadWidget> {
           child: Column(children: [
             _buildAccountsMenu(accounts, mCallProvider),
             const SizedBox(height: 15),
-            Center(
-              child: Consumer<CallProvider>(
-                builder: (context, provider, child) {
-                  return Text(
-                    SharedPrefs().getValue(Constants.SIP_USERNAME) ?? '',
-                    style: TextStyle(fontSize: 15, color: textColor),
-                  );
-                },
-              ),
-            ),
+            // Center(
+            //   child: Consumer<CallProvider>(
+            //     builder: (context, provider, child) {
+            //       return Text(
+            //         SharedPrefs().getValue(Constants.SIP_USERNAME) ?? '',
+            //         style: TextStyle(fontSize: 15, color: textColor),
+            //       );
+            //     },
+            //   ),
+            // ),
             const SizedBox(height: 20),
             _buildPhoneNumberField(mCallProvider),
           ])),
@@ -150,7 +150,12 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
   Widget _buildKeypad(CallProvider mCallProvider, AccountsModel accounts) {
     const double spacing = 8;
-    const double buttonSize = 72;
+    double buttonSize = 72;
+    if (Platform.isAndroid || Platform.isIOS)
+      buttonSize = 92;
+    else
+      buttonSize = 72;
+
     const TextStyle numberStyle =
     TextStyle(fontSize: 25, fontWeight: FontWeight.w400, color: Colors.white);
     const TextStyle letterStyle = TextStyle(fontSize: 8, color: Colors.grey);
@@ -158,7 +163,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
     Widget buildKeypadButton(String number, String letters, VoidCallback onPressed) {
       return OutlinedButton(
         style: OutlinedButton.styleFrom(
-          fixedSize: const Size(buttonSize, buttonSize),
+          fixedSize: Size(buttonSize, buttonSize),
           shape: const CircleBorder(),
           side: BorderSide.none,
           backgroundColor: Colors.grey.withOpacity(0.1),
@@ -174,6 +179,32 @@ class _DialpadscreenState extends State<DialpadWidget> {
                 style: letterStyle,
                 maxLines: 1,
               ),
+          ],
+        ),
+      );
+    }
+
+    double mCallbuttonSize = 62;
+    if (Platform.isAndroid || Platform.isIOS)
+      mCallbuttonSize = 82;
+    else
+      mCallbuttonSize = 62;
+
+    Widget buildCallButton(String number, VoidCallback onPressed) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          fixedSize: Size(mCallbuttonSize, mCallbuttonSize),
+          shape: const CircleBorder(),
+          side: BorderSide.none,
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: onPressed,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(size: 30.0, Icons.dialer_sip, color: Colors.white)
           ],
         ),
       );
@@ -210,23 +241,37 @@ class _DialpadscreenState extends State<DialpadWidget> {
               buildKeypadButton('#', '', () => mCallProvider.phoneNumbCtrl.text += '#'),
             ]),
             const SizedBox(height: spacing * 2),
-            ActionButton(
-              icon: Icons.dialer_sip,
-              fillColor: Colors.green,
-              onPressed: () {
-                mCallProvider.mInvite(context, false, accounts);
-                if (mCallProvider.errorText == null || mCallProvider.errorText == "") {
-                  mCallProvider.clearText();
-                  if (widget.popUpMode) {
-                    Navigator.of(context).pop();
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(mCallProvider.errorText!)),
-                  );
+
+            buildCallButton('Call', () {
+              mCallProvider.mInvite(context, false, accounts);
+              if (mCallProvider.errorText == null || mCallProvider.errorText == "") {
+                mCallProvider.clearText();
+                if (widget.popUpMode) {
+                  Navigator.of(context).pop();
                 }
-              },
-            ),
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(mCallProvider.errorText!)),
+                );
+              }
+            }),
+            // ActionButton(
+            //   icon: Icons.dialer_sip,
+            //   fillColor: Colors.green,
+            //   onPressed: () {
+            //     mCallProvider.mInvite(context, false, accounts);
+            //     if (mCallProvider.errorText == null || mCallProvider.errorText == "") {
+            //       mCallProvider.clearText();
+            //       if (widget.popUpMode) {
+            //         Navigator.of(context).pop();
+            //       }
+            //     } else {
+            //       ScaffoldMessenger.of(context).showSnackBar(
+            //         SnackBar(content: Text(mCallProvider.errorText!)),
+            //       );
+            //     }
+            //   },
+            // ),
             // IconButton.filledTonal(
             //   onPressed: () => mCallProvider.phoneNumbCtrl.text = '',
             //   icon: const Icon(Icons.cancel),
@@ -561,6 +606,17 @@ class _DialpadscreenState extends State<DialpadWidget> {
     var response = await mCallProvider.LogoutApiCalling(context);
     if (response) {
       mCallProvider.clearText();
+
+      try {
+        for (int i = 0; i < context
+            .read<AppAccountsModel>()
+            .length; i++) {
+          await context.read<AppAccountsModel>().deleteAccount(i);
+        }
+      } catch (e) {
+        print(e);
+      }
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

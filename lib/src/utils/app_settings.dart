@@ -1,5 +1,6 @@
 class AppSettings {
-  static const String BASED_URL = "https://beta-aaochat-sip-api.aaochat.com/";
+  // static const String BASED_URL = "https://beta-aaochat-sip-api.aaochat.com/";
+  static const String BASED_URL = "https://voip-api.aaochat.com/";
 
   /*Api EndPoints*/
   static const String API_DOMAIN = "/master/auth/domain";

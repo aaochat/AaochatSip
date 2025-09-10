@@ -268,11 +268,13 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           IconButton.filledTonal(
+            tooltip: "Add call",
             iconSize: eIconSize,
             onPressed: _showAddCallPage,
             icon: const Icon(Icons.add),
           ),
           IconButton.filledTonal(
+            tooltip: "Hold/Unhold call",
             iconSize: eIconSize,
             onPressed: (widget.myCall.state == CallState.holding) ? null : _holdCall,
             icon: Icon(widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause),
@@ -388,11 +390,11 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   _handleRecord() async {
-    if (!_isRecording) {
-      widget.myCall.recordFile('${widget.myCall.myCallId}.wav');
-    } else {
-      widget.myCall.stopRecordFile();
-    }
+    // if (!_isRecording) {
+    //   widget.myCall.recordFile('${widget.myCall.myCallId}.wav');
+    // } else {
+    //   widget.myCall.stopRecordFile();
+    // }
 
     // widget.myCall.getSipHeader(headerName)
     // if (widget.myCall.isRecStarted) {

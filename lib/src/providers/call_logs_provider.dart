@@ -7,6 +7,8 @@ import 'package:siprix_voip_sdk/calls_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
 
 import '../../main.dart';
+import '../Repository/api_calling_repository.dart';
+import '../api_response/based_response.dart';
 import '../event/PlaceCallEvent.dart';
 import '../models/appacount_model.dart';
 import '../models/call_model.dart';
@@ -30,7 +32,7 @@ class CallProvider extends ChangeNotifier {
   String? get mExtentionNumber => _ExtentionNumber;
 
   Future<void> AddData(BuildContext context, AccountModel _account) async {
-    final args = ModalRoute.of(context)?.settings.arguments;
+    // final args = ModalRoute.of(context)?.settings.arguments;
 
     if (_account == null) {
       _errText = "No account data passed to this screen.";
@@ -52,8 +54,8 @@ class CallProvider extends ChangeNotifier {
     _account.rewriteContactIp = true;
     _account.ringTonePath = MyApp.getRingtonePath();
 
-    for (int i = 0; i < context.read<AccountsModel>().length; i++) {
-      await context.read<AccountsModel>().deleteAccount(i);
+    for (int i = 0; i < context.read<AppAccountsModel>().length; i++) {
+      await context.read<AppAccountsModel>().deleteAccount(i);
     }
 
 
@@ -106,5 +108,54 @@ class CallProvider extends ChangeNotifier {
 
   placeCall(String phoneNumber) {
     eventBus.fire(PlaceCallEvent(phoneNumber, placeCall: false));
+  }
+
+  bool _loading = false;
+  late String _error;
+
+  String get error => _error;
+
+  bool get isLoading => _loading;
+
+  Future<bool> LogoutApiCalling(BuildContext context) async {
+    _loading = true;
+    _error = "";
+    notifyListeners();
+    try {
+      BasedResponse<String> response = await ApiCallingRepo.GetLogOutRequest(context);
+      if (response.status == "success") {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      _loading = false;
+      _error = e.toString();
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> DeleteAccountApiCalling(BuildContext context) async {
+    _loading = true;
+    _error = "";
+    notifyListeners();
+    try {
+      BasedResponse<String> response = await ApiCallingRepo.GetDeleteAccountRequest(context);
+      if (response.status == "success") {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      _loading = false;
+      _error = e.toString();
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
   }
 }

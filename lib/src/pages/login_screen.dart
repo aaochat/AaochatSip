@@ -474,8 +474,14 @@ class _LoginscreenState extends State<LoginScreen> {
                   ),
                 ),
                 child: provider.isLoading
-                    ? const CircularProgressIndicator(
-                    color: Colors.white, strokeWidth: 2)
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
                     : const Text("Login"),
               ),
             );

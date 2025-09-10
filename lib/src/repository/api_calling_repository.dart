@@ -11,6 +11,68 @@ import '../utils/secure_storage.dart';
 
 class ApiCallingRepo {
 
+  static Future<BasedResponse<String>> GetDeleteAccountRequest(BuildContext context) async {
+    String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
+
+    final response = await ApiClient.instance.request(context,
+        '/tenant/$IDS/users/delete', DioMethod.get
+    );
+
+    if (response.statusCode == 200) {
+      BasedResponse<String> apiResponse = BasedResponse<String>.fromJsonString(
+        response.data,
+            (data) => data.toString(),
+      );
+      if (apiResponse.status == "success") {
+        await SecureStorage().clear();
+        await SharedPrefs().clear();
+
+        return apiResponse;
+      } else {
+        return BasedResponse<String>(
+          status: 'error',
+          message: apiResponse.message,
+        );
+      }
+    } else {
+      return BasedResponse<String>(
+        status: 'error',
+        message: 'Something went wrong',
+      );
+    }
+  }
+
+  static Future<BasedResponse<String>> GetLogOutRequest(BuildContext context) async {
+    String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
+
+    final response = await ApiClient.instance.request(context,
+        '/tenant/$IDS/auth/logout', DioMethod.post
+    );
+
+    if (response.statusCode == 200) {
+      BasedResponse<String> apiResponse = BasedResponse<String>.fromJsonString(
+        response.data,
+            (data) => data.toString(),
+      );
+
+      if (apiResponse.status == "success") {
+        await SecureStorage().clear();
+        await SharedPrefs().clear();
+        return apiResponse;
+      } else {
+        return BasedResponse<String>(
+          status: "error",
+          message: apiResponse.message,
+        );
+      }
+    } else {
+      return BasedResponse<String>(
+        status: 'error',
+        message: 'Something went wrong',
+      );
+    }
+  }
+
   static Future<BasedResponse<List<CallLogResponse>>> GetLogListRequest(BuildContext context,
       data) async {
     String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
@@ -29,14 +91,25 @@ class ApiCallingRepo {
 
       final logs = list.map((e) => CallLogResponse.fromJson(e)).toList();
 
-      return BasedResponse<List<CallLogResponse>>(
-        status: "success",
-        data: logs,
-      );
+      BasedResponse<List<CallLogResponse>> apiResponse =
+      BasedResponse<List<CallLogResponse>>.fromMap(data);
+
+      if (apiResponse.status == 'success') {
+        apiResponse.data = (response.data['data'] as List)
+            .map((item) => CallLogResponse.fromJson(item))
+            .toList();
+
+        return apiResponse;
+      } else {
+        return BasedResponse<List<CallLogResponse>>(
+          status: "error",
+          message: apiResponse.message,
+        );
+      }
     } else {
       return BasedResponse<List<CallLogResponse>>(
         status: 'error',
-        message: response.statusMessage,
+        message: 'Something went wrong',
       );
     }
   }
@@ -156,7 +229,7 @@ class ApiCallingRepo {
       print('API call failed: ${response.statusMessage}');
       return BasedResponse<LoginResponse>(
         status: 'error',
-        message: response.statusMessage,
+        message: 'Something went wrong',
       );
     }
   }
@@ -200,7 +273,7 @@ class ApiCallingRepo {
       print('API call failed: ${response.statusMessage}');
       return BasedResponse<String>(
         status: 'error',
-        message: response.statusMessage,
+        message: 'Something went wrong',
       );
     }
   }

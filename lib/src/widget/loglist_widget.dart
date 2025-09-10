@@ -235,7 +235,7 @@ class _LogScreenState extends State<LogListScreen> {
               return Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    bool isMobile = constraints.maxWidth < 600; // 📱 breakpoint
+                    bool isMobile = constraints.maxWidth < 600; // breakpoint
 
                     return Container(
                       height: isMobile ? null : 500,
@@ -527,14 +527,15 @@ class _LogScreenState extends State<LogListScreen> {
           ),
           child: IntrinsicHeight(
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                _getCdrIconsAndCall(cdrs),
+                // _getCdrIconsAndCall(cdrs),
 
-                SizedBox(width: 10),
-                Container(
-                  // width: 90,
-                  child: InkWell(
+                // SizedBox(width: 10),
+                Expanded(
+                    flex: 2,
+                    child: InkWell(
                     onTap: () {
                       if (cdrs.src == mExtentionNumber) {
                         mCallProvider.phoneNumbCtrl.text =
@@ -550,13 +551,12 @@ class _LogScreenState extends State<LogListScreen> {
                       cdrs.src == mExtentionNumber
                           ? cdrs.dst
                           : "${cdrs.cnam}\n(${cdrs.src})",
-                      style: TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 14),
                     ),
-                  ),
-                ),
-                SizedBox(width: 20),
-                Container(
-                  // width: 110,
+                    )),
+                SizedBox(width: 10),
+                Expanded(
+                  flex: 2,
                   child: Text(
                     provider.getFormattedCallStatusName(cdrs),
                     style: TextStyle(
@@ -566,17 +566,19 @@ class _LogScreenState extends State<LogListScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 15),
+                SizedBox(width: 10),
                 Expanded(
                     flex: 3,
                     child: Column(
-                      spacing: 2,
+                      spacing: 1,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           provider.convertDateFormat(cdrs.calldate),
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                          maxLines: 2,
                           style: TextStyle(
+                            fontSize: 12,
                             color:
                             Theme
                                 .of(context)
@@ -587,8 +589,23 @@ class _LogScreenState extends State<LogListScreen> {
                           ),
                         ),
 
+                        // Text(
+                        //   provider.convertTimeFormat(cdrs.calldate),
+                        //   overflow: TextOverflow.ellipsis,
+                        //   maxLines: 1,
+                        //   style: TextStyle(
+                        //     color:
+                        //     Theme
+                        //         .of(context)
+                        //         .brightness ==
+                        //         Brightness.dark
+                        //         ? Colors.white.withOpacity(1)
+                        //         : Colors.black.withOpacity(0.7),
+                        //   ),
+                        // ),
+
                         Visibility(
-                          visible: cdrs.disposition == "ANSWERED" ? true : false,
+                          visible: cdrs.disposition == "ANSWERED" ? false : false,
                           child: Text(
                             "Duration: ${formatDuration(cdrs.duration)}",
                             style: TextStyle(
@@ -602,71 +619,16 @@ class _LogScreenState extends State<LogListScreen> {
                             ),
                           ),
                         ),
-
-                        // if (cdrs.statusCode != 0)
-                        //   Text(
-                        //     "Status code: ${cdrs.statusCode}",
-                        //     style: TextStyle(
-                        //       color:
-                        //       Theme
-                        //           .of(context)
-                        //           .brightness ==
-                        //           Brightness.dark
-                        //           ? Colors.white.withOpacity(0.7)
-                        //           : Colors.black.withOpacity(0.7),
-                        //     ),
-                        //   ),
-
-                        // if (cdrs.hasVideo!)
-                        //   const Icon(
-                        //     Icons.videocam_outlined,
-                        //     color: Colors.grey,
-                        //     size: 18,
-                        //   ),
                       ],
                     )),
-
-                /*Todo:Additional Functionality:-For added Caller name and Extension Number After Date*/
-                // SizedBox(width: 15),
-                // if (cdrs.src == mExtentionNumber)
-                //   InkWell(
-                //     onTap: () {
-                //       eventBus.fire(PlaceCallEvent(cdrs.dst));
-                //     },
-                //     child: Text(
-                //       provider.getCallDestinationName(cdrs),
-                //       style: TextStyle(
-                //         fontSize: 14,
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                //     ),
-                //   )
-                // else
-                //   InkWell(
-                //     onTap: () {
-                //       eventBus.fire(
-                //         PlaceCallEvent(
-                //           cdrs.src == mExtentionNumber
-                //               ? cdrs.dst
-                //               : cdrs.src,
-                //         ),
-                //       );
-                //     },
-                //     child: Text(
-                //       '${cdrs.src} - ${cdrs.cnam}',
-                //       style: TextStyle(
-                //         fontSize: 14,
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                //     ),
-                //   ),
-                // Spacer(),
-                /*End Era*/
 
                 // call button
                 SizedBox(width: 10),
                 if (cdrs.recordingfile != '')
-                  IconButton(
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(
+                        padding: EdgeInsets.zero,
                     tooltip: 'Recording',
                     onPressed: () {
                       if (player.state == PlayerState.playing) {
@@ -689,53 +651,13 @@ class _LogScreenState extends State<LogListScreen> {
                               cdrs.getRecordingFile()
                           ? Icons.stop
                           : Icons.play_arrow,
-                    ),
+                    )),
                   )
-
-                /*TODO: Delete Record*/
-                // SizedBox(width: 10),
-                // _getCdrRowTrailing(cdrs, index, provider),
-
-                // create ticket button
-                // if (callLogs[index].supportTicketMaster ==
-                //     null)
-                //   ElevatedButton(
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: Colors.grey.shade900,
-                //       foregroundColor:
-                //       Colors.white.withOpacity(0.5),
-                //     ),
-                //     onPressed: () {
-                //       Get.find<LayoutController>()
-                //           .goToCreateSupportTicket(
-                //           callLogs[index].uniqueid);
-                //     },
-                //     child: Text('Create Ticket'),
-                //   ),
-                // if (callLogs[index].supportTicketMaster !=
-                //     null)
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.green,
-                //     foregroundColor: Colors.black,
-                //   ),
-                //   onPressed: () {
-                //     Get.dialog(
-                //       SupportTicketDetailModal(
-                //         supportTicketMaster: callLogs[index]
-                //             .supportTicketMaster!,
-                //       ),
-                //     );
-                //   },
-                //   child: Text(
-                //       '#${callLogs[index].supportTicketMaster?.ticket_id}'),
-                // ),
-              ]
-              ,
-            )
-            ,
-          )
-          ,
+                else
+                  Expanded(flex: 1, child: SizedBox())
+              ],
+            ),
+          ),
         );
       },
     );

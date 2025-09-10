@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:callingproject/src/pages/call_page.dart';
@@ -12,7 +11,6 @@ import 'package:siprix_voip_sdk/network_model.dart';
 import '../event/PlaceCallEvent.dart';
 import '../providers/call_logs_provider.dart';
 import '../widget/loglist_widget.dart';
-import 'incomming_call_screen.dart';
 
 class CallScreenWidget extends StatefulWidget {
   const CallScreenWidget({super.key});
@@ -26,6 +24,7 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
   double _windowWidth = 1150;
   var _selectedPageIndex = 0;
   EventTaxi eventBus = EventTaxiImpl.singleton();
+  CallProvider _callProvider = CallProvider();
 
   @override
   void didChangeDependencies() {
@@ -33,18 +32,35 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
     _account =
         (ModalRoute.of(context)?.settings.arguments as AccountModel?) ??
         AccountModel();
+
+    _callProvider = Provider.of<CallProvider>(context, listen: false);
   }
 
   @override
   void initState() {
-    Future.microtask(() {
-      final provider = Provider.of<CallProvider>(context, listen: false);
-      provider.AddData(context, _account);
+    // Future.microtask(() {
+    //   final provider = Provider.of<CallProvider>(context, listen: false);
+    //   provider.AddData(context, _account);
+    //   try {
+    //     if (provider.errorText != null)
+    //       ScaffoldMessenger.of(
+    //         context,
+    //       ).showSnackBar(SnackBar(content: Text(provider.errorText!)));
+    //   } on Exception catch (e) {
+    //     print(e.toString());
+    //   }
+    // });
+
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _callProvider.AddData(context, _account);
       try {
-        if (provider.errorText != null)
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(provider.errorText!)));
+        if (_callProvider.errorText != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_callProvider.errorText!)),
+          );
+        }
       } on Exception catch (e) {
         print(e.toString());
       }
@@ -57,23 +73,6 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
     });
     super.initState();
     // windowManager.addListener(this);
-
-
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   var callProvider = Provider.of<CallProvider>(context, listen: false);
-    //   callProvider.AddData(context, _account);
-    //
-    //   try {
-    //     if (callProvider.errorText != null) {
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         SnackBar(content: Text(callProvider.errorText!)),
-    //       );
-    //     }
-    //   } on Exception catch (e) {
-    //     print(e.toString());
-    //   }
-    // });
   }
 
   /*TODO This is Working Build Method*/

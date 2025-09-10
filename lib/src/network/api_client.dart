@@ -5,7 +5,9 @@ import 'package:callingproject/src/utils/constants.dart';
 import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../models/appacount_model.dart';
 import '../utils/shared_prefs.dart';
 
 enum DioMethod { post, get, put, delete }
@@ -89,6 +91,14 @@ class AuthInterceptor extends Interceptor {
     if (err.response?.statusCode == 401) {
       await SecureStorage().clear();
       SharedPrefs().clear();
+
+      try {
+        for (int i = 0; i < context.read<AppAccountsModel>().length; i++) {
+          await context.read<AppAccountsModel>().deleteAccount(i);
+        }
+      } catch (e) {
+        print(e);
+      }
 
       /// Example: clear navigation and go to login
       Navigator.of(context).pushNamedAndRemoveUntil('/domain', (route) => false);
