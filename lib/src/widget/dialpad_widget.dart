@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
+import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -11,9 +12,8 @@ import 'package:siprix_voip_sdk/accounts_model.dart';
 
 import '../Databased/calllog_history.dart';
 import '../event/PlaceCallEvent.dart';
-import '../models/appacount_model.dart';
 import '../models/telephone_master.dart';
-import '../pages/SettingsPage.dart';
+import '../pages/settings_page.dart';
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
 
@@ -427,19 +427,19 @@ class _DialpadscreenState extends State<DialpadWidget> {
             child: TextField(
               focusNode: focusNode,
               controller: controller,
-              cursorColor: Colors.blueAccent,
+              cursorColor: Colors.deepOrangeAccent,
               // textAlign: TextAlign.st,
               // style: TextStyle(fontSize: 18, color: textFieldColor),
               decoration: InputDecoration(
                 labelText: "Enter /Search phone number",
                 labelStyle: const TextStyle(color: Colors.white70),
-                floatingLabelStyle: const TextStyle(color: Colors.blueAccent),
+                floatingLabelStyle: const TextStyle(color: Colors.deepOrangeAccent),
                 filled: false,
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey), // default line
                 ),
                 focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+                  borderSide: BorderSide(color: Colors.deepOrangeAccent, width: 2),
                 ),
 
                 suffixIcon: Padding(
@@ -603,19 +603,8 @@ class _DialpadscreenState extends State<DialpadWidget> {
   }
 
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
-    var response = await mCallProvider.LogoutApiCalling(context);
-    if (response) {
-      mCallProvider.clearText();
-
-      try {
-        for (int i = 0; i < context
-            .read<AccountsModel>()
-            .length; i++) {
-          await context.read<AccountsModel>().deleteAccount(i);
-        }
-      } catch (e) {
-        print(e);
-      }
+   await mCallProvider.logout();
+      await ExtensionUtil.deleteAllAccounts(context);
 
       Navigator.pushAndRemoveUntil(
         context,
@@ -625,5 +614,5 @@ class _DialpadscreenState extends State<DialpadWidget> {
         ModalRoute.withName("/Login"),
       );
     }
-  }
+  
 }

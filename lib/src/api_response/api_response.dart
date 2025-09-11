@@ -1,28 +1,28 @@
 import 'dart:convert';
 
-class BasedResponse<T> {
+class ApiResponse<T> {
   T? data;
   String? message;
   String status;
 
-  BasedResponse({this.data, this.message, required this.status});
+  ApiResponse({this.data, this.message, required this.status});
 
-  factory BasedResponse.fromJson(
+  factory ApiResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromDataJson,
   ) {
-    return BasedResponse<T>(
+    return ApiResponse<T>(
       status: json['status'] ?? '',
       message: json['message'] ?? '',
       data: fromDataJson(json['data'] ?? {}),
     );
   }
 
-  factory BasedResponse.fromJsonString(
+  factory ApiResponse.fromJsonString(
       Map<String, dynamic> json,
       T Function(dynamic json) fromJsonT,
       ) {
-    return BasedResponse<T>(
+    return ApiResponse<T>(
       status: json['status'] ?? '',
       message: json['message'] ?? '',
       data: fromJsonT(json['data']),
@@ -43,17 +43,17 @@ class BasedResponse<T> {
     return {'message': message, 'status': status};
   }
 
-  factory BasedResponse.fromMap(Map<String, dynamic> map) {
-    return BasedResponse<T>(message: map['message'], status: map['status']);
+  factory ApiResponse.fromMap(Map<String, dynamic> map) {
+    return ApiResponse<T>(message: map['message'], status: map['status']);
   }
 
   String toJsonn() => json.encode(toMap());
 
-  factory BasedResponse.fromJsonn(String source) =>
-      BasedResponse.fromMap(json.decode(source));
+  factory ApiResponse.fromJsonn(String source) =>
+      ApiResponse.fromMap(json.decode(source));
 
-  BasedResponse<T> copyWith({T? data, String? message, String? status}) {
-    return BasedResponse<T>(
+  ApiResponse<T> copyWith({T? data, String? message, String? status}) {
+    return ApiResponse<T>(
       data: data ?? this.data,
       message: message ?? this.message,
       status: status ?? this.status,
@@ -69,7 +69,7 @@ class BasedResponse<T> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is BasedResponse<T> &&
+    return other is ApiResponse<T> &&
         other.data == data &&
         other.message == message &&
         other.status == status;

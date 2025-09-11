@@ -1,3 +1,7 @@
+import 'package:callingproject/main.dart';
+import 'package:siprix_voip_sdk/accounts_model.dart';
+import 'package:siprix_voip_sdk/network_model.dart';
+
 class Extension {
   String id;
   String userId;
@@ -30,6 +34,18 @@ class Extension {
       updatedAt: DateTime.parse(json['updatedAt']),
       sipServer: json["sip_server"] != null ? SipServer.fromJson(json["sip_server"]) : null,
     );
+  }
+
+  AccountModel toAccountModel() {
+    AccountModel account = AccountModel();
+    account.sipServer = sipServer!.host!;
+    account.sipExtension = extensionNumber;
+    account.sipPassword = sipPassword;
+    account.expireTime = 350;
+    account.port = sipServer!.port!;
+    account.transport = sipServer!.protocol == "UDP" ? SipTransport.udp : SipTransport.tcp;
+    account.ringTonePath = MyApp.getRingtonePath();
+    return account;
   }
 
   Map<String, dynamic> toJson() {

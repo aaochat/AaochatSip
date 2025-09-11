@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:callingproject/src/pages/call_screen.dart';
+import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/secure_storage.dart';
+import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,14 +22,14 @@ class _SplashscreenState extends State<Splashscreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () async {
-      String? value = await SecureStorage().read(Constants.IS_LOGGEDIN);
-      bool boolvalue = value == 'true';
+      bool? isLoggedIn = await SharedPrefs().getValue(Constants.IS_LOGGEDIN);
+ 
       var mProvider = context.read<CallProvider>();
-      if (boolvalue) {
+      if (isLoggedIn==true) {
         // mProvider.deleteAccount(context);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CallScreenWidget()),
+          MaterialPageRoute(builder: (context) => MainPage()),
         );
       } else {
         Navigator.pushReplacement(

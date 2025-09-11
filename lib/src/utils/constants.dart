@@ -3,7 +3,6 @@ class Constants {
   static const String TOKEN = "token";
   static const String USER_DOMAIN_ID = "user_domain_id";
   static const String IS_LOGGEDIN = "isLoggedIn";
-  static const String USERNAME = "username";
   static const String EMAILID = "emailId";
   static const String PHONE = "phone";
   static const String ROLE = "role";
@@ -11,6 +10,8 @@ class Constants {
   static const String CRDS = "cdrs";
   static const String ACCOUNTS = "accounts";
 
+  static const String USER = "user";
+  static const String EXTENSIONS = "extensions";
   /*Sip Preference*/
   static const String ID = "id";
   static const String USERID = "userid";

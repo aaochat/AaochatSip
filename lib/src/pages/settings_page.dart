@@ -29,8 +29,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final devices = context.watch<DevicesModel>();
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.grey.shade900,
+        surfaceTintColor: Colors.grey.shade900,
         title: const Text('Settings'),
-        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.4),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

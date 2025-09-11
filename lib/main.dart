@@ -4,9 +4,8 @@ import 'package:callingproject/src/Databased/calllog_history.dart';
 import 'package:callingproject/src/Providers/domain_provider.dart';
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/Providers/theme_provider.dart';
-import 'package:callingproject/src/models/appacount_model.dart';
 import 'package:callingproject/src/models/call_model.dart';
-import 'package:callingproject/src/pages/call_screen.dart';
+import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/pages/login_screen.dart';
 import 'package:callingproject/src/providers/call_logs_provider.dart';
@@ -133,7 +132,7 @@ class _MyAppState extends State<MyApp> {
     '/': ([ Object? arguments]) => Splashscreen(),
     '/domain': ([Object? arguments]) => Domainscreen(),
     '/login': ([Object? arguments]) => LoginScreen(),
-    '/callscreen': ([Object? arguments]) => CallScreenWidget(),
+    '/callscreen': ([Object? arguments]) => MainPage(),
     DialpadWidget.routeName: ([Object? arguments]) =>
     const DialpadWidget(true),
   };

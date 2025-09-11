@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:callingproject/src/Databased/calllog_history.dart';
+import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/models/call_model.dart';
+import 'package:callingproject/src/repository/sip_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
@@ -172,6 +174,11 @@ class LayoutProvider extends ChangeNotifier {
     eventBus.fire(RefreshCallLogEvent(isUpdate: mIsUpdate));
   }
 
+  goToVoiceMails() {
+    sideScreen = 'voice-mails';
+    notifyListeners();
+  }
+
   goToDialPad() {
     _currentScreen = 'dialpad';
     notifyListeners();
@@ -290,7 +297,7 @@ class LayoutProvider extends ChangeNotifier {
 
   List<CallLogResponse> get logList => _logList;
 
-  Future<void> ApiCalling(BuildContext context, {bool isFirstTime = false}) async {
+  Future<void> ApiCalling(String mExtensionId, {bool isFirstTime = false}) async {
     if (_loading) {
       return;
     }
@@ -308,9 +315,10 @@ class LayoutProvider extends ChangeNotifier {
 
     _loading = true;
     _error = "";
+    
 
     try {
-      var response = await ApiCallingRepo.GetLogListRequest(context, {
+      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(mExtensionId, {
         'page': _page,
         'limit': _pageSize,
       });
@@ -323,19 +331,6 @@ class LayoutProvider extends ChangeNotifier {
       } else {
         _error = response.message ?? "Something went wrong";
       }
-    } on DioException catch (dioError) {
-      // Handle Dio-specific errors
-      if (dioError.response!.statusCode == 400) {
-        _error = dioError.response?.data["message"];
-      } else if (dioError.type == DioExceptionType.receiveTimeout) {
-        _error = "Receive timeout. Try again later.";
-      } else if (dioError.type == DioExceptionType.badResponse) {
-        _error = "Bad response: ${dioError.response?.statusCode}";
-      } else if (dioError.type == DioExceptionType.connectionError) {
-        _error = "Connection error. Please try again.";
-      } else {
-        _error = "Unexpected error occurred: ${dioError.message}";
-      }
     } catch (e) {
       // Handle any other unexpected errors
       _error = "An unexpected error occurred: $e";
@@ -346,17 +341,17 @@ class LayoutProvider extends ChangeNotifier {
   }
 
   /// optional: pull-to-refresh
-  Future<void> refreshLogs(BuildContext context) async {
+  Future<void> refreshLogs(String mExtensionId) async {
     _page = 1;
     _logList.clear();
     _hasMore = true;
-    await ApiCalling(context);
+    await ApiCalling(mExtensionId);
   }
 
   /*Pagination Api calling */
-  Future<String> refreshApiCalling(BuildContext context) async {
+  Future<String> refreshApiCalling(String mExtensionId) async {
     try {
-      final response = await ApiCallingRepo.GetLogListRequest(context, {
+      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(mExtensionId, {
         'page': 1,
         'limit': _pageSize,
       });

@@ -1,3 +1,6 @@
+import 'package:callingproject/src/utils/constants.dart';
+import 'package:callingproject/src/utils/shared_prefs.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -32,7 +35,6 @@ class CallLogResponse {
   final String peeraccount;
   final int sequence;
 
-
   CallLogResponse({
     required this.calldate,
     required this.clid,
@@ -61,7 +63,6 @@ class CallLogResponse {
     required this.peeraccount,
     required this.sequence,
   });
-
 
   factory CallLogResponse.fromJson(Map<String, dynamic> json) {
     return CallLogResponse(
@@ -127,9 +128,51 @@ class CallLogResponse {
 
   String getRecordingFile() {
     DateTime date = DateFormat('MM/dd/yyyy HH:mm:ss a').parse(calldate);
-    String url = AppSettings.baseUrlSip +
+    String url =
+        AppSettings.baseUrlSip +
         "/recording/${date.year}/${date.month.toString().padLeft(2, '0')}/${date.toUtc().day.toString().padLeft(2, '0')}/${recordingfile}";
     return url;
   }
 
+  String getFormattedCallDate() {
+    DateTime utcDateTime = DateTime.parse(calldate).toUtc();
+    DateTime dateTime = DateTime.parse(calldate).toLocal();
+
+    // Step 2: Desired output format
+    String desiredFormat = "d MMM yyyy, hh:mm a";
+    DateFormat outputFormat = DateFormat(desiredFormat);
+
+    return outputFormat.format(utcDateTime);
+  }
+
+  Icon getFormattedCallIcon(String extensionNumber) {
+    if (src == extensionNumber || channel.contains(extensionNumber)) {
+      return disposition == 'ANSWERED'
+          ? const Icon(Icons.call_received_rounded, color: Colors.green)
+          : const Icon(Icons.call_missed_outgoing_rounded, color: Colors.red);
+    } else {
+      return disposition == 'ANSWERED'
+          ? const Icon(Icons.call_made_rounded, color: Colors.green)
+          : const Icon(
+        Icons.call_missed_rounded,
+        color: Colors.red,
+      );
+    }
+  }
+
+  String getFormattedDuration() {
+   final durationObject = Duration(seconds: duration);
+
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    final hours = durationObject.inHours;
+    final minutes = twoDigits(durationObject.inMinutes.remainder(60));
+    final seconds = twoDigits(durationObject.inSeconds.remainder(60));
+
+    if (hours > 0) {
+      return "$hours:$minutes:$seconds"; // hh:mm:ss
+    } else {
+      return "$minutes:$seconds"; // mm:ss
+    }
+  }
 }

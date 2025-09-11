@@ -78,19 +78,19 @@ class _CallPageState extends State<CallPage> {
     return ListTile(
       selected: isSwitched,
       selectedColor: Colors.black,
-      selectedTileColor: Theme.of(context).secondaryHeaderColor,
-      leading: Icon(call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded),
+      selectedTileColor: Colors.grey.shade300,
+      leading: Icon(call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded, color: isSwitched ? Colors.black : Colors.white54),
       title: Text(
         call.nameAndExt,
-        style: TextStyle(fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal)),
+        style: TextStyle(fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal), color:isSwitched ? Colors.black: Colors.white54),
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(call.state.name),
+      subtitle: Text(call.state.name, style: TextStyle(color: isSwitched ? Colors.black : Colors.white54)),
       trailing:
           isSwitched
               ? null
               : IconButton(
-                icon: const Icon(Icons.swap_calls_rounded),
+                icon: const Icon(Icons.swap_calls_rounded, color: Colors.white54),
                 onPressed: () {
                   calls.switchToCall(call.myCallId);
                 },
@@ -120,8 +120,6 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   EventTaxi eventBus = EventTaxiImpl.singleton();
 
   bool _sendDtmfMode = false;
-
-  bool shouldShowSupportTicket = false;
 
   @override
   void initState() {
@@ -222,29 +220,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
     children.add(
       Wrap(
-        spacing: 25,
-        runSpacing: 15,
+        spacing: 10,
+        runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          IconButton.filledTonal(
-            iconSize: eIconSize,
-            onPressed: _muteMic,
-            icon:
-                widget.myCall.isMicMuted
-                    ? const Icon(Icons.mic_off_rounded)
-                    : const Icon(Icons.mic_rounded),
-          ),
-          IconButton.filledTonal(
-            iconSize: eIconSize,
-            onPressed: isCallConnected ? _toggleSendDtmfMode : null,
-            icon: const Icon(Icons.dialpad_rounded),
-          ),
+          buildIconButton(Icons.mic_off_rounded, _muteMic),
+          buildIconButton(Icons.dialpad_rounded, isCallConnected ? _toggleSendDtmfMode : null),
+          
           MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
-              return IconButton.filledTonal(
-                icon: const Icon(Icons.volume_up),
-                iconSize: eIconSize,
-                onPressed: () {
+              return buildIconButton(Icons.volume_up, () {
                   if (controller.isOpen) {
                     controller.close();
                   } else {
@@ -263,32 +248,15 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
     children.add(
       Wrap(
-        spacing: 25,
-        runSpacing: 15,
+        spacing: 10,
+        runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          IconButton.filledTonal(
-            tooltip: "Add call",
-            iconSize: eIconSize,
-            onPressed: _showAddCallPage,
-            icon: const Icon(Icons.add),
-          ),
-          IconButton.filledTonal(
-            tooltip: "Hold/Unhold call",
-            iconSize: eIconSize,
-            onPressed: (widget.myCall.state == CallState.holding) ? null : _holdCall,
-            icon: Icon(widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause),
-          ),
-          IconButton.filledTonal(
-            tooltip: "Record call",
-            color: _isRecording ? Colors.green : null,
-            iconSize: eIconSize,
-            onPressed: isCallConnected ? _handleRecord : null,
-            icon:
-                _isRecording
-                    ? const Icon(Icons.fiber_manual_record)
-                    : const Icon(Icons.fiber_manual_record_outlined),
-          ),
+          buildIconButton(Icons.add, _showAddCallPage),
+          buildIconButton(widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause, (widget.myCall.state == CallState.holding) ? null : _holdCall),
+           
+          buildIconButton(Icons.fiber_manual_record_outlined, isCallConnected ? _handleRecord : null),
+        
         ],
       ),
     );
@@ -296,35 +264,34 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     children.add(const SizedBox(height: 10));
     children.add(
       Wrap(
-        spacing: 25,
-        runSpacing: 15,
+        spacing: 10,
+        runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          if (shouldShowSupportTicket)
-            IconButton.filledTonal(
-              tooltip: "Create Ticket",
-              iconSize: eIconSize,
-              onPressed: isCallConnected ? _handleCreateTicket : null,
-              icon: const Icon(Icons.create_new_folder_outlined),
-            ),
-          IconButton.filledTonal(
-            tooltip: "Transfer Call",
-            iconSize: eIconSize,
-            onPressed: isCallConnected ? () => _openCallTransferPopup(context) : null,
-            icon: const Icon(Icons.forward_outlined),
-          ),
-          IconButton.filledTonal(
-            tooltip: "Make Conference",
-            iconSize: eIconSize,
-            onPressed: isCallConnected ? _makeConference : null,
-            icon: const Icon(Icons.group_outlined),
-          ),
+        
+          buildIconButton(Icons.forward_outlined, isCallConnected ? () => _openCallTransferPopup(context) : null),
+        
+          buildIconButton(Icons.group_outlined, isCallConnected ? _makeConference : null),
         ],
       ),
     );
 
     return children;
   }
+
+  Widget buildIconButton(IconData icon, VoidCallback? onPressed) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.all(5),
+          fixedSize: Size(eIconSize*1.5, eIconSize*1.5),
+          shape: const CircleBorder(),
+          side: BorderSide.none,
+          backgroundColor: Colors.grey.withOpacity(0.1),
+        ),
+        onPressed: onPressed,
+        child: Center(child: Icon(icon, size: eIconSize, color: Colors.white54)),
+      );
+    }
 
   void _openCallTransferPopup(BuildContext context) {
     final callsModel = context.read<AppCallsModel>();
@@ -390,22 +357,6 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   _handleRecord() async {
-    // if (!_isRecording) {
-    //   widget.myCall.recordFile('${widget.myCall.myCallId}.wav');
-    // } else {
-    //   widget.myCall.stopRecordFile();
-    // }
-
-    // widget.myCall.getSipHeader(headerName)
-    // if (widget.myCall.isRecStarted) {
-    //   widget.myCall.stopRecordFile().catchError(showSnackBar);
-    // } else {
-    //   String pathToFile = await MyApp.getRecFilePathName(
-    //     widget.myCall.myCallId,
-    //   );
-    //   widget.myCall.recordFile(pathToFile).catchError(showSnackBar);
-    // }
-
     widget.myCall.sendDtmf('*');
     _isRecording = !_isRecording;
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -413,15 +364,6 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     });
   }
 
-  void _handleCreateTicket() async {
-    // ApiResponse<String> apiResponse = await TeamlocusRepository.getCurrentCallLog({
-    //   'ext_no': widget.myCall.isIncoming ? widget.myCall.remoteExt : box.read('extensionNo'),
-    //   'dest_no': widget.myCall.isIncoming ? box.read('extensionNo') : widget.myCall.remoteExt,
-    // });
-    // if (apiResponse.status == 'ok') {
-    //   Get.find<LayoutController>().goToCreateSupportTicket(apiResponse.response);
-    // }
-  }
 
   Text _buildCallDuration() {
     String label;
@@ -594,19 +536,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('1'),
+              child: const Text('1', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("1");
               },
             ),
             OutlinedButton(
-              child: const Text('2'),
+              child: const Text('2', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("2");
               },
             ),
             OutlinedButton(
-              child: const Text('3'),
+              child: const Text('3', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("3");
               },
@@ -618,19 +560,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('4'),
+              child: const Text('4', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("4");
               },
             ),
             OutlinedButton(
-              child: const Text('5'),
+              child: const Text('5', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("5");
               },
             ),
             OutlinedButton(
-              child: const Text('6'),
+              child: const Text('6', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("6");
               },
@@ -642,19 +584,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('7'),
+              child: const Text('7', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("7");
               },
             ),
             OutlinedButton(
-              child: const Text('8'),
+              child: const Text('8', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("8");
               },
             ),
             OutlinedButton(
-              child: const Text('9'),
+              child: const Text('9', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("9");
               },
@@ -666,19 +608,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('*'),
+              child: const Text('*', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("*");
               },
             ),
             OutlinedButton(
-              child: const Text('0'),
+              child: const Text('0', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("0");
               },
             ),
             OutlinedButton(
-              child: const Text('#'),
+              child: const Text('#', style: TextStyle(color: Colors.white54)),
               onPressed: () {
                 _sendDtmf("#");
               },
@@ -686,7 +628,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ],
         ),
         const SizedBox(height: spacing),
-        IconButton.filledTonal(onPressed: _toggleSendDtmfMode, icon: const Icon(Icons.close)),
+        buildIconButton(Icons.close, _toggleSendDtmfMode),
       ],
     );
   }
