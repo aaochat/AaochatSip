@@ -1,13 +1,17 @@
 import 'dart:io';
 
+import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/pages/call_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
+import 'package:callingproject/src/utils/layout_util.dart';
 import 'package:callingproject/src/widget/voicemail_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
+import 'package:siprix_voip_sdk/calls_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../event/PlaceCallEvent.dart';
 import '../providers/call_logs_provider.dart';
@@ -39,7 +43,28 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-   
+
+    context.read<AppCallsModel>().onNewIncomingCall = () {
+      if (Platform.isWindows) {
+        WindowManager.instance.setAlwaysOnTop(true);
+        WindowManager.instance.focus();
+        Future.delayed(Duration(seconds: 2), () {
+          WindowManager.instance.setAlwaysOnTop(false);
+        });
+
+
+      } else if (Platform.isMacOS) {
+        // MacOs specific code here
+        bringWindowToFront();
+      } else if(LayoutUtil.isMobile()){
+
+        setState(() {
+          _selectedPageIndex = 0;
+        });
+      }
+
+    };
+
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
       setState(() {
@@ -49,13 +74,23 @@ class _MainPageState extends State<MainPage> {
     super.initState();
   }
 
+  Future<void> bringWindowToFront() async {
+    await windowManager.show(); // In case the window is hidden
+    await windowManager.focus(); // Bring it to the front
+    await windowManager.setAlwaysOnTop(true); // Temporarily set on top
+    await Future.delayed(Duration(milliseconds: 100)); // Small delay
+    await windowManager.setAlwaysOnTop(false); // Remove always on top
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LayoutProvider>(context);
     return Scaffold(
       appBar:
           !Platform.isWindows && !Platform.isMacOS
-              ? AppBar(title: Text('Aao Voip'), actions: [SizedBox(width: 10)])
+              ? AppBar(
+              leading: Padding(padding: EdgeInsets.all(10),child: Image.asset('assets/voip_logo.png',)),
+              title: Text('Aao VOIP', style: TextStyle(fontSize: 20),), actions: [SizedBox(width: 10)])
               : null,
       body: getBody(provider),
       bottomNavigationBar:
@@ -64,6 +99,7 @@ class _MainPageState extends State<MainPage> {
               : BottomNavigationBar(
                 currentIndex: _selectedPageIndex,
                 onTap: _onTabTapped,
+                selectedItemColor: Colors.orange,
                 items: [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.dialpad_outlined),

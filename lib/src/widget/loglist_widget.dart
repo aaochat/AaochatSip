@@ -253,69 +253,61 @@ class _LogScreenState extends State<LogListScreen> {
           margin: EdgeInsets.only(bottom: 10),
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black
-                    : Colors.grey[200],
+            color: Colors.black,
             borderRadius: BorderRadius.circular(10),
           ),
           child: IntrinsicHeight(
             child: Row(
+              spacing: 10,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                cdrs.getFormattedCallIcon(mExtentionNumber),
                 Expanded(
                   flex: 2,
-                  child: InkWell(
-                    onTap: () {
-                      if (cdrs.src == mExtentionNumber ||
-                          cdrs.channel.contains(mExtentionNumber)) {
-                        mCallProvider.phoneNumbCtrl.text = cdrs.dst.toString();
-                        eventBus.fire(PlaceCallEvent(cdrs.dst));
-                      } else {
-                        mCallProvider.phoneNumbCtrl.text = cdrs.src.toString();
-                        eventBus.fire(PlaceCallEvent(cdrs.src));
-                      }
-                    },
-                    child: Text(
-                      cdrs.src == mExtentionNumber
-                          ? cdrs.dst
-                          : "${cdrs.cnam}\n(${cdrs.src})",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
+                  child:  InkWell(
+                      onTap: () {
+                        if (cdrs.src == mExtentionNumber ||
+                            cdrs.channel.contains(mExtentionNumber)) {
+                          mCallProvider.phoneNumbCtrl.text = cdrs.dst.toString();
+                          eventBus.fire(PlaceCallEvent(cdrs.dst));
+                        } else {
+                          mCallProvider.phoneNumbCtrl.text = cdrs.src.toString();
+                          eventBus.fire(PlaceCallEvent(cdrs.src));
+                        }
+                      },
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                     Text(
+                          cdrs.src == mExtentionNumber || cdrs.channel.contains(mExtentionNumber)
+                              ? cdrs.dst
+                              : "${cdrs.cnam} (${cdrs.src})",
+                          style: TextStyle(fontSize: 14),
+                        ),
+
+                      Text(
+                          provider.getFormattedCallStatusName(cdrs),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: provider.getCallLogColor(cdrs),
+                          ),
+                        ),
+
+                    ],
+                  ))
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    provider.getFormattedCallStatusName(cdrs),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: provider.getCallLogColor(cdrs),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10),
                 Expanded(
                   flex: 3,
-                  child: Column(
-                    spacing: 1,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        provider.convertDateFormat(cdrs.calldate),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white.withOpacity(1)
-                                  : Colors.black.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
+                  child:  Text(
+                    cdrs.getFormattedCallDate(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(1)
+                    ),
                   ),
                 ),
 

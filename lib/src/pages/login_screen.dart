@@ -145,7 +145,6 @@ class _LoginscreenState extends State<LoginScreen> {
                       builder: (context, provider, child) {
                         return SizedBox(
                           width: double.infinity,
-                          height: 45,
                           child: ElevatedButton(
                             onPressed: () => _onSubmit(provider),
                             style: ElevatedButton.styleFrom(

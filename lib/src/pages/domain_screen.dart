@@ -94,7 +94,6 @@ class _DomainscreenState extends State<Domainscreen> {
               builder: (context, provider, child) {
                 return SizedBox(
                   width: double.infinity,
-                  height: 45,
                   child: ElevatedButton(
                     onPressed: () => _onSubmit(provider),
                     style: ElevatedButton.styleFrom(
@@ -114,7 +113,7 @@ class _DomainscreenState extends State<Domainscreen> {
                                 strokeWidth: 2,
                               ),
                             )
-                            : const Text("Submit"),
+                            : const Text("Proceed"),
                   ),
                 );
               },
