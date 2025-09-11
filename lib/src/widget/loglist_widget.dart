@@ -220,17 +220,17 @@ class _LogScreenState extends State<LogListScreen> {
         /*Todo Separate*/
         Consumer<LayoutProvider>(
             builder: (context, provider, _) {
-              if (provider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (provider.error.isNotEmpty) {
-                return Center(child: Text("Error: ${provider.error}"));
-              }
-
-              if (provider.logList.isEmpty) {
-                return const Center(child: Text("No call logs available"));
-              }
+              // if (provider.isLoading) {
+              //   return const Center(child: CircularProgressIndicator());
+              // }
+              //
+              // if (provider.error.isNotEmpty) {
+              //   return Center(child: Text("Error: ${provider.error}"));
+              // }
+              //
+              // if (provider.logList.isEmpty) {
+              //   return const Center(child: Text("No call logs available"));
+              // }
 
               return Expanded(
                 child: LayoutBuilder(
@@ -345,7 +345,7 @@ class _LogScreenState extends State<LogListScreen> {
                     ),
 
                     Visibility(
-                      visible: cdrs.disposition == "ANSWERED" ? true : false,
+                      visible: cdrs.disposition == "ANSWERED" ? false : false,
                       child: Text(
                         "Duration: ${formatDuration(cdrs.duration)}",
                         style: TextStyle(

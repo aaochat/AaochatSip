@@ -57,7 +57,7 @@ void main() async {
 
   LogsModel logsModel = LogsModel(true);
   CdrsModel cdrsModel = CdrsModel();
-  AppAccountsModel accountsModel = AppAccountsModel(logsModel);
+  AccountsModel accountsModel = AccountsModel(logsModel);
   MessagesModel messagesModel = MessagesModel(accountsModel, logsModel);
   AppCallsModel callsModel = AppCallsModel(accountsModel, logsModel, cdrsModel);
   // CallsModel mCallsModel = CallsModel(accountsModel, logsModel, cdrsModel); //List of calls
@@ -73,7 +73,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LayoutProvider()),
         ChangeNotifierProvider(create: (_) => AccountsModel()),
         ChangeNotifierProvider(
-          create: (context) => AppAccountsModel(logsModel),
+          create: (context) => AccountsModel(logsModel),
         ),
         ChangeNotifierProvider(create: (context) => NetworkModel(logsModel)),
         ChangeNotifierProvider(create: (context) => DevicesModel(logsModel)),
@@ -192,7 +192,7 @@ class _MyAppState extends State<MyApp> {
 
   void _loadModels(String accJsonStr, String cdrsJsonStr) {
     //Accounts
-    AppAccountsModel accsModel = context.read<AppAccountsModel>();
+    AccountsModel accsModel = context.read<AccountsModel>();
     accsModel.onSaveChanges = _saveAccountChanges;
 
     //CDRs (Call Details Records)

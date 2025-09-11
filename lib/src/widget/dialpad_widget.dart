@@ -31,12 +31,12 @@ class _DialpadscreenState extends State<DialpadWidget> {
   List<TelephoneMaster> allTelephoneMaster = [];
   EventTaxi eventBus = EventTaxiImpl.singleton();
   var _mCallProvider = CallProvider();
-  var _accounts = AppAccountsModel();
+  var _accounts = AccountsModel();
 
   @override
   void didChangeDependencies() {
     _mCallProvider = Provider.of<CallProvider>(context);
-    _accounts = context.read<AppAccountsModel>();
+    _accounts = context.read<AccountsModel>();
     super.didChangeDependencies();
   }
 
@@ -69,7 +69,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = context.read<AppAccountsModel>();
+    final accounts = context.watch<AccountsModel>();
     final mCallProvider = Provider.of<CallProvider>(context);
     final mLayoutProvider = Provider.of<LayoutProvider>(context);
 
@@ -511,11 +511,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
         child: Row(
           children: [
             Icon(
-              acc.regState == RegState.success
+              acc.regState == RegState.success || acc.regState ==RegState.inProgress
                   ? Icons.check_circle_outline
                   : Icons.error_outline,
               color:
-              acc.regState == RegState.success ? Colors.green : Colors.red,
+              acc.regState == RegState.success ||acc.regState ==RegState.inProgress ? Colors.green : Colors.red,
             ),
             SizedBox(width: 10),
             Text(acc.sipExtension),
@@ -609,9 +609,9 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
       try {
         for (int i = 0; i < context
-            .read<AppAccountsModel>()
+            .read<AccountsModel>()
             .length; i++) {
-          await context.read<AppAccountsModel>().deleteAccount(i);
+          await context.read<AccountsModel>().deleteAccount(i);
         }
       } catch (e) {
         print(e);

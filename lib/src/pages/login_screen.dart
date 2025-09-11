@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/pages/call_screen.dart';
 import 'package:callingproject/src/utils/constants.dart';
@@ -219,8 +221,8 @@ class _LoginscreenState extends State<LoginScreen> {
     //   ),
     // );
 
-
     return Scaffold(
+      appBar: (Platform.isAndroid || Platform.isIOS) ? AppBar(title: const Text('Login')) : null,
       body: Center(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -276,7 +278,7 @@ class _LoginscreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            provider.error ?? 'Login error',
+            provider.error.isEmpty ? 'Network Connection error' : provider.error,
           ),
         ),
       );
@@ -311,7 +313,24 @@ class _LoginscreenState extends State<LoginScreen> {
               ),
               borderRadius: BorderRadius.horizontal(left: Radius.circular(16)),
             ),
-            child: _logoPanel(context),
+
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: SafeArea(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ),
+                _logoPanel(context),
+              ],
+            ),
           ),
         ),
 

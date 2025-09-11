@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:callingproject/src/Databased/calllog_history.dart';
 import 'package:callingproject/src/models/call_model.dart';
+import 'package:dio/dio.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -225,13 +226,14 @@ class LayoutProvider extends ChangeNotifier {
   String convertDateFormat(String dateString) {
     try {
       // Step 1: Parse ISO date string into DateTime object
+      DateTime utcDateTime = DateTime.parse(dateString).toUtc();
       DateTime dateTime = DateTime.parse(dateString).toLocal();
 
       // Step 2: Desired output format
       String desiredFormat = "d-M-yyyy, hh:mm a";
       DateFormat outputFormat = DateFormat(desiredFormat);
 
-      return outputFormat.format(dateTime);
+      return outputFormat.format(utcDateTime);
     } catch (e) {
       print('Error during date format conversion: $e');
       return dateString; // fallback
@@ -241,13 +243,14 @@ class LayoutProvider extends ChangeNotifier {
   String convertOnlyDateFormat(String dateString) {
     try {
       // Step 1: Parse ISO date string into DateTime object
+      DateTime utcDateTime = DateTime.parse(dateString).toUtc();
       DateTime dateTime = DateTime.parse(dateString).toLocal();
 
       // Step 2: Desired output format
-      String desiredFormat = "dd MMM yyyy";
+      String desiredFormat = "d-M-yyyy";
       DateFormat outputFormat = DateFormat(desiredFormat);
 
-      return outputFormat.format(dateTime);
+      return outputFormat.format(utcDateTime);
     } catch (e) {
       print('Error during date format conversion: $e');
       return dateString; // fallback
@@ -257,13 +260,14 @@ class LayoutProvider extends ChangeNotifier {
   String convertTimeFormat(String dateString) {
     try {
       // Step 1: Parse ISO date string into DateTime object
+      DateTime utcDateTime = DateTime.parse(dateString).toUtc();
       DateTime dateTime = DateTime.parse(dateString).toLocal();
 
       // Step 2: Desired output format
       String desiredFormat = "hh:mm a";
       DateFormat outputFormat = DateFormat(desiredFormat);
 
-      return outputFormat.format(dateTime);
+      return outputFormat.format(utcDateTime);
     } catch (e) {
       print('Error during date format conversion: $e');
       return dateString; // fallback
@@ -319,8 +323,22 @@ class LayoutProvider extends ChangeNotifier {
       } else {
         _error = response.message ?? "Something went wrong";
       }
+    } on DioException catch (dioError) {
+      // Handle Dio-specific errors
+      if (dioError.response!.statusCode == 400) {
+        _error = dioError.response?.data["message"];
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        _error = "Receive timeout. Try again later.";
+      } else if (dioError.type == DioExceptionType.badResponse) {
+        _error = "Bad response: ${dioError.response?.statusCode}";
+      } else if (dioError.type == DioExceptionType.connectionError) {
+        _error = "Connection error. Please try again.";
+      } else {
+        _error = "Unexpected error occurred: ${dioError.message}";
+      }
     } catch (e) {
-      _error = e.toString();
+      // Handle any other unexpected errors
+      _error = "An unexpected error occurred: $e";
     } finally {
       _loading = false;
       notifyListeners();

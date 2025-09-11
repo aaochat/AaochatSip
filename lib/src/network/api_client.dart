@@ -6,8 +6,9 @@ import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:siprix_voip_sdk/accounts_model.dart';
 
-import '../models/appacount_model.dart';
+import '../Providers/login_provider.dart';
 import '../utils/shared_prefs.dart';
 
 enum DioMethod { post, get, put, delete }
@@ -30,7 +31,12 @@ class ApiClient {
           BaseOptions(
             baseUrl: AppSettings.BASED_URL,
             contentType: Headers.jsonContentType,
-            headers: {HttpHeaders.authorizationHeader: 'Bearer $mToken'},
+            connectTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
+            headers: {
+              HttpHeaders.authorizationHeader: 'Bearer $mToken',
+              "Content-Type": "application/json",
+            },
           ),
         )
         ..interceptors.addAll([
@@ -93,8 +99,8 @@ class AuthInterceptor extends Interceptor {
       SharedPrefs().clear();
 
       try {
-        for (int i = 0; i < context.read<AppAccountsModel>().length; i++) {
-          await context.read<AppAccountsModel>().deleteAccount(i);
+        for (int i = 0; i < context.read<AccountsModel>().length; i++) {
+          await context.read<AccountsModel>().deleteAccount(i);
         }
       } catch (e) {
         print(e);
@@ -113,7 +119,9 @@ class AuthInterceptor extends Interceptor {
           backgroundColor: Colors.red,
         ),
       );
-    }
+    } /*else if (err.response?.statusCode == 400) {
+      Provider.of<LoginProvider>(context, listen: false).setError(err.response?.data["message"] ?? "Bad Request (400)");
+    }*/
     super.onError(err, handler);
   }
 }

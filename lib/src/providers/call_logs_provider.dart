@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ import '../event/PlaceCallEvent.dart';
 import '../models/appacount_model.dart';
 import '../models/call_model.dart';
 import '../utils/Constants.dart';
-import '../utils/secure_storage.dart';
 import '../utils/shared_prefs.dart';
 
 class CallProvider extends ChangeNotifier {
@@ -33,6 +33,7 @@ class CallProvider extends ChangeNotifier {
 
   Future<void> AddData(BuildContext context, AccountModel _account) async {
     // final args = ModalRoute.of(context)?.settings.arguments;
+    deleteAccount(context);
 
     if (_account == null) {
       _errText = "No account data passed to this screen.";
@@ -54,12 +55,8 @@ class CallProvider extends ChangeNotifier {
     _account.rewriteContactIp = true;
     _account.ringTonePath = MyApp.getRingtonePath();
 
-    for (int i = 0; i < context.read<AppAccountsModel>().length; i++) {
-      await context.read<AppAccountsModel>().deleteAccount(i);
-    }
 
-
-    Future<void> action = context.read<AppAccountsModel>().addAccount(_account);
+    Future<void> action = context.read<AccountsModel>().addAccount(_account);
 
     action
         .then((_) {
@@ -72,13 +69,19 @@ class CallProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  deleteAccount(BuildContext context) async {
+    for (int i = 0; i < context.read<AccountsModel>().length; i++) {
+      await context.read<AccountsModel>().deleteAccount(i);
+    }
+  }
+
   void mInvite(BuildContext context, bool withVideo, AccountsModel accounts) {
     if (_phoneNumbCtrl.text.isEmpty) {
       _errText = "Phone number is empty";
       return;
     }
 
-    final accounts = context.read<AppAccountsModel>();
+    final accounts = context.read<AccountsModel>();
     if (accounts.selAccountId == null) {
       _errText = "Account not selected";
       return;
@@ -128,9 +131,23 @@ class CallProvider extends ChangeNotifier {
       } else {
         return false;
       }
+    } on DioException catch (dioError) {
+      // Handle Dio-specific errors
+      if (dioError.response!.statusCode == 400) {
+        _error = dioError.response?.data["message"];
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        _error = "Receive timeout. Try again later.";
+      } else if (dioError.type == DioExceptionType.badResponse) {
+        _error = "Bad response: ${dioError.response?.statusCode}";
+      } else if (dioError.type == DioExceptionType.connectionError) {
+        _error = "Connection error. Please try again.";
+      } else {
+        _error = "Unexpected error occurred: ${dioError.message}";
+      }
+      return false;
     } catch (e) {
-      _loading = false;
-      _error = e.toString();
+      // Handle any other unexpected errors
+      _error = "An unexpected error occurred: $e";
       return false;
     } finally {
       _loading = false;
@@ -149,9 +166,23 @@ class CallProvider extends ChangeNotifier {
       } else {
         return false;
       }
+    } on DioException catch (dioError) {
+      // Handle Dio-specific errors
+      if (dioError.response!.statusCode == 400) {
+        _error = dioError.response?.data["message"];
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        _error = "Receive timeout. Try again later.";
+      } else if (dioError.type == DioExceptionType.badResponse) {
+        _error = "Bad response: ${dioError.response?.statusCode}";
+      } else if (dioError.type == DioExceptionType.connectionError) {
+        _error = "Connection error. Please try again.";
+      } else {
+        _error = "Unexpected error occurred: ${dioError.message}";
+      }
+      return false;
     } catch (e) {
-      _loading = false;
-      _error = e.toString();
+      // Handle any other unexpected errors
+      _error = "An unexpected error occurred: $e";
       return false;
     } finally {
       _loading = false;

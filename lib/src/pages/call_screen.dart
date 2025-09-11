@@ -38,33 +38,33 @@ class _CallScreenWidgetState extends State<CallScreenWidget> {
 
   @override
   void initState() {
-    // Future.microtask(() {
-    //   final provider = Provider.of<CallProvider>(context, listen: false);
-    //   provider.AddData(context, _account);
-    //   try {
-    //     if (provider.errorText != null)
-    //       ScaffoldMessenger.of(
-    //         context,
-    //       ).showSnackBar(SnackBar(content: Text(provider.errorText!)));
-    //   } on Exception catch (e) {
-    //     print(e.toString());
-    //   }
-    // });
-
-
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _callProvider.AddData(context, _account);
+    Future.microtask(() {
+      final provider = Provider.of<CallProvider>(context, listen: false);
+    _callProvider.AddData(context, _account);
       try {
-        if (_callProvider.errorText != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_callProvider.errorText!)),
-          );
-        }
+        if (_callProvider.errorText != null)
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(_callProvider.errorText!)));
       } on Exception catch (e) {
         print(e.toString());
       }
     });
+
+
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _callProvider.AddData(context, _account);
+    //   try {
+    //     if (_callProvider.errorText != null) {
+    //       ScaffoldMessenger.of(context).showSnackBar(
+    //         SnackBar(content: Text(_callProvider.errorText!)),
+    //       );
+    //     }
+    //   } on Exception catch (e) {
+    //     print(e.toString());
+    //   }
+    // });
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
       setState(() {

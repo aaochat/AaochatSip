@@ -18,7 +18,6 @@ class ApiCallingRepo {
         '/tenant/$IDS/users/delete', DioMethod.get
     );
 
-    if (response.statusCode == 200) {
       BasedResponse<String> apiResponse = BasedResponse<String>.fromJsonString(
         response.data,
             (data) => data.toString(),
@@ -34,12 +33,6 @@ class ApiCallingRepo {
           message: apiResponse.message,
         );
       }
-    } else {
-      return BasedResponse<String>(
-        status: 'error',
-        message: 'Something went wrong',
-      );
-    }
   }
 
   static Future<BasedResponse<String>> GetLogOutRequest(BuildContext context) async {
@@ -49,7 +42,6 @@ class ApiCallingRepo {
         '/tenant/$IDS/auth/logout', DioMethod.post
     );
 
-    if (response.statusCode == 200) {
       BasedResponse<String> apiResponse = BasedResponse<String>.fromJsonString(
         response.data,
             (data) => data.toString(),
@@ -65,12 +57,6 @@ class ApiCallingRepo {
           message: apiResponse.message,
         );
       }
-    } else {
-      return BasedResponse<String>(
-        status: 'error',
-        message: 'Something went wrong',
-      );
-    }
   }
 
   static Future<BasedResponse<List<CallLogResponse>>> GetLogListRequest(BuildContext context,
@@ -83,16 +69,15 @@ class ApiCallingRepo {
       '/tenant/$IDS/sip-servers/$mExtensionId/logs', DioMethod.get, param: data,
     );
 
-    if (response.statusCode == 200) {
-      final data = response.data;
+      final dataResponse = response.data;
 
       final List<dynamic> list =
-      (data is Map && data.containsKey("data")) ? data["data"] : data;
+      (dataResponse is Map && dataResponse.containsKey("data")) ? dataResponse["data"] : dataResponse;
 
       final logs = list.map((e) => CallLogResponse.fromJson(e)).toList();
 
       BasedResponse<List<CallLogResponse>> apiResponse =
-      BasedResponse<List<CallLogResponse>>.fromMap(data);
+      BasedResponse<List<CallLogResponse>>.fromMap(dataResponse);
 
       if (apiResponse.status == 'success') {
         apiResponse.data = (response.data['data'] as List)
@@ -106,12 +91,6 @@ class ApiCallingRepo {
           message: apiResponse.message,
         );
       }
-    } else {
-      return BasedResponse<List<CallLogResponse>>(
-        status: 'error',
-        message: 'Something went wrong',
-      );
-    }
   }
 
   static Future<BasedResponse<LoginResponse>> GetMakeApiRequest(BuildContext context,
@@ -126,8 +105,6 @@ class ApiCallingRepo {
       DioMethod.post,
       param: {'email': email, 'password': password},
     );
-
-    if (response.statusCode == 200) {
       BasedResponse<LoginResponse> apiResponse =
           BasedResponse<LoginResponse>.fromJson(
             response.data,
@@ -225,13 +202,6 @@ class ApiCallingRepo {
           message: apiResponse.message,
         );
       }
-    } else {
-      print('API call failed: ${response.statusMessage}');
-      return BasedResponse<LoginResponse>(
-        status: 'error',
-        message: 'Something went wrong',
-      );
-    }
   }
 
   static Future<BasedResponse<String>> GetDomainApiRequest(BuildContext context,
@@ -244,7 +214,6 @@ class ApiCallingRepo {
       param: {'domain': mDomainName},
     );
 
-    if (response.statusCode == 200) {
       BasedResponse<String> apiResponse = BasedResponse<String>.fromJsonString(
         response.data,
         (data) => data.toString(),
@@ -269,12 +238,5 @@ class ApiCallingRepo {
           message: apiResponse.message,
         );
       }
-    } else {
-      print('API call failed: ${response.statusMessage}');
-      return BasedResponse<String>(
-        status: 'error',
-        message: 'Something went wrong',
-      );
-    }
   }
 }

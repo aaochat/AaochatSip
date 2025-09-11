@@ -1,15 +1,21 @@
 import 'package:callingproject/src/Repository/api_calling_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../api_response/based_response.dart';
 import '../api_response/login_response.dart';
 import '../utils/secure_storage.dart';
 
-class LoginProvider extends ChangeNotifier {
+class LoginProvider with ChangeNotifier {
   bool _loading = false;
   late String _error;
 
   String get error => _error;
+
+  void setError(String message) {
+    _error = message;
+    notifyListeners();
+  }
 
   bool get isLoading => _loading;
 
@@ -37,9 +43,23 @@ class LoginProvider extends ChangeNotifier {
       } else {
         return false;
       }
+    } on DioException catch (dioError) {
+      // Handle Dio-specific errors
+      if (dioError.response!.statusCode == 400) {
+        _error = dioError.response?.data["message"];
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        _error = "Receive timeout. Try again later.";
+      } else if (dioError.type == DioExceptionType.badResponse) {
+        _error = "Bad response: ${dioError.response?.statusCode}";
+      } else if (dioError.type == DioExceptionType.connectionError) {
+        _error = "Connection error. Please try again.";
+      } else {
+        _error = "Unexpected error occurred: ${dioError.message}";
+      }
+      return false;
     } catch (e) {
-      _loading = false;
-      _error = e.toString();
+      // Handle any other unexpected errors
+      _error = "An unexpected error occurred: $e";
       return false;
     } finally {
       _loading = false;

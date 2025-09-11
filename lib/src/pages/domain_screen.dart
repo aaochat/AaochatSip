@@ -414,7 +414,7 @@ class _DomainscreenState extends State<Domainscreen> {
         ).showSnackBar(
           SnackBar(
             content: Text(
-              '' ?? 'Unknown error',
+              provider.error.isEmpty ? 'Network Connection error' : provider.error,
             ),
           ),
         );
