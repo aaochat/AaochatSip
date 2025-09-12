@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/pages/domain_screen.dart';
-import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -23,10 +20,7 @@ class _SplashscreenState extends State<Splashscreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () async {
       bool? isLoggedIn = await SharedPrefs().getValue(Constants.IS_LOGGEDIN);
- 
-      var mProvider = context.read<CallProvider>();
       if (isLoggedIn==true) {
-        // mProvider.deleteAccount(context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => MainPage()),

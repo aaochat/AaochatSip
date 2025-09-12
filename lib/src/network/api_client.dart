@@ -22,7 +22,6 @@ class ApiClient {
   }) async {
     final dio = Dio(
       BaseOptions(
-        baseUrl: AppSettings.BASED_URL,
         contentType: Headers.jsonContentType,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),

@@ -45,7 +45,7 @@ void main() async {
       size: Size(1200, 750),
       minimumSize: Size(1200, 750),
       center: true,
-      title: 'Aao Voip',
+      title: 'Aao VOIP',
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {

@@ -297,7 +297,7 @@ class LayoutProvider extends ChangeNotifier {
 
   List<CallLogResponse> get logList => _logList;
 
-  Future<void> ApiCalling(String mExtensionId, {bool isFirstTime = false}) async {
+  Future<void> getCallLogs( String sipServerHost, String mExtensionId, {bool isFirstTime = false}) async {
     if (_loading) {
       return;
     }
@@ -318,7 +318,7 @@ class LayoutProvider extends ChangeNotifier {
     
 
     try {
-      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(mExtensionId, {
+      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(sipServerHost, mExtensionId, {
         'page': _page,
         'limit': _pageSize,
       });
@@ -341,17 +341,17 @@ class LayoutProvider extends ChangeNotifier {
   }
 
   /// optional: pull-to-refresh
-  Future<void> refreshLogs(String mExtensionId) async {
+  Future<void> refreshLogs(String sipServerHost, String mExtensionId) async {
     _page = 1;
     _logList.clear();
     _hasMore = true;
-    await ApiCalling(mExtensionId);
+    await getCallLogs(sipServerHost, mExtensionId);
   }
 
   /*Pagination Api calling */
-  Future<String> refreshApiCalling(String mExtensionId) async {
+  Future<String> getNewCallLogs(String sipServerHost, String mExtensionId) async {
     try {
-      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(mExtensionId, {
+      ApiResponse<List<CallLogResponse>> response = await SipRepository.getCallLogs(sipServerHost, mExtensionId, {
         'page': 1,
         'limit': _pageSize,
       });

@@ -1,20 +1,19 @@
 import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/api_response/call_log_response.dart';
+import 'package:callingproject/src/models/voice_mail_log.dart';
 import 'package:callingproject/src/network/api_client.dart';
-import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:dio/dio.dart';
 
 class SipRepository {
   static Future<ApiResponse<List<CallLogResponse>>> getCallLogs(
-    String mExtensionId,
+    String sipServerHost,
+    String sipExtension,
     Map<String, dynamic> data,
   ) async {
     try {
-      String? tenantId = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
 
-      final response = await ApiClient.instance.request(
-        '/tenant/$tenantId/sip-servers/$mExtensionId/logs', DioMethod.get, param: data,
+      final response = await ApiClient.instance.request("http://"+sipServerHost+":3000/logs/"+sipExtension,
+        DioMethod.get, param: data,
       );
       ApiResponse<List<CallLogResponse>> apiResponse =
           ApiResponse<List<CallLogResponse>>.fromMap(
@@ -28,13 +27,11 @@ class SipRepository {
 
       return apiResponse;
     } on DioException catch (dioError) {
-      print(dioError);
       return ApiResponse<List<CallLogResponse>>(
         status: 'error',
         message: dioError.response?.data["message"],
       );
     } catch (e) {
-      print(e);
       return ApiResponse<List<CallLogResponse>>(
         status: 'error',
         message: 'Failed to process your request. Please try again.',
@@ -42,35 +39,32 @@ class SipRepository {
     }
   }
 
-  // static Future<ApiResponse<String>> validateDomain(String domainName) async {
-  //   try {
-  //     final response = await ApiClient.instance.request(
-  //       '/master/auth/domain',
-  //       DioMethod.post,
-  //       param: {'domain': domainName},
-  //     );
-  //     ApiResponse<String> apiResponse = ApiResponse<String>.fromMap(
-  //       response.data
-  //     );
-  //
-  //     if(apiResponse.status == 'success') {
-  //       apiResponse.data = response.data['data'];
-  //       return apiResponse;
-  //     }
-  //
-  //     return apiResponse;
-  //   } on DioException catch (dioError) {
-  //     print(dioError);
-  //     return ApiResponse<String>(
-  //       status: 'error',
-  //       message: dioError.response?.data["message"],
-  //     );
-  //   } catch (e) {
-  //     print(e);
-  //     return ApiResponse<String>(
-  //       status: 'error',
-  //       message: 'Failed to process your request. Please try again.',
-  //     );
-  //   }
-  // }
+  static Future<ApiResponse<List<VoiceMailLog>>> getVoiceMailList(String sipServerHost, String sipExtension) async {
+    try {
+      final response = await ApiClient.instance.request(
+        'http://'+sipServerHost+":3000/voice-mails/"+sipExtension,
+        DioMethod.get,
+      );
+      ApiResponse<List<VoiceMailLog>> apiResponse = ApiResponse<List<VoiceMailLog>>.fromMap(
+        response.data
+      );
+  
+      if(apiResponse.status == 'success') {
+        apiResponse.data = (response.data['data'] as List).map((e) => VoiceMailLog.fromMap(e)).toList();
+        return apiResponse;
+      }
+  
+      return apiResponse;
+    } on DioException catch (dioError) {
+      return ApiResponse<List<VoiceMailLog>>(
+        status: 'error',
+        message: dioError.response?.data["message"],
+      );
+    } catch (e) {
+      return ApiResponse<List<VoiceMailLog>>(
+        status: 'error',
+        message: 'Failed to process your request. Please try again.',
+      );
+    }
+  }
 }

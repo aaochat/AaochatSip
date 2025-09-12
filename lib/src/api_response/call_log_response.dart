@@ -127,11 +127,7 @@ class CallLogResponse {
   }
 
   String getRecordingFile() {
-    DateTime date = DateFormat('MM/dd/yyyy HH:mm:ss a').parse(calldate);
-    String url =
-        AppSettings.baseUrlSip +
-        "/recording/${date.year}/${date.month.toString().padLeft(2, '0')}/${date.toUtc().day.toString().padLeft(2, '0')}/${recordingfile}";
-    return url;
+    return recordingfile;
   }
 
   String getFormattedCallDate() {

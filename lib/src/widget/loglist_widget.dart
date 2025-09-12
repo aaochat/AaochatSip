@@ -1,22 +1,14 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
-import 'package:callingproject/src/Databased/calllog_history.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
-import 'package:siprix_voip_sdk/cdrs_model.dart';
-
-import '../api_response/call_log_response.dart';
 import '../event/PlaceCallEvent.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
-import '../utils/Constants.dart';
-import '../utils/shared_prefs.dart';
 
 enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
 
@@ -32,7 +24,6 @@ class LogListScreen extends StatefulWidget {
 class _LogScreenState extends State<LogListScreen> {
   EventTaxi eventBus = EventTaxiImpl.singleton();
   final ScrollController _scrollController = ScrollController();
-  String mSip_usernam = "";
 
   final player = AudioPlayer();
   String recordingFile = '';
@@ -49,21 +40,19 @@ class _LogScreenState extends State<LogListScreen> {
       (element) => element.myAccId == selectedAccountId,
     );
     mExtentionNumber = selectedAccount.sipExtension;
-    print('mExtentionNumber: $mExtentionNumber');
 
     final provider = Provider.of<LayoutProvider>(context, listen: false);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200) {
-        provider.ApiCalling(mExtentionNumber);
+        provider.getCallLogs(selectedAccount.sipServer, mExtentionNumber);
       }
     });
 
     // Run task every 5 minutes
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      print('refreshApiCalling');
-      provider.refreshApiCalling(mExtentionNumber);
+      provider.getNewCallLogs(selectedAccount.sipServer, mExtentionNumber);
     });
 
     player.onPlayerStateChanged.listen((event) {
@@ -76,11 +65,11 @@ class _LogScreenState extends State<LogListScreen> {
     eventBus.registerTo<RefreshCallLogEvent>(false).listen((event) {
       if (event.isUpdate) {
         Future.delayed(Duration(seconds: 2), () {
-          provider.refreshApiCalling(mExtentionNumber);
+          provider.getNewCallLogs(selectedAccount.sipServer, mExtentionNumber);
         });
       }
     });
-    provider.ApiCalling(mExtentionNumber, isFirstTime: true);
+    provider.getCallLogs(selectedAccount.sipServer, mExtentionNumber, isFirstTime: true);
 
     super.initState();
   }
@@ -129,6 +118,7 @@ class _LogScreenState extends State<LogListScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    player.dispose();
     super.dispose();
   }
 
@@ -202,7 +192,7 @@ class _LogScreenState extends State<LogListScreen> {
 
                 // call button
                 Spacer(),
-                if (cdrs.recordingfile != '')
+                if (cdrs.recordingfile != '' && cdrs.disposition.contains('ANSWERED'))
                   IconButton(
                     tooltip: 'Recording',
                     onPressed: () {
@@ -210,11 +200,13 @@ class _LogScreenState extends State<LogListScreen> {
                         player.stop();
                         isPlaying = false;
                         recordingFile = '';
+                        setState(() {});
                       } else {
                         player.play(UrlSource(cdrs.getRecordingFile()));
                         player.getDuration();
                         isPlaying = true;
                         recordingFile = cdrs.getRecordingFile();
+                        setState(() {});
                       }
                     },
                     icon: Icon(

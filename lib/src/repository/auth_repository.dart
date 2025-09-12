@@ -2,6 +2,7 @@ import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/api_response/login_response.dart';
 import 'package:callingproject/src/network/api_client.dart';
 import 'package:callingproject/src/utils/Constants.dart';
+import 'package:callingproject/src/utils/app_settings.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:dio/dio.dart';
 
@@ -14,7 +15,7 @@ class AuthRepository {
       String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
 
       final response = await ApiClient.instance.request(
-        '/tenant/$IDS/auth/login',
+        AppSettings.API_URL + '/tenant/$IDS/auth/login',
         DioMethod.post,
         param: {'email': email, 'password': password},
       );
@@ -43,7 +44,7 @@ class AuthRepository {
   static Future<ApiResponse<String>> validateDomain(String domainName) async {
     try {
       final response = await ApiClient.instance.request(
-        '/master/auth/domain',
+       AppSettings.API_URL + '/master/auth/domain',
         DioMethod.post,
         param: {'domain': domainName},
       );

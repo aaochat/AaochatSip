@@ -102,7 +102,10 @@ class _LoginscreenState extends State<LoginScreen> {
                   children: [
                     _logoPanel(context),
                     const SizedBox(height: 20),
-                    TextField(
+                      const SizedBox(height: 20),
+          Container(
+            constraints: BoxConstraints(maxWidth: 350),
+            child: TextField(
                       cursorColor: Colors.deepOrangeAccent,
                       controller: mLoginProvider.mEmailController,
 
@@ -112,9 +115,11 @@ class _LoginscreenState extends State<LoginScreen> {
                         focusedBorder: focusBorder,
                       ),
                       onSubmitted: (_) => _onSubmit(mLoginProvider),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
+                    )),
+                     const SizedBox(height: 20),
+          Container(
+            constraints: BoxConstraints(maxWidth: 350),
+            child:  TextField(
                       controller: mLoginProvider.mPasswordController,
                       obscureText: _obscureText,
                       autocorrect: false,
@@ -139,9 +144,11 @@ class _LoginscreenState extends State<LoginScreen> {
                         ),
                       ),
                       onSubmitted: (_) => _onSubmit(mLoginProvider),
-                    ),
+                    )),
                     const SizedBox(height: 24),
-                    Consumer<LoginProvider>(
+          Container(
+            constraints: BoxConstraints(maxWidth: 350),
+            child:  Consumer<LoginProvider>(
                       builder: (context, provider, child) {
                         return SizedBox(
                           width: double.infinity,
@@ -168,7 +175,7 @@ class _LoginscreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                    ),
+                    )),
                   ],
                 ),
               ),
