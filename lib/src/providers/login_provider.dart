@@ -1,14 +1,12 @@
 import 'dart:convert';
 
-import 'package:callingproject/src/repository/auth_repository.dart';
 import 'package:callingproject/src/api_response/api_response.dart';
+import 'package:callingproject/src/repository/auth_repository.dart';
 import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../api_response/login_response.dart';
-import '../utils/secure_storage.dart';
 
 class LoginProvider with ChangeNotifier {
   bool _loading = false;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
@@ -79,13 +80,22 @@ class _CallPageState extends State<CallPage> {
       selected: isSwitched,
       selectedColor: Colors.black,
       selectedTileColor: Colors.grey.shade300,
-      leading: Icon(call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded, color: isSwitched ? Colors.black : Colors.white54),
+      leading: Icon(
+        call.isIncoming ? Icons.call_received_rounded : Icons.call_made_rounded,
+        color: isSwitched ? Colors.black : Colors.white54,
+      ),
       title: Text(
         call.nameAndExt,
-        style: TextStyle(fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal), color:isSwitched ? Colors.black: Colors.white54),
+        style: TextStyle(
+          fontWeight: (isSwitched ? FontWeight.bold : FontWeight.normal),
+          color: isSwitched ? Colors.black : Colors.white54,
+        ),
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(call.state.name, style: TextStyle(color: isSwitched ? Colors.black : Colors.white54)),
+      subtitle: Text(
+        call.state.name,
+        style: TextStyle(color: isSwitched ? Colors.black : Colors.white54),
+      ),
       trailing:
           isSwitched
               ? null
@@ -100,7 +110,6 @@ class _CallPageState extends State<CallPage> {
   }
 }
 
-
 //SwitchedCallWidget - provides controls for manipulating current/switched call
 class SwitchedCallWidget extends StatefulWidget {
   const SwitchedCallWidget(this.myCall, {super.key});
@@ -114,7 +123,7 @@ class SwitchedCallWidget extends StatefulWidget {
 class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   final SiprixVideoRenderer _localRenderer = SiprixVideoRenderer();
   final SiprixVideoRenderer _remoteRenderer = SiprixVideoRenderer();
-  static const double eIconSize = 30;
+  static double eIconSize = Platform.isAndroid || Platform.isIOS ? 45 : 35;
   bool _isRecording = false;
 
   EventTaxi eventBus = EventTaxiImpl.singleton();
@@ -226,17 +235,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         children: [
           buildIconButton(Icons.mic_off_rounded, _muteMic),
           buildIconButton(Icons.dialpad_rounded, isCallConnected ? _toggleSendDtmfMode : null),
-          
+
           MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
               return buildIconButton(Icons.volume_up, () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
-                  }
-                },
-              );
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              });
             },
             menuChildren: _buildPlayoutDevicesMenu(),
           ),
@@ -253,10 +261,15 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           buildIconButton(Icons.add, _showAddCallPage),
-          buildIconButton(widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause, (widget.myCall.state == CallState.holding) ? null : _holdCall),
-           
-          buildIconButton(Icons.fiber_manual_record_outlined, isCallConnected ? _handleRecord : null),
-        
+          buildIconButton(
+            widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause,
+            (widget.myCall.state == CallState.holding) ? null : _holdCall,
+          ),
+
+          buildIconButton(
+            Icons.fiber_manual_record_outlined,
+            isCallConnected ? _handleRecord : null,
+          ),
         ],
       ),
     );
@@ -268,9 +281,11 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-        
-          buildIconButton(Icons.forward_outlined, isCallConnected ? () => _openCallTransferPopup(context) : null),
-        
+          buildIconButton(
+            Icons.forward_outlined,
+            isCallConnected ? () => _openCallTransferPopup(context) : null,
+          ),
+
           buildIconButton(Icons.group_outlined, isCallConnected ? _makeConference : null),
         ],
       ),
@@ -280,18 +295,18 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   Widget buildIconButton(IconData icon, VoidCallback? onPressed) {
-      return OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.all(5),
-          fixedSize: Size(eIconSize*1.5, eIconSize*1.5),
-          shape: const CircleBorder(),
-          side: BorderSide.none,
-          backgroundColor: Colors.grey.withOpacity(0.1),
-        ),
-        onPressed: onPressed,
-        child: Center(child: Icon(icon, size: eIconSize, color: Colors.white54)),
-      );
-    }
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        padding: EdgeInsets.all(5),
+        fixedSize: Size(eIconSize * 1.5, eIconSize * 1.5),
+        shape: const CircleBorder(),
+        side: BorderSide.none,
+        backgroundColor: Colors.grey.withOpacity(0.1),
+      ),
+      onPressed: onPressed,
+      child: Center(child: Icon(icon, size: eIconSize, color: Colors.white54)),
+    );
+  }
 
   void _openCallTransferPopup(BuildContext context) {
     final callsModel = context.read<AppCallsModel>();
@@ -364,7 +379,6 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     });
   }
 
-
   Text _buildCallDuration() {
     String label;
     switch (widget.myCall.state) {
@@ -389,6 +403,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       runSpacing: 10,
       children: [
         IconButton.filledTonal(
+          iconSize: eIconSize,
           onPressed: _rejectCall,
           icon: const Icon(Icons.call_end),
           style: OutlinedButton.styleFrom(
@@ -397,6 +412,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ),
         ),
         IconButton.filledTonal(
+          iconSize: eIconSize,
           onPressed: _acceptCall,
           icon: const Icon(Icons.call),
           style: OutlinedButton.styleFrom(

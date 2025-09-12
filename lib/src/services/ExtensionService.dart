@@ -5,7 +5,6 @@ import 'package:siprix_voip_sdk/network_model.dart';
 
 import '../../main.dart';
 import '../utils/Constants.dart';
-import '../utils/secure_storage.dart';
 import '../utils/shared_prefs.dart';
 
 class ExtensionService {
@@ -27,6 +26,6 @@ class ExtensionService {
   }
 
   static bool isRegistered() {
-    return SecureStorage().read(Constants.IS_LOGGEDIN) == true;
+    return SharedPrefs().getValue(Constants.IS_LOGGEDIN) == true;
   }
 }
