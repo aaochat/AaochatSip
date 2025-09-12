@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:callingproject/src/event/refresh_call_log_event.dart';
+import 'package:callingproject/src/event/refresh_voice_mail_event.dart';
 import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/pages/call_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
@@ -9,11 +11,10 @@ import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
-import 'package:siprix_voip_sdk/calls_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../event/PlaceCallEvent.dart';
+import '../event/place_call_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../widget/loglist_widget.dart';
 
@@ -233,7 +234,13 @@ class _MainPageState extends State<MainPage> {
                             Spacer(),
 
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                if(provider.sideScreen == 'voice-mails'){
+                                  eventBus.fire(RefreshVoiceMailEvent());
+                                } else if(provider.sideScreen == 'call-logs'){
+                                  eventBus.fire(RefreshCallLogEvent(isUpdate: true));
+                                }
+                              },
                               icon: Icon(Icons.refresh),
                             ),
                           ],

@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:callingproject/src/api_response/api_response.dart';
+import 'package:callingproject/src/event/refresh_voice_mail_event.dart';
 import 'package:callingproject/src/models/voice_mail_log.dart';
 import 'package:callingproject/src/repository/sip_repository.dart';
+import 'package:callingproject/src/utils/layout_util.dart';
+import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:provider/provider.dart';
@@ -20,36 +25,53 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
   final player = audioPlayer.AudioPlayer();
   String recordingFile = '';
   bool isPlaying = false;
+  EventTaxi eventBus = EventTaxiImpl.singleton();
+  StreamSubscription<RefreshVoiceMailEvent>? refreshVoiceMailSubscription;
 
   @override
   void initState() {
     getVoiceMailList();
+
+    refreshVoiceMailSubscription = eventBus
+        .registerTo<RefreshVoiceMailEvent>(false)
+        .listen((event) {
+          getVoiceMailList();
+        });
+
     super.initState();
   }
 
   getVoiceMailList() async {
+    if (isLoading) return;
     isLoading = true;
 
-    final selectedAccountId = context.read<AccountsModel>().selAccountId;
-    final selectedAccount = context.read<AccountsModel>().accounts.firstWhere(
-      (element) => element.myAccId == selectedAccountId,
-    );
+    try {
+      final selectedAccountId = context.read<AccountsModel>().selAccountId;
+      final selectedAccount = context.read<AccountsModel>().accounts.firstWhere(
+        (element) => element.myAccId == selectedAccountId,
+      );
 
-    ApiResponse<List<VoiceMailLog>> response =
-        await SipRepository.getVoiceMailList(
-          selectedAccount.sipServer,
-          selectedAccount.sipExtension,
-        );
-    if (response.status == "success" && response.data != null) {
-      voiceMailList = response.data ?? [];
+      ApiResponse<List<VoiceMailLog>> response =
+          await SipRepository.getVoiceMailList(
+            selectedAccount.sipServer,
+            selectedAccount.sipExtension,
+          );
+      if (response.status == "success" && response.data != null) {
+        voiceMailList = response.data ?? [];
+      }
+      isLoading = false;
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading = false;
+      setState(() {});
     }
-    isLoading = false;
-    setState(() {});
   }
 
   @override
   void dispose() {
     player.dispose();
+    refreshVoiceMailSubscription?.cancel();
     super.dispose();
   }
 
@@ -61,6 +83,7 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
       child: ListView.separated(
         itemBuilder:
             (context, index) => Container(
+              constraints: BoxConstraints(minHeight: 50),
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.black,
@@ -68,30 +91,50 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
               ),
               child: IntrinsicHeight(
                 child: Row(
+                  spacing: 20,
                   children: [
-                    Text(
-                      voiceMailList[index].getFormattedDate(),
-                      style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      voiceMailList[index].caller_id,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                    if (LayoutUtil.isMobile())
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            voiceMailList[index].caller_id,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            voiceMailList[index].getFormattedDate(),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(width: 10),
+                    if (!LayoutUtil.isMobile())
+                      Text(
+                        voiceMailList[index].caller_id,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    if (!LayoutUtil.isMobile())
+                      Text(
+                        voiceMailList[index].getFormattedDate(),
+                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                      ),
                     Spacer(),
-                    IconButton(
-                      icon: Icon(
+                    InkWell(
+                      child: Icon(
                         isPlaying &&
                                 recordingFile ==
                                     voiceMailList[index].getVoiceMailFile()
                             ? Icons.stop
                             : Icons.play_arrow,
                       ),
-                      onPressed: () {
+                      onTap: () {
                         if (player.state == audioPlayer.PlayerState.playing) {
                           player.stop();
                           isPlaying = false;

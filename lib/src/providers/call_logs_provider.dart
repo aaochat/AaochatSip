@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/calls_model.dart';
 import '../Repository/api_calling_repository.dart';
-import '../event/PlaceCallEvent.dart';
+import '../event/place_call_event.dart';
 import '../models/call_model.dart';
 
 class CallProvider extends ChangeNotifier {

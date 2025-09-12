@@ -5,7 +5,7 @@ import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
-import '../event/PlaceCallEvent.dart';
+import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
@@ -141,6 +141,7 @@ class _LogScreenState extends State<LogListScreen> {
         final cdrs = provider.logList[index];
         return Container(
           key: ValueKey(cdrs.did),
+          constraints: BoxConstraints(minHeight: 50),
           margin: EdgeInsets.only(bottom: 10),
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -193,9 +194,8 @@ class _LogScreenState extends State<LogListScreen> {
                 // call button
                 Spacer(),
                 if (cdrs.recordingfile != '' && cdrs.disposition.contains('ANSWERED'))
-                  IconButton(
-                    tooltip: 'Recording',
-                    onPressed: () {
+                  InkWell(
+                    onTap: () {
                       if (player.state == PlayerState.playing) {
                         player.stop();
                         isPlaying = false;
@@ -209,7 +209,7 @@ class _LogScreenState extends State<LogListScreen> {
                         setState(() {});
                       }
                     },
-                    icon: Icon(
+                    child: Icon(
                       isPlaying && recordingFile == cdrs.getRecordingFile()
                           ? Icons.stop
                           : Icons.play_arrow,
