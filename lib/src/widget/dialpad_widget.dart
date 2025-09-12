@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:callingproject/src/models/sip_user_model.dart';
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
+import 'package:callingproject/src/repository/sip_repository.dart';
 import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 
 import '../Databased/calllog_history.dart';
-import '../event/PlaceCallEvent.dart';
+import '../event/place_call_event.dart';
 import '../models/telephone_master.dart';
 import '../pages/settings_page.dart';
 import '../providers/call_logs_provider.dart';
@@ -34,6 +36,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
   EventTaxi eventBus = EventTaxiImpl.singleton();
   var _mCallProvider = CallProvider();
   var _accounts = AccountsModel();
+  List<SIPUser> allSipUsers = [];
 
   @override
   void didChangeDependencies() {
@@ -42,8 +45,20 @@ class _DialpadscreenState extends State<DialpadWidget> {
     super.didChangeDependencies();
   }
 
+  Future<void> getAllSipUsers() async {
+    final selectedAccountId = context.read<AccountsModel>().selAccountId;
+    final selectedAccount = context.read<AccountsModel>().accounts.firstWhere(
+      (element) => element.myAccId == selectedAccountId,
+    );
+    final response = await SipRepository.getAllSipUsers(selectedAccount.sipServer);
+    if (response.status == 'success') {
+      allSipUsers = response.data ?? [];
+    }
+  }
+
   @override
   void initState() {
+    getAllSipUsers();
     super.initState();
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
@@ -53,20 +68,6 @@ class _DialpadscreenState extends State<DialpadWidget> {
         _mCallProvider.mInvite(context, false, _accounts);
       }
     });
-    // try {
-    //   final mprovider = Provider.of<CallProvider>(context, listen: false);
-    //   mprovider.DataDisplay();
-    // } catch (e) {
-    //   print(e);
-    // }
-    // eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
-    //   _textController.text = event.phoneNumber;
-    //   if (getx.Get.find<LayoutController>().currentCall == null) {
-    //     _handleCall(context, true);
-    //   } else {
-    //     PageExtender.showErrorSnackbar("One call already in progress");
-    //   }
-    // });
   }
 
   @override
@@ -337,29 +338,20 @@ class _DialpadscreenState extends State<DialpadWidget> {
           // ), //BoxShado
         ],
       ),
-      child: TypeAheadField<CallLogHistory>(
+      child: TypeAheadField<SIPUser>(
         controller: mCallProvider.phoneNumbCtrl,
         hideOnEmpty: true,
-        // debounceDuration: const Duration(milliseconds: 300), // live update
+        debounceDuration: const Duration(milliseconds: 100), // live update
         suggestionsCallback: (search) {
-          if (search.isEmpty) {
-            return []; // or return full list if you want all suggestions
-          }
-          // return mLayoutProvider.getSuggestions(search);
-          return [];
+          return allSipUsers.where((element) => element.name.contains(search) || element.extension.contains(search)).take(10).toList();
         },
 
-        itemBuilder: (context, CallLogHistory mCallLogHistory) {
+        itemBuilder: (context, SIPUser mSIPUser) {
           return Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                color:
-                Theme
-                    .of(context)
-                    .brightness == Brightness.dark
-                    ? Colors.black
-                    : Colors.grey[200]!,
+                color: Colors.black
               ),
               borderRadius: BorderRadius.circular(4),
             ),
@@ -369,27 +361,27 @@ class _DialpadscreenState extends State<DialpadWidget> {
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    mCallLogHistory.displName ?? '',
+                    mSIPUser.name ?? '',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                if (mCallLogHistory.remoteExt != null &&
-                    mCallLogHistory.remoteExt!.isNotEmpty)
+                if (mSIPUser.extension != null &&
+                    mSIPUser.extension!.isNotEmpty)
                   TextButton(
                     onPressed:
                         () =>
                     {
                       mCallProvider.phoneNumbCtrl.text =
-                          mCallLogHistory.remoteExt ?? '',
+                          mSIPUser.extension ?? '',
                     },
                     child: Text(
-                      mCallLogHistory.remoteExt ?? '',
+                      mSIPUser.extension ?? '',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.white60,
                       ),
                     ),
                   ),
@@ -398,8 +390,8 @@ class _DialpadscreenState extends State<DialpadWidget> {
             ),
           );
         },
-        onSelected: (CallLogHistory mCallLogHistory) {
-          mCallProvider.phoneNumbCtrl.text = mCallLogHistory.remoteExt ?? '';
+        onSelected: (SIPUser mSIPUser) {
+          mCallProvider.phoneNumbCtrl.text = mSIPUser.extension ?? '';
         },
 
         // /*Decor SuggestionBox if I clicked on Text field*/
