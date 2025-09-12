@@ -42,35 +42,35 @@ class SipRepository {
     }
   }
 
-  static Future<ApiResponse<String>> validateDomain(String domainName) async {
-    try {
-      final response = await ApiClient.instance.request(
-        '/master/auth/domain',
-        DioMethod.post,
-        param: {'domain': domainName},
-      );
-      ApiResponse<String> apiResponse = ApiResponse<String>.fromMap(
-        response.data
-      );
-
-      if(apiResponse.status == 'success') {
-        apiResponse.data = response.data['data'];
-        return apiResponse;
-      }
-
-      return apiResponse;
-    } on DioException catch (dioError) {
-      print(dioError);
-      return ApiResponse<String>(
-        status: 'error',
-        message: dioError.response?.data["message"],
-      );
-    } catch (e) {
-      print(e);
-      return ApiResponse<String>(
-        status: 'error',
-        message: 'Failed to process your request. Please try again.',
-      );
-    }
-  }
+  // static Future<ApiResponse<String>> validateDomain(String domainName) async {
+  //   try {
+  //     final response = await ApiClient.instance.request(
+  //       '/master/auth/domain',
+  //       DioMethod.post,
+  //       param: {'domain': domainName},
+  //     );
+  //     ApiResponse<String> apiResponse = ApiResponse<String>.fromMap(
+  //       response.data
+  //     );
+  //
+  //     if(apiResponse.status == 'success') {
+  //       apiResponse.data = response.data['data'];
+  //       return apiResponse;
+  //     }
+  //
+  //     return apiResponse;
+  //   } on DioException catch (dioError) {
+  //     print(dioError);
+  //     return ApiResponse<String>(
+  //       status: 'error',
+  //       message: dioError.response?.data["message"],
+  //     );
+  //   } catch (e) {
+  //     print(e);
+  //     return ApiResponse<String>(
+  //       status: 'error',
+  //       message: 'Failed to process your request. Please try again.',
+  //     );
+  //   }
+  // }
 }

@@ -20,9 +20,6 @@ class ApiCallingRepo {
             (data) => data.toString(),
       );
       if (apiResponse.status == "success") {
-        await SecureStorage().clear();
-        await SharedPrefs().clear();
-
         return apiResponse;
       } else {
         return ApiResponse<String>(
@@ -32,29 +29,27 @@ class ApiCallingRepo {
       }
   }
 
-  static Future<ApiResponse<String>> GetLogOutRequest(BuildContext context) async {
-    String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
-
-    final response = await ApiClient.instance.request(
-        '/tenant/$IDS/auth/logout', DioMethod.post
-    );
-
-      ApiResponse<String> apiResponse = ApiResponse<String>.fromJsonString(
-        response.data,
-            (data) => data.toString(),
-      );
-
-      if (apiResponse.status == "success") {
-        await SecureStorage().clear();
-        await SharedPrefs().clear();
-        return apiResponse;
-      } else {
-        return ApiResponse<String>(
-          status: "error",
-          message: apiResponse.message,
-        );
-      }
-  }
+  // static Future<ApiResponse<String>> GetLogOutRequest(BuildContext context) async {
+  //   String? IDS = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
+  //
+  //   final response = await ApiClient.instance.request(
+  //       '/tenant/$IDS/auth/logout', DioMethod.post
+  //   );
+  //
+  //     ApiResponse<String> apiResponse = ApiResponse<String>.fromJsonString(
+  //       response.data,
+  //           (data) => data.toString(),
+  //     );
+  //
+  //     if (apiResponse.status == "success") {
+  //       return apiResponse;
+  //     } else {
+  //       return ApiResponse<String>(
+  //         status: "error",
+  //         message: apiResponse.message,
+  //       );
+  //     }
+  // }
 
 
 }

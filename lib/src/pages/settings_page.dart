@@ -213,6 +213,7 @@ class _SettingsPageState extends State<SettingsPage> {
       } catch (e) {
         print(e);
       }
+      await SharedPrefs().clear();
       mCallProvider.clearText();
       Navigator.pushAndRemoveUntil(
         context,

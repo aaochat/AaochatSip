@@ -16,6 +16,7 @@ import '../models/telephone_master.dart';
 import '../pages/settings_page.dart';
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
+import '../utils/shared_prefs.dart';
 
 class DialpadWidget extends StatefulWidget {
   const DialpadWidget(this.popUpMode, {super.key});
@@ -605,7 +606,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
    await mCallProvider.logout();
       await ExtensionUtil.deleteAllAccounts(context);
-
+      await SharedPrefs().clear();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
