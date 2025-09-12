@@ -78,13 +78,14 @@ class _LoginscreenState extends State<LoginScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 10),
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
+          Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back),
+              )),
 
           // Logo Panel on top
           Expanded(

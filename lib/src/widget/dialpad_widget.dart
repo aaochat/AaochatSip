@@ -503,11 +503,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
         child: Row(
           children: [
             Icon(
-              acc.regState == RegState.success
+              acc.regState == RegState.success||acc.regState == RegState.inProgress
                   ? Icons.check_circle_outline
                   : Icons.error_outline,
               color:
-              acc.regState == RegState.success ? Colors.green : Colors.red,
+              acc.regState == RegState.success||acc.regState == RegState.inProgress ? Colors.green : Colors.red,
             ),
             SizedBox(width: 10),
             Text(acc.sipExtension),

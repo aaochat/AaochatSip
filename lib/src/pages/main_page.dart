@@ -10,12 +10,10 @@ import 'package:callingproject/src/widget/voicemail_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../event/place_call_event.dart';
-import '../providers/call_logs_provider.dart';
 import '../widget/loglist_widget.dart';
 
 class MainPage extends StatefulWidget {
@@ -250,7 +248,31 @@ class _MainPageState extends State<MainPage> {
     } else {
       return IndexedStack(
         index: _selectedPageIndex,
-        children: [CallPage(), LogListScreen() , VoicemailWidget()],
+        children: [CallPage(),
+          Column(children: [
+            Align(alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    "Call Logs",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                )),
+            Expanded(child: LogListScreen()),
+          ]),
+          Column(children: [
+            Align(alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    "Voice Mails",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                )),
+            Expanded(child: VoicemailWidget()),
+          ],
+          )
+        ],
       );
     }
   }

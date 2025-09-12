@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -84,20 +82,49 @@ class _SettingsPageState extends State<SettingsPage> {
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: const Text('Delete Account'),
-                    content: const Text('Are you sure you want to delete your account?'),
+                    title: Text('Delete Account',
+                        style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    )),
+                    content: Text(
+                        'Are you sure you want to delete your account?',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
                     actions: [
                       TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey.shade700,
+                        ),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         child: const Text('Cancel'),
                       ),
-                      TextButton(
+
+                      // TextButton(
+                      //   onPressed: () {
+                      //     deleteAccount();
+                      //   },
+                      //   child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      // ),
+
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         onPressed: () {
                           deleteAccount();
                         },
-                        child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                        child: Text("Delete"),
                       ),
                     ],
                   ),

@@ -78,7 +78,6 @@ class _LogScreenState extends State<LogListScreen> {
   }
 
   void _handleVisibilityChanged(VisibilityInfo info) {
-    if (!mounted) return;
     player.stop();
     isPlaying = false;
     setState(() {
@@ -320,7 +319,7 @@ class _LogScreenState extends State<LogListScreen> {
 
                 // call button
                 SizedBox(width: 10),
-                if (cdrs.recordingfile != '')
+                if (cdrs.recordingfile != '' && cdrs.disposition.contains('ANSWERED'))
                   Expanded(
                     flex: 1,
                     child: IconButton(
@@ -331,11 +330,13 @@ class _LogScreenState extends State<LogListScreen> {
                           player.stop();
                           isPlaying = false;
                           recordingFile = '';
+                          setState(() {});
                         } else {
                           player.play(UrlSource(cdrs.getRecordingFile()));
                           player.getDuration();
                           isPlaying = true;
                           recordingFile = cdrs.getRecordingFile();
+                          setState(() {});
                         }
                       },
                       icon: Icon(
