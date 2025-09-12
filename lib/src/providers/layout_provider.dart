@@ -215,10 +215,9 @@ class LayoutProvider extends ChangeNotifier {
   String getFormattedCallStatusName(CallLogResponse cdr) {
     if (cdr.disposition == 'ANSWERED') {
       return 'ANSWERED';
-    } else if (cdr.dst == SharedPrefs().getValue(Constants.EXTENSION_NUMBER) && cdr.disposition == 'NO ANSWER') {
+    } else if (SharedPrefs().getValue(Constants.EXTENSION_NUMBER).toString().contains(cdr.dst) && cdr.disposition == 'NO ANSWER') {
       return 'MISSED CALL';
     }
-
     return cdr.disposition.toUpperCase();
   }
 

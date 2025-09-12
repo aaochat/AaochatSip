@@ -131,14 +131,12 @@ class CallLogResponse {
   }
 
   String getFormattedCallDate() {
-    DateTime utcDateTime = DateTime.parse(calldate).toUtc();
-    DateTime dateTime = DateTime.parse(calldate).toLocal();
-
-    // Step 2: Desired output format
-    String desiredFormat = "d MMM yyyy, hh:mm a";
-    DateFormat outputFormat = DateFormat(desiredFormat);
-
-    return outputFormat.format(utcDateTime);
+    DateTime localTime = DateTime.parse(calldate).toLocal();
+    String formatted = DateFormat("dd MMM yy hh:mm a").format(localTime);
+    return formatted;
+    // DateTime mDate =
+    // DateFormat('yyyy-MM-dd HH:mm:ss').parse(calldate, true).toLocal();
+    // return DateFormat('dd MMM yy hh:mm a').format(mDate);
   }
 
   Icon getFormattedCallIcon(String extensionNumber) {

@@ -43,6 +43,12 @@ class LoginProvider with ChangeNotifier {
           Constants.USER,
           jsonEncode(response.data?.user.toJson()),
         );
+
+        await SharedPrefs().setValue(
+          Constants.EXTENSION_NUMBER,
+          jsonEncode(response.data?.user.extensions?[0].extensionNumber),
+        );
+
         await SharedPrefs().setValue(
           Constants.TOKEN,
           response.data?.token ?? '',
@@ -57,7 +63,8 @@ class LoginProvider with ChangeNotifier {
           jsonEncode(response.data?.user.extensions?.map((e) => e.toJson()).toList()),
         );
 
-  
+        mEmailController.clear();
+        mPasswordController.clear();
 
         return null;
       } else {

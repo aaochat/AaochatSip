@@ -4,8 +4,8 @@ import 'package:callingproject/src/models/extension_model.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
-import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:provider/provider.dart';
+import 'package:siprix_voip_sdk/accounts_model.dart';
 
 class ExtensionUtil {
   static Future<void> deleteAllAccounts(BuildContext context) async {

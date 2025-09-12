@@ -234,7 +234,10 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          buildIconButton(Icons.mic_off_rounded, _muteMic),
+          buildIconButton(
+            widget.myCall.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
+            _muteMic
+          ),
           buildIconButton(Icons.dialpad_rounded, isCallConnected ? _toggleSendDtmfMode : null),
 
           MenuAnchor(
@@ -268,6 +271,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ),
 
           buildIconButton(
+            tooltipMessage: "Record Call",
             Icons.fiber_manual_record_outlined,
             isCallConnected ? _handleRecord : null,
           ),
@@ -283,11 +287,12 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           buildIconButton(
+            tooltipMessage: "Transfer Call",
             Icons.forward_outlined,
             isCallConnected ? () => _openCallTransferPopup(context) : null,
           ),
 
-          buildIconButton(Icons.group_outlined, isCallConnected ? _makeConference : null),
+          buildIconButton(Icons.group_outlined, isCallConnected ? _makeConference : null,tooltipMessage: "Make conference"),
         ],
       ),
     );
@@ -297,8 +302,8 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
   static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 1.5;
 
-  Widget buildIconButton(IconData icon, VoidCallback? onPressed) {
-    return OutlinedButton(
+  Widget buildIconButton(IconData icon, VoidCallback? onPressed,{String? tooltipMessage}) {
+    Widget button= OutlinedButton(
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.all(5),
         fixedSize: Size(
@@ -312,6 +317,24 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       onPressed: onPressed,
       child: Center(child: Icon(icon, size: eIconSize, color: Colors.white54)),
     );
+
+    if (tooltipMessage != null && tooltipMessage.isNotEmpty) {
+      return Tooltip(
+        message: tooltipMessage,
+        child: button,
+        // You can customize the tooltip further:
+        // preferBelow: false, // Whether to prefer showing the tooltip below the widget
+        // waitDuration: Duration(milliseconds: 500), // Default is 0
+        // showDuration: Duration(milliseconds: 1500), // Default
+        // textStyle: TextStyle(color: Colors.white),
+        // decoration: BoxDecoration(
+        //   color: Colors.black.withOpacity(0.8),
+        //   borderRadius: BorderRadius.circular(4),
+        // ),
+      );
+    } else {
+      return button; // Return button directly if no tooltip message
+    }
   }
 
   void _openCallTransferPopup(BuildContext context) {
@@ -321,27 +344,40 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Transfer Call', style: Theme.of(context).textTheme.titleMedium),
+          title: Text(
+            'Transfer Call',
+            style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Transfer Blind", style: TextStyle(color: Colors.blue)),
+              Text(
+                "Transfer Blind",
+                style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               TextField(
                 controller: _transferController,
+                cursorColor: Colors.deepOrangeAccent,
+                style: TextStyle(
+                  color: Colors.black87,
+                ),
                 onSubmitted: (value) {
                   _transferBlind(value);
                   Navigator.of(context).pop();
                 },
                 decoration: InputDecoration(
-                  hintText: "Extension number",
+                  labelText: "Extension number",
+                  labelStyle: TextStyle(color: Colors.black54),
+                  floatingLabelStyle: TextStyle(color: Colors.deepOrangeAccent),
+                  filled: false,
                   suffix: IconButton(
                     tooltip: "Transer Blind",
                     onPressed: () {
                       _transferBlind(_transferController.text);
                       Navigator.of(context).pop();
                     },
-                    icon: const Icon(Icons.arrow_right_alt),
+                    icon: Icon(Icons.arrow_right_alt, color: Colors.black),
                   ),
                 ),
               ),
