@@ -1,8 +1,4 @@
-import 'dart:io';
-
-import 'package:callingproject/src/utils/app_settings.dart';
 import 'package:callingproject/src/utils/constants.dart';
-import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:dio/dio.dart';
 
 import '../utils/shared_prefs.dart';
@@ -73,9 +69,7 @@ class AuthInterceptor extends Interceptor {
   ) async {
     // Handle token refresh, logging, or custom errors
     if (err.response?.statusCode == 401) {
-      await SecureStorage().clear();
       SharedPrefs().clear();
-
       // redirect to login page
     }
     super.onError(err, handler);

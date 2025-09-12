@@ -5,14 +5,13 @@ import 'package:callingproject/src/Providers/domain_provider.dart';
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/Providers/theme_provider.dart';
 import 'package:callingproject/src/models/call_model.dart';
-import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/pages/domain_screen.dart';
 import 'package:callingproject/src/pages/login_screen.dart';
+import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/splash_screen.dart';
 import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/secure_storage.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:callingproject/src/widget/dialpad_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -184,8 +183,8 @@ class _MyAppState extends State<MyApp> {
 
   void _readSavedState() async {
     debugPrint('_readSavedState');
-    String accJsonStr = await SecureStorage().read(Constants.ACCOUNTS) ?? '';
-    String cdrsJsonStr = await SecureStorage().read(Constants.CRDS) ?? '';
+    String accJsonStr = await SharedPrefs().getValue(Constants.ACCOUNTS) ?? '';
+    String cdrsJsonStr = await SharedPrefs().getValue(Constants.CRDS) ?? '';
     _loadModels(accJsonStr, cdrsJsonStr);
   }
 
@@ -208,13 +207,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _saveCdrsChanges(String cdrsJsonStr) async {
-    await SecureStorage().write(key: Constants.CRDS, value: cdrsJsonStr);
+    await SharedPrefs().setValue(Constants.CRDS, cdrsJsonStr);
   }
 
   Future<void> _saveAccountChanges(String accountsJsonStr) async {
-    await SecureStorage().write(
-      key: Constants.ACCOUNTS,
-      value: accountsJsonStr,
-    );
+    await SharedPrefs().setValue(Constants.ACCOUNTS, accountsJsonStr);
   }
 }
