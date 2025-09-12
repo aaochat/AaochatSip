@@ -41,7 +41,6 @@ class Extension {
     account.sipServer = sipServer!.host!;
     account.sipExtension = extensionNumber;
     account.sipPassword = sipPassword;
-    account.expireTime = 350;
     account.port = sipServer!.port!;
     account.transport = sipServer!.protocol == "UDP" ? SipTransport.udp : SipTransport.tcp;
     account.ringTonePath = MyApp.getRingtonePath();
