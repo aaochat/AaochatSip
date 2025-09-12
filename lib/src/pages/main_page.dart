@@ -25,25 +25,12 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  AccountModel _account = AccountModel();
   double _windowWidth = 1150;
   var _selectedPageIndex = 0;
   EventTaxi eventBus = EventTaxiImpl.singleton();
-  CallProvider _callProvider = CallProvider();
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _account =
-        (ModalRoute.of(context)?.settings.arguments as AccountModel?) ??
-        AccountModel();
-
-    _callProvider = Provider.of<CallProvider>(context, listen: false);
-  }
 
   @override
   void initState() {
-
     context.read<AppCallsModel>().onNewIncomingCall = () {
       if (Platform.isWindows) {
         WindowManager.instance.setAlwaysOnTop(true);

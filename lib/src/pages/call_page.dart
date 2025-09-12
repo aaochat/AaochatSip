@@ -13,6 +13,7 @@ import 'package:siprix_voip_sdk/video.dart';
 import '../../main.dart';
 import '../models/call_model.dart';
 import '../providers/layout_provider.dart';
+import '../utils/showAppSnackBar.dart';
 import '../widget/dialpad_widget.dart';
 
 enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
@@ -123,7 +124,7 @@ class SwitchedCallWidget extends StatefulWidget {
 class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   final SiprixVideoRenderer _localRenderer = SiprixVideoRenderer();
   final SiprixVideoRenderer _remoteRenderer = SiprixVideoRenderer();
-  static double eIconSize = Platform.isAndroid || Platform.isIOS ? 45 : 35;
+  static double eIconSize = Platform.isAndroid || Platform.isIOS ? 40 : 30;
   bool _isRecording = false;
 
   EventTaxi eventBus = EventTaxiImpl.singleton();
@@ -294,11 +295,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     return children;
   }
 
+  static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 1.5;
+
   Widget buildIconButton(IconData icon, VoidCallback? onPressed) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.all(5),
-        fixedSize: Size(eIconSize * 1.5, eIconSize * 1.5),
+        fixedSize: Size(
+          eIconSize * eBackgroundSizeMultiplication,
+          eIconSize * eBackgroundSizeMultiplication,
+        ),
         shape: const CircleBorder(),
         side: BorderSide.none,
         backgroundColor: Colors.grey.withOpacity(0.1),
@@ -403,6 +409,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       runSpacing: 10,
       children: [
         IconButton.filledTonal(
+          padding: EdgeInsets.all(eIconSize / 2.3),
           iconSize: eIconSize,
           onPressed: _rejectCall,
           icon: const Icon(Icons.call_end),
@@ -412,6 +419,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ),
         ),
         IconButton.filledTonal(
+          padding: EdgeInsets.all(eIconSize / 2.3),
           iconSize: eIconSize,
           onPressed: _acceptCall,
           icon: const Icon(Icons.call),
@@ -427,6 +435,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   Widget _buildHangupButton() {
     final bool enabled = (widget.myCall.state != CallState.disconnecting);
     return IconButton.filledTonal(
+      padding: EdgeInsets.all(eIconSize / 2.3),
       iconSize: eIconSize,
       icon: const Icon(Icons.call_end),
       style: OutlinedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
@@ -437,7 +446,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
   void showSnackBar(dynamic err) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+    showAppSnackBar(context, message: err);
   }
 
   List<MenuItemButton> _buildPlayoutDevicesMenu() {

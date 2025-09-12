@@ -4,6 +4,8 @@ import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../utils/showAppSnackBar.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -47,9 +49,7 @@ class _LoginscreenState extends State<LoginScreen> {
 
   Future<void> _onSubmit(LoginProvider provider) async {
     if (provider.validate() != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(provider.validate() ?? '')));
+      showAppSnackBar(context, message: provider.validate() ?? '');
       return;
     }
     final String? error = await provider.login(
@@ -64,9 +64,7 @@ class _LoginscreenState extends State<LoginScreen> {
         (Route<dynamic> route) => false,
       );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
+      showAppSnackBar(context, message: error);
     }
   }
 
@@ -80,6 +78,7 @@ class _LoginscreenState extends State<LoginScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 10),
           IconButton(
             onPressed: () {
               Navigator.pop(context);

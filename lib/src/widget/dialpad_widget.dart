@@ -17,6 +17,7 @@ import '../pages/settings_page.dart';
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
 import '../utils/shared_prefs.dart';
+import '../utils/showAppSnackBar.dart';
 
 class DialpadWidget extends StatefulWidget {
   const DialpadWidget(this.popUpMode, {super.key});
@@ -251,9 +252,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
                   Navigator.of(context).pop();
                 }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(mCallProvider.errorText!)),
-                );
+                showAppSnackBar(context, message: mCallProvider.errorText!);
               }
             }),
             // ActionButton(
@@ -512,11 +511,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
         child: Row(
           children: [
             Icon(
-              acc.regState == RegState.success || acc.regState ==RegState.inProgress
+              acc.regState == RegState.success
                   ? Icons.check_circle_outline
                   : Icons.error_outline,
               color:
-              acc.regState == RegState.success ||acc.regState ==RegState.inProgress ? Colors.green : Colors.red,
+              acc.regState == RegState.success ? Colors.green : Colors.red,
             ),
             SizedBox(width: 10),
             Text(acc.sipExtension),

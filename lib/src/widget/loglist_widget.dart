@@ -1,10 +1,13 @@
 import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+
 import '../event/PlaceCallEvent.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
@@ -32,6 +35,7 @@ class _LogScreenState extends State<LogListScreen> {
   Timer? _timer;
 
   String mExtentionNumber = "";
+  final Key _visibilityDetectorKey = UniqueKey();
 
   @override
   void initState() {
@@ -74,11 +78,23 @@ class _LogScreenState extends State<LogListScreen> {
     super.initState();
   }
 
+  void _handleVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) return;
+    player.stop();
+    isPlaying = false;
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     
     final mCallProvider = Provider.of<CallProvider>(context);
-    return Container(
+    return VisibilityDetector(
+        onVisibilityChanged: _handleVisibilityChanged,
+        key: _visibilityDetectorKey,
+        child: Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),
 
@@ -112,7 +128,7 @@ class _LogScreenState extends State<LogListScreen> {
           ),
         ],
       ),
-    );
+        ));
   }
 
   @override

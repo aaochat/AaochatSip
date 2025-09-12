@@ -1,10 +1,11 @@
+import 'package:audioplayers/audioplayers.dart' as audioPlayer;
 import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/models/voice_mail_log.dart';
 import 'package:callingproject/src/repository/sip_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:provider/provider.dart';
-import 'package:audioplayers/audioplayers.dart' as audioPlayer;
+import 'package:siprix_voip_sdk/accounts_model.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VoicemailWidget extends StatefulWidget {
   VoicemailWidget({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
   final player = audioPlayer.AudioPlayer();
   String recordingFile = '';
   bool isPlaying = false;
+  final Key _visibilityDetectorKey = UniqueKey();
 
   @override
   void initState() {
@@ -53,9 +55,21 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
     super.dispose();
   }
 
+  void _handleVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) return;
+    player.stop();
+    isPlaying=false;
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return VisibilityDetector(
+        onVisibilityChanged: _handleVisibilityChanged,
+        key: _visibilityDetectorKey,
+        child: Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),
       child: ListView.separated(
@@ -118,6 +132,6 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
         separatorBuilder: (context, index) => SizedBox(height: 10),
         itemCount: voiceMailList.length,
       ),
-    );
+        ));
   }
 }

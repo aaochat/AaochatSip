@@ -10,6 +10,7 @@ import 'package:siprix_voip_sdk/siprix_voip_sdk.dart';
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
 import '../utils/shared_prefs.dart';
+import '../utils/showAppSnackBar.dart';
 import 'domain_screen.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -48,18 +49,18 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   List<Widget> _buildBody(DevicesModel devices) {
-    if (Platform.isIOS) {
-      return [const Text('iOS doesn\'t have settings yet')];
-    } else if (Platform.isAndroid) {
-      return [
-        SwitchListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-          title: const Text('Run phone service in foreground mode'),
-          value: devices.foregroundModeEnabled,
-          onChanged: onSetForegroundMode,
-        ),
-      ];
-    } else {
+    // if (Platform.isIOS) {
+    //   return [const Text('iOS doesn\'t have settings yet')];
+    // } else if (Platform.isAndroid) {
+    //   return [
+    //     SwitchListTile(
+    //       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+    //       title: const Text('Run phone service in foreground mode'),
+    //       value: devices.foregroundModeEnabled,
+    //       onChanged: onSetForegroundMode,
+    //     ),
+    //   ];
+    // } else {
       return [
         _buildPlayoutDevicesDropDown(devices),
         const SizedBox(height: 20),
@@ -105,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: const Text('Delete Account'),
         ),
       ];
-    }
+    // }
   }
 
   DropdownMenuItem<int> mediaDeviceItem(MediaDevice dvc) {
@@ -189,7 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void showSnackBar(dynamic err) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+    showAppSnackBar(context, message: err);
   }
 
   Future<void> requestMicPermissions() async {

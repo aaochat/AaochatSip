@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/domain_provider.dart';
+import '../utils/showAppSnackBar.dart';
 import 'login_screen.dart';
 
 class Domainscreen extends StatefulWidget {
@@ -126,9 +127,7 @@ class _DomainscreenState extends State<Domainscreen> {
 
   Future<void> _onSubmit(DomainProvider provider) async {
     if (!provider.validate()) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(provider.ValidatorDomainMsg)));
+      showAppSnackBar(context, message: provider.ValidatorDomainMsg);
       return;
     }
     try {
@@ -140,14 +139,10 @@ class _DomainscreenState extends State<Domainscreen> {
           MaterialPageRoute(builder: (_) => LoginScreen()),
         );
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error)));
+        showAppSnackBar(context, message: error);
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAppSnackBar(context, message: e.toString());
     }
   }
 }
