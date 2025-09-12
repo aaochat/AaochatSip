@@ -26,8 +26,9 @@ class _LoginscreenState extends State<LoginScreen> {
 
   @override
   initState() {
-    super.initState();
+    
     ExtensionUtil.deleteAllAccounts(context);
+    super.initState();
   }
 
   @override
@@ -58,11 +59,13 @@ class _LoginscreenState extends State<LoginScreen> {
     );
     if (error == null) {
       await ExtensionUtil.initializeAccounts(context);
+      Future.delayed(Duration(seconds: 2), () {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => MainPage()),
         (Route<dynamic> route) => false,
       );
+      });
     } else {
       showAppSnackBar(context, message: error);
     }

@@ -35,13 +35,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
   List<TelephoneMaster> allTelephoneMaster = [];
   EventTaxi eventBus = EventTaxiImpl.singleton();
   var _mCallProvider = CallProvider();
-  var _accounts = AccountsModel();
   List<SIPUser> allSipUsers = [];
 
   @override
   void didChangeDependencies() {
     _mCallProvider = Provider.of<CallProvider>(context);
-    _accounts = context.read<AccountsModel>();
     super.didChangeDependencies();
   }
 
@@ -65,10 +63,19 @@ class _DialpadscreenState extends State<DialpadWidget> {
       _mCallProvider.phoneNumbCtrl.text =
           event.phoneNumber.replaceAll(new RegExp(r'[^0-9]'), '');
       if (event.placeCall) {
-        _mCallProvider.mInvite(context, false, _accounts);
+        _mCallProvider.mInvite(context, false, context.read<AccountsModel>());
       }
     });
+
+    context.read<AccountsModel>().addListener(() {
+      if(mounted) {
+        setState(() {
+        });
+      }
+    });
+    
   }
+  
 
   @override
   Widget build(BuildContext context) {

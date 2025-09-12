@@ -23,7 +23,6 @@ class ExtensionUtil {
             .map((e) => Extension.fromJson(e))
             .toList();
 
-print('extensions: ${extensions[0].sipServer?.protocol}');
     for (int i = 0; i < extensions.length; i++) {
       await context.read<AccountsModel>().addAccount(
         extensions[i].toAccountModel(),
