@@ -16,6 +16,7 @@
         android:enableOnBackInvokedCallback="true"
         android:label="Aao Voip"
         android:name="${applicationName}"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/voip_logo">
         <activity
             android:name=".MainActivity"

@@ -1,6 +1,6 @@
+import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart' as audioPlayer;
-import 'dart:async';
 import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/event/refresh_voice_mail_event.dart';
 import 'package:callingproject/src/models/voice_mail_log.dart';
@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
+import '../providers/layout_provider.dart';
 
 class VoicemailWidget extends StatefulWidget {
   VoicemailWidget({Key? key}) : super(key: key);
@@ -34,13 +36,23 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
 
   @override
   void initState() {
-    getVoiceMailList();
+    final provider = Provider.of<LayoutProvider>(context, listen: false);
+    provider.getVoiceMailList(context);
 
     refreshVoiceMailSubscription = eventBus
         .registerTo<RefreshVoiceMailEvent>(false)
         .listen((event) {
-          getVoiceMailList();
+      provider.getVoiceMailList(context);
+    });
+
+    player.onPlayerStateChanged.listen((event) {
+      if (event == audioPlayer.PlayerState.completed) {
+        isPlaying = false;
+        recordingFile = '';
+        setState(() {
         });
+      }
+    });
 
     super.initState();
   }
@@ -90,93 +102,110 @@ class _VoicemailWidgetState extends State<VoicemailWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LayoutProvider>(context, listen: false);
+    if (provider.voiceMailList.isEmpty) {
+      return const Center(
+        child: Text(
+          "No records found",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
     return VisibilityDetector(
         onVisibilityChanged: _handleVisibilityChanged,
         key: _visibilityDetectorKey,
         child: Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(16),
-      child: ListView.separated(
-        itemBuilder:
-            (context, index) => Container(
-              constraints: BoxConstraints(minHeight: 50),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  spacing: 20,
-                  children: [
-                    if (LayoutUtil.isMobile())
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            voiceMailList[index].caller_id,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
+          child: Consumer<LayoutProvider>(
+              builder: (context, provider, _) {
+                return ListView.separated(
+                  itemBuilder:
+                      (context, index) =>
+                      Container(
+                        constraints: BoxConstraints(minHeight: 50),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            spacing: 20,
+                            children: [
+                              if (LayoutUtil.isMobile())
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      provider.voiceMailList[index].caller_id,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      provider.voiceMailList[index].getFormattedDate(),
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              if (!LayoutUtil.isMobile())
+                                Text(
+                                  provider.voiceMailList[index].caller_id,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (!LayoutUtil.isMobile())
+                                Text(
+                                  provider.voiceMailList[index].getFormattedDate(),
+                                  style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                                ),
+                              Spacer(),
+                              InkWell(
+                                child: Icon(
+                                  isPlaying &&
+                                      recordingFile ==
+                                          provider.voiceMailList[index].getVoiceMailFile()
+                                      ? Icons.stop
+                                      : Icons.play_arrow,
+                                ),
+                                onTap: () {
+                                  if (player.state == audioPlayer.PlayerState.playing) {
+                                    player.stop();
+                                    isPlaying = false;
+                                    recordingFile = '';
+                                    setState(() {});
+                                  } else {
+                                    player.play(
+                                      audioPlayer.UrlSource(
+                                        provider.voiceMailList[index].getVoiceMailFile(),
+                                      ),
+                                    );
+                                    player.getDuration();
+                                    isPlaying = true;
+                                    recordingFile =
+                                        provider.voiceMailList[index].getVoiceMailFile();
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                            ],
                           ),
-                          Text(
-                            voiceMailList[index].getFormattedDate(),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (!LayoutUtil.isMobile())
-                      Text(
-                        voiceMailList[index].caller_id,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    if (!LayoutUtil.isMobile())
-                      Text(
-                        voiceMailList[index].getFormattedDate(),
-                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                      ),
-                    Spacer(),
-                    InkWell(
-                      child: Icon(
-                        isPlaying &&
-                                recordingFile ==
-                                    voiceMailList[index].getVoiceMailFile()
-                            ? Icons.stop
-                            : Icons.play_arrow,
-                      ),
-                      onTap: () {
-                        if (player.state == audioPlayer.PlayerState.playing) {
-                          player.stop();
-                          isPlaying = false;
-                          recordingFile = '';
-                          setState(() {});
-                        } else {
-                          player.play(
-                            audioPlayer.UrlSource(
-                              voiceMailList[index].getVoiceMailFile(),
-                            ),
-                          );
-                          player.getDuration();
-                          isPlaying = true;
-                          recordingFile =
-                              voiceMailList[index].getVoiceMailFile();
-                          setState(() {});
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        separatorBuilder: (context, index) => SizedBox(height: 10),
-        itemCount: voiceMailList.length,
-      ),
+                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                  itemCount:  provider.voiceMailList.length,
+                );
+              }),
         ));
   }
 }

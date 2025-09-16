@@ -602,7 +602,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
   }
 
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
-   await mCallProvider.logout();
+      await mCallProvider.logout();
       await ExtensionUtil.deleteAllAccounts(context);
       await SharedPrefs().clear();
       Navigator.pushAndRemoveUntil(

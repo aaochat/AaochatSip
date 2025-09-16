@@ -10,6 +10,7 @@ import 'package:callingproject/src/widget/voicemail_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -51,6 +52,17 @@ class _MainPageState extends State<MainPage> {
 
     };
 
+    final selectedAccountId = context
+        .read<AccountsModel>()
+        .selAccountId;
+    final selectedAccount = context
+        .read<AccountsModel>()
+        .accounts
+        .firstWhere(
+          (element) => element.myAccId == selectedAccountId,
+    );
+
+    context.read<LayoutProvider>().connectToSocket(selectedAccount.sipServer);
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
       setState(() {
@@ -301,6 +313,8 @@ class _MainPageState extends State<MainPage> {
     final provider = Provider.of<LayoutProvider>(context, listen: false);
     if (index == 0) {
       provider.goToCallLogs();
+    } else if (index == 2) {
+      provider.getVoiceMailList(context);
     }
   }
 }

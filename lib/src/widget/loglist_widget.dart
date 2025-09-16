@@ -1,16 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
+import 'package:callingproject/src/widget/ai_boat_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
+import '../event/CallAnalyticsUpdatedEvent.dart';
 import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
+import '../utils/Constants.dart';
+import '../utils/shared_prefs.dart';
 
 enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
 
@@ -43,6 +49,7 @@ class _LogScreenState extends State<LogListScreen> {
       (element) => element.myAccId == selectedAccountId,
     );
     mExtentionNumber = selectedAccount.sipExtension;
+    // mExtentionNumber = jsonDecode(SharedPrefs().getValue(Constants.EXTENSION_NUMBER));
 
     final provider = Provider.of<LayoutProvider>(context, listen: false);
 
@@ -62,8 +69,20 @@ class _LogScreenState extends State<LogListScreen> {
       if (event == PlayerState.completed) {
         isPlaying = false;
         recordingFile = '';
+        setState(() {
+        });
       }
     });
+
+    eventBus.registerTo<CallAnalyticsUpdatedEvent>(false).listen((event) async {
+      for (var callLog in provider.logList) {
+        if (callLog.getRecordingFile().contains(event.recording_file)) {
+          callLog.is_call_summary = event.is_call_summary;
+        }
+      }
+      setState(() {});
+    });
+
 
     eventBus.registerTo<RefreshCallLogEvent>(false).listen((event) {
       if (event.isUpdate) {
@@ -78,6 +97,7 @@ class _LogScreenState extends State<LogListScreen> {
   }
 
   void _handleVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) return;
     player.stop();
     isPlaying = false;
     setState(() {
@@ -141,6 +161,18 @@ class _LogScreenState extends State<LogListScreen> {
     LayoutProvider provider,
     CallProvider mCallProvider,
   ) {
+    if (provider.logList.isEmpty) {
+      return const Center(
+        child: Text(
+          "No records found",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
     return ListView.builder(
       controller: _scrollController,
       itemCount: provider.logList.length + (provider.hasMore ? 1 : 0),
@@ -229,6 +261,26 @@ class _LogScreenState extends State<LogListScreen> {
                           : Icons.play_arrow,
                     ),
                   ),
+
+                if (cdrs.is_call_summary)
+                  SizedBox(width: 15),
+                if (cdrs.is_call_summary)
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) =>
+                              ApiBoatWidget(mURL: cdrs.getRecordingFile()))
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      child: Image.asset('assets/ai.png'),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -242,12 +294,24 @@ class _LogScreenState extends State<LogListScreen> {
     LayoutProvider provider,
     CallProvider mCallProvider,
   ) {
+    if (provider.logList.isEmpty) {
+      return const Center(
+        child: Text(
+          "No records found",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
     return ListView.builder(
       controller: _scrollController,
       itemCount: provider.logList.length + (provider.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (provider.hasMore && index == provider.logList.length) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator()),
           );
@@ -348,6 +412,25 @@ class _LogScreenState extends State<LogListScreen> {
                   )
                 else
                   Expanded(flex: 1, child: SizedBox()),
+
+                if (cdrs.is_call_summary)
+                  Expanded(flex: 1,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) =>
+                                  ApiBoatWidget(mURL: cdrs.getRecordingFile()))
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          child: Image.asset('assets/ai.png'),
+                        ),
+                      )),
               ],
             ),
           ),

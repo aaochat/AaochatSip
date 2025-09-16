@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/devices_model.dart';
 import 'package:siprix_voip_sdk/siprix_voip_sdk.dart';
 
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
+import '../utils/extension_util.dart';
 import '../utils/shared_prefs.dart';
 import '../utils/showAppSnackBar.dart';
 import 'domain_screen.dart';
@@ -230,24 +230,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
-    var response = await mCallProvider.DeleteAccountApiCalling(context);
-    if (response) {
-      try {
-        for (int i = 0; i < context
-            .read<AccountsModel>()
-            .length; i++) {
-          await context.read<AccountsModel>().deleteAccount(i);
-        }
-      } catch (e) {
-        print(e);
-      }
-      await SharedPrefs().clear();
-      mCallProvider.clearText();
+    await mCallProvider.DeleteAccountApiCalling(context);
+    await ExtensionUtil.deleteAllAccounts(context);
+    await SharedPrefs().clear();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => Domainscreen()),
         ModalRoute.withName("/Login"),
       );
-    }
   }
 }

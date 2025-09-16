@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -5,16 +6,19 @@ import 'package:callingproject/src/Databased/calllog_history.dart';
 import 'package:callingproject/src/api_response/api_response.dart';
 import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/repository/sip_repository.dart';
-import 'package:dio/dio.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/cdrs_model.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import '../Repository/api_calling_repository.dart';
 import '../api_response/call_log_response.dart';
+import '../event/CallAnalyticsUpdatedEvent.dart';
 import '../event/refresh_call_log_event.dart';
+import '../models/voice_mail_log.dart';
 import '../utils/Constants.dart';
 import '../utils/shared_prefs.dart';
 
@@ -42,6 +46,27 @@ class LayoutProvider extends ChangeNotifier {
 
   List<CallLogHistory> get mCallLogHistory =>
       _box.values.toList().reversed.toList();
+
+  connectToSocket(String sipServer) {
+    String mBaseUrl = "http://" + sipServer + ":3000/";
+    print('connecting to socket');
+    IO.Socket socket = IO.io(
+        mBaseUrl,
+        IO.OptionBuilder()
+            .setTransports(['websocket']) // for Flutter or Dart VM
+            .disableAutoConnect()
+            .enableReconnection()
+            .build());
+    socket.onConnect((_) {
+      print('connected to socket');
+    });
+    socket.on('call:summary:updated', (data) {
+      eventBus.fire(CallAnalyticsUpdatedEvent.fromMap(data));
+    });
+    socket.onError((error) => print(error));
+    socket.onDisconnect((_) => print('disconnect'));
+    socket.connect();
+  }
 
   Future<void> UpdateCallLog(CallLogHistory callLog) async {
     final box = Hive.box<CallLogHistory>(Constants.TBL_CALLLOG);
@@ -215,7 +240,7 @@ class LayoutProvider extends ChangeNotifier {
   String getFormattedCallStatusName(CallLogResponse cdr) {
     if (cdr.disposition == 'ANSWERED') {
       return 'ANSWERED';
-    } else if (SharedPrefs().getValue(Constants.EXTENSION_NUMBER).toString().contains(cdr.dst) && cdr.disposition == 'NO ANSWER') {
+    } else if (jsonDecode(SharedPrefs().getValue(Constants.EXTENSION_NUMBER)).toString().contains(cdr.dst) && cdr.disposition == 'NO ANSWER') {
       return 'MISSED CALL';
     }
     return cdr.disposition.toUpperCase();
@@ -296,7 +321,8 @@ class LayoutProvider extends ChangeNotifier {
 
   List<CallLogResponse> get logList => _logList;
 
-  Future<void> getCallLogs( String sipServerHost, String mExtensionId, {bool isFirstTime = false}) async {
+  Future<void> getCallLogs(String sipServerHost, String mExtensionId,
+      {bool isFirstTime = false}) async {
     if (_loading) {
       return;
     }
@@ -343,7 +369,6 @@ class LayoutProvider extends ChangeNotifier {
   Future<void> refreshLogs(String sipServerHost, String mExtensionId) async {
     _page = 1;
     _logList.clear();
-    _hasMore = true;
     await getCallLogs(sipServerHost, mExtensionId);
   }
 
@@ -393,6 +418,44 @@ class LayoutProvider extends ChangeNotifier {
 
   void EventBusforUpdateCallLog(bool isUpdate) {
     eventBus.fire(RefreshCallLogEvent(isUpdate: isUpdate));
+  }
+
+
+  List<VoiceMailLog> _voicemailList = [];
+
+  List<VoiceMailLog> get voiceMailList => _voicemailList;
+
+  Future<void> getVoiceMailList(BuildContext context) async {
+    if (_loading)
+      return;
+    _loading = true;
+
+    try {
+      final selectedAccountId = context
+          .read<AccountsModel>()
+          .selAccountId;
+      final selectedAccount = context
+          .read<AccountsModel>()
+          .accounts
+          .firstWhere(
+              (element) => element.myAccId == selectedAccountId);
+
+      ApiResponse<List<VoiceMailLog>> response =
+      await SipRepository.getVoiceMailList(
+        selectedAccount.sipServer,
+        selectedAccount.sipExtension,
+      );
+      if (response.status == "success" && response.data != null) {
+        final newItems = response.data ?? [];
+        _voicemailList = newItems;
+      }
+      _loading = false;
+    } catch (e) {
+      print(e);
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
   }
 
   getCallDestinationName(CallLogResponse? callLog) {

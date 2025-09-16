@@ -47,7 +47,9 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.1.1
   infinite_scroll_pagination: ^4.1.0
-  siprix_voip_sdk: ^1.0.14
+  siprix_voip_sdk: ^1.0.19
+  flutter_inappwebview: ^6.0.0
+  socket_io_client: ^3.1.2
 #  siprix_voip_sdk: ^1.0.18
 #  siprix_voip_sdk:
 #    # When depending on this package from a real application you should use:

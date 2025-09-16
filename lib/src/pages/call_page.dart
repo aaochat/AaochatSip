@@ -236,7 +236,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         children: [
           buildIconButton(
             widget.myCall.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
-            _muteMic
+            _muteMic,
           ),
           buildIconButton(Icons.dialpad_rounded, isCallConnected ? _toggleSendDtmfMode : null),
 
@@ -272,7 +272,8 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
           buildIconButton(
             tooltipMessage: "Record Call",
-            Icons.fiber_manual_record_outlined,
+            color: _isRecording ? Colors.green : null,
+            _isRecording ? Icons.fiber_manual_record : Icons.fiber_manual_record_outlined,
             isCallConnected ? _handleRecord : null,
           ),
         ],
@@ -292,7 +293,11 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
             isCallConnected ? () => _openCallTransferPopup(context) : null,
           ),
 
-          buildIconButton(Icons.group_outlined, isCallConnected ? _makeConference : null,tooltipMessage: "Make conference"),
+          buildIconButton(
+            Icons.group_outlined,
+            isCallConnected ? _makeConference : null,
+            tooltipMessage: "Make conference",
+          ),
         ],
       ),
     );
@@ -302,8 +307,8 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
   static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 1.5;
 
-  Widget buildIconButton(IconData icon, VoidCallback? onPressed,{String? tooltipMessage}) {
-    Widget button= OutlinedButton(
+  Widget buildIconButton(IconData icon, VoidCallback? onPressed,{String? tooltipMessage,Color? color}) {
+    Widget button = OutlinedButton(
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.all(5),
         fixedSize: Size(
@@ -315,7 +320,8 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         backgroundColor: Colors.grey.withOpacity(0.1),
       ),
       onPressed: onPressed,
-      child: Center(child: Icon(icon, size: eIconSize, color: Colors.white54)),
+      child: Center(
+          child: Icon(icon, size: eIconSize, color: color == null ? Colors.white54 : color)),
     );
 
     if (tooltipMessage != null && tooltipMessage.isNotEmpty) {
@@ -359,9 +365,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
               TextField(
                 controller: _transferController,
                 cursorColor: Colors.deepOrangeAccent,
-                style: TextStyle(
-                  color: Colors.black87,
-                ),
+                style: TextStyle(color: Colors.black87),
                 onSubmitted: (value) {
                   _transferBlind(value);
                   Navigator.of(context).pop();
@@ -415,7 +419,9 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
   _handleRecord() async {
     widget.myCall.sendDtmf('*');
-    _isRecording = !_isRecording;
+    setState(() {
+      _isRecording = !_isRecording;
+    });
     Future.delayed(const Duration(milliseconds: 100), () {
       widget.myCall.sendDtmf('1');
     });

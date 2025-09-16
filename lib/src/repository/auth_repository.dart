@@ -78,7 +78,7 @@ class AuthRepository {
     try {
        String? tenantId = SharedPrefs().getValue(Constants.USER_DOMAIN_ID);
       final response = await ApiClient.instance.request(
-        '/tenant/$tenantId/auth/logout', DioMethod.post
+          AppSettings.API_URL +'/tenant/$tenantId/auth/logout', DioMethod.post
       );
       ApiResponse<String> apiResponse = ApiResponse<String>.fromJsonString(
         response.data,

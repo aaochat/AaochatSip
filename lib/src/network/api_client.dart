@@ -25,7 +25,17 @@ class ApiClient {
           "Content-Type": "application/json",
         },
       ),
-    )..interceptors.addAll([AuthInterceptor()]);
+    )
+      ..interceptors.addAll([AuthInterceptor(), LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        logPrint: (obj) => print(obj),
+      )
+      ]);
     switch (method) {
       case DioMethod.post:
         return dio.post(endpoint, data: param ?? formData);

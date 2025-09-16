@@ -34,6 +34,7 @@ class CallLogResponse {
   final String linkedid;
   final String peeraccount;
   final int sequence;
+  bool is_call_summary;
 
   CallLogResponse({
     required this.calldate,
@@ -62,6 +63,7 @@ class CallLogResponse {
     required this.linkedid,
     required this.peeraccount,
     required this.sequence,
+    required this.is_call_summary,
   });
 
   factory CallLogResponse.fromJson(Map<String, dynamic> json) {
@@ -92,6 +94,7 @@ class CallLogResponse {
       linkedid: json["linkedid"] ?? "",
       peeraccount: json["peeraccount"] ?? "",
       sequence: json["sequence"] ?? 0,
+      is_call_summary: json["is_call_summary"] ?? false,
     );
   }
 
@@ -123,6 +126,7 @@ class CallLogResponse {
       "linkedid": linkedid,
       "peeraccount": peeraccount,
       "sequence": sequence,
+      "is_call_summary": is_call_summary,
     };
   }
 
@@ -142,11 +146,11 @@ class CallLogResponse {
   Icon getFormattedCallIcon(String extensionNumber) {
     if (src == extensionNumber || channel.contains(extensionNumber)) {
       return disposition == 'ANSWERED'
-          ? const Icon(Icons.call_received_rounded, color: Colors.green)
+          ? const Icon(Icons.call_made_rounded, color: Colors.green)
           : const Icon(Icons.call_missed_outgoing_rounded, color: Colors.red);
     } else {
       return disposition == 'ANSWERED'
-          ? const Icon(Icons.call_made_rounded, color: Colors.green)
+          ? const Icon(Icons.call_received_rounded, color: Colors.green)
           : const Icon(
         Icons.call_missed_rounded,
         color: Colors.red,

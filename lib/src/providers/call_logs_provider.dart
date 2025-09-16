@@ -78,41 +78,33 @@ class CallProvider extends ChangeNotifier {
 
   bool get isLoading => _loading;
 
-  Future<void> logout() async {
- await AuthRepository.logout();
-    SharedPrefs().clear();
+  Future<String?> logout() async {
+    try {
+      ApiResponse<String> response = await AuthRepository.logout();
+      if (response.status == "success") {
+        SharedPrefs().clear();
+        return null;
+      } else {
+        return response.message;
+      }
+    } catch (e) {
+      _error = "An unexpected error occurred: $e";
+      return _error;
+    }
   }
 
-  Future<bool> DeleteAccountApiCalling(BuildContext context) async {
+  Future<String?> DeleteAccountApiCalling(BuildContext context) async {
     _loading = true;
-    _error = "";
     notifyListeners();
     try {
-      ApiResponse<String> response =
-          await ApiCallingRepo.GetDeleteAccountRequest(context);
+      ApiResponse<String> response = await ApiCallingRepo.GetDeleteAccountRequest(context);
       if (response.status == "success") {
-        return true;
+        return null;
       } else {
-        return false;
+        return response.message;
       }
-    } on DioException catch (dioError) {
-      // Handle Dio-specific errors
-      if (dioError.response!.statusCode == 400) {
-        _error = dioError.response?.data["message"];
-      } else if (dioError.type == DioExceptionType.receiveTimeout) {
-        _error = "Receive timeout. Try again later.";
-      } else if (dioError.type == DioExceptionType.badResponse) {
-        _error = "Bad response: ${dioError.response?.statusCode}";
-      } else if (dioError.type == DioExceptionType.connectionError) {
-        _error = "Connection error. Please try again.";
-      } else {
-        _error = "Unexpected error occurred: ${dioError.message}";
-      }
-      return false;
     } catch (e) {
-      // Handle any other unexpected errors
-      _error = "An unexpected error occurred: $e";
-      return false;
+      return e.toString();
     } finally {
       _loading = false;
       notifyListeners();
