@@ -1,10 +1,11 @@
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/utils/extension_util.dart';
+import 'package:callingproject/src/widget/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/showAppSnackBar.dart';
+import '../utils/snackbar_util.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,11 +16,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginscreenState extends State<LoginScreen> {
   OutlineInputBorder border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(15),
+    borderRadius: BorderRadius.circular(5),
+    
+    borderSide: BorderSide(color: Colors.grey),
   );
 
   OutlineInputBorder focusBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(15),
+    borderRadius: BorderRadius.circular(5),
+    
+    borderSide: BorderSide(color: Colors.grey),
   );
 
   bool _obscureText = true;
@@ -36,12 +41,12 @@ class _LoginscreenState extends State<LoginScreen> {
     final mLoginProvider = Provider.of<LoginProvider>(context);
 
     return Scaffold(
+      appBar: ThemeAppBar(),
       body: Center(
         child: Container(
-          height: MediaQuery.of(context).size.height,
           width: double.infinity,
           color: Colors.grey.shade900,
-          constraints: const BoxConstraints(maxWidth: 500),
+          constraints: const BoxConstraints(maxWidth: 500,),
           child: Center(child: _buildMobileLayout(context, mLoginProvider)),
         ),
       ),
@@ -59,13 +64,13 @@ class _LoginscreenState extends State<LoginScreen> {
     );
     if (error == null) {
       await ExtensionUtil.initializeAccounts(context);
-      Future.delayed(Duration(seconds: 2), () {
+      // Future.delayed(Duration(seconds: 2), () {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => MainPage()),
         (Route<dynamic> route) => false,
       );
-      });
+      // });
     } else {
       showAppSnackBar(context, message: error);
     }
@@ -80,15 +85,14 @@ class _LoginscreenState extends State<LoginScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: IconButton(
+         IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 icon: Icon(Icons.arrow_back),
-              )),
+              ),
 
           // Logo Panel on top
           Expanded(
@@ -106,7 +110,7 @@ class _LoginscreenState extends State<LoginScreen> {
             child: TextField(
                       cursorColor: Colors.deepOrangeAccent,
                       controller: mLoginProvider.mEmailController,
-
+autofocus: true,
                       decoration: InputDecoration(
                         labelText: "Username",
                         enabledBorder: border,
@@ -156,7 +160,7 @@ class _LoginscreenState extends State<LoginScreen> {
                               backgroundColor: Colors.deepOrangeAccent,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             ),
                             child:
@@ -191,14 +195,6 @@ class _LoginscreenState extends State<LoginScreen> {
         children: [
           Image.asset('assets/voip_logo.png', height: 100, fit: BoxFit.contain),
           const SizedBox(height: 20),
-          const Text(
-            'Welcome Back!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
           const Padding(
             padding: EdgeInsets.all(12.0),
             child: Text(

@@ -6,6 +6,7 @@ import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/pages/call_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
+import 'package:callingproject/src/widget/appbar.dart';
 import 'package:callingproject/src/widget/voicemail_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
@@ -84,12 +85,13 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<LayoutProvider>(context);
     return Scaffold(
-      appBar:
-          !Platform.isWindows && !Platform.isMacOS
-              ? AppBar(
-              leading: Padding(padding: EdgeInsets.all(10),child: Image.asset('assets/voip_logo.png',)),
-              title: Text('Aao VOIP', style: TextStyle(fontSize: 20),), actions: [SizedBox(width: 10)])
-              : null,
+       appBar: ThemeAppBar(),
+      // appBar:
+      //     !Platform.isWindows && !Platform.isMacOS
+      //         ? AppBar(
+      //         leading: Padding(padding: EdgeInsets.all(10),child: Image.asset('assets/voip_logo.png',)),
+      //         title: Text('Aao VOIP', style: TextStyle(fontSize: 20),), actions: [SizedBox(width: 10)])
+              // : null,
       body: getBody(provider),
       bottomNavigationBar:
           MediaQuery.sizeOf(context).width > _windowWidth

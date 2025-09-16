@@ -8,7 +8,7 @@ import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
 import '../utils/extension_util.dart';
 import '../utils/shared_prefs.dart';
-import '../utils/showAppSnackBar.dart';
+import '../utils/snackbar_util.dart';
 import 'domain_screen.dart';
 
 class SettingsPage extends StatefulWidget {

@@ -8,7 +8,6 @@ import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/repository/sip_repository.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
@@ -39,13 +38,8 @@ class LayoutProvider extends ChangeNotifier {
 
   final player = AudioPlayer();
 
-  final Box<CallLogHistory> _box = Hive.box<CallLogHistory>(
-    Constants.TBL_CALLLOG,
-  );
   DateFormat format = DateFormat("MMM dd yyyy, hh:mm:ss a");
 
-  List<CallLogHistory> get mCallLogHistory =>
-      _box.values.toList().reversed.toList();
 
   connectToSocket(String sipServer) {
     String mBaseUrl = "http://" + sipServer + ":3000/";
@@ -68,39 +62,7 @@ class LayoutProvider extends ChangeNotifier {
     socket.connect();
   }
 
-  Future<void> UpdateCallLog(CallLogHistory callLog) async {
-    final box = Hive.box<CallLogHistory>(Constants.TBL_CALLLOG);
-    try {
-      // Parse to DateTime
-      DateTime parsedDate = format.parse(callLog.madeAtDate!);
-      // Use millisecondsSinceEpoch as key
-      String key = (parsedDate.millisecondsSinceEpoch.toString());
-      // Save to Hive (add or update)
-      await box.put(key, callLog);
-      notifyListeners();
 
-      print('Record added or updated at $key');
-    } catch (e) {
-      print('Failed to parse date or save record: $e');
-    }
-  }
-
-  Future<void> Updateduration(String mDuration) async {
-    if (_box.isNotEmpty) {
-      final lastRecord = _box.values.last;
-      DateTime parsedDate = format.parse(lastRecord.madeAtDate!);
-      String key = (parsedDate.millisecondsSinceEpoch.toString());
-      lastRecord.duration = mDuration;
-      _box.put(key, lastRecord);
-      notifyListeners();
-    }
-  }
-
-  List<CallLogHistory> getSuggestions(String pattern) {
-    return _box.values
-        .where((log) => log.displName!.contains(pattern))
-        .toList();
-  }
 
   // List<CallLogHistory> filterTelephoneMaster(String search) {
   //   if (search.isEmpty) {
@@ -123,20 +85,6 @@ class LayoutProvider extends ChangeNotifier {
   //       .toList();
   // }
 
-  Future<void> deleteCallLog(CallLogHistory cdr) async {
-    final keyToDelete = _box.keys.firstWhere(
-      (key) => _box.get(key)?.madeAtDate == cdr.madeAtDate,
-      orElse: () => null,
-    );
-
-    if (keyToDelete != null) {
-      _box.delete(keyToDelete);
-      print("Record with id ${cdr.madeAtDate} deleted.");
-    } else {
-      print("Record not found.");
-    }
-    notifyListeners();
-  }
 
   playRingtone() async {
     player.setVolume(1);
@@ -184,7 +132,6 @@ class LayoutProvider extends ChangeNotifier {
         statusCode: calls[0].statusCode,
         madeAtDate: calls[0].madeAtDate,
       );
-      UpdateCallLog(callLog);
       log("Call_Update_Log: ${callLog.toString()}");
     }
   }

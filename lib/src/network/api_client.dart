@@ -26,15 +26,7 @@ class ApiClient {
         },
       ),
     )
-      ..interceptors.addAll([AuthInterceptor(), LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        logPrint: (obj) => print(obj),
-      )
+      ..interceptors.addAll([AuthInterceptor()
       ]);
     switch (method) {
       case DioMethod.post:

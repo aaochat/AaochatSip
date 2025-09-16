@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:callingproject/src/api_response/call_log_response.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
-import 'package:callingproject/src/widget/ai_boat_widget.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../event/CallAnalyticsUpdatedEvent.dart';
@@ -15,9 +15,6 @@ import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
-import '../utils/Constants.dart';
-import '../utils/shared_prefs.dart';
-
 enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
 
 enum CdrAction { delete, deleteAll }
@@ -41,6 +38,8 @@ class _LogScreenState extends State<LogListScreen> {
 
   String mExtentionNumber = "";
   final Key _visibilityDetectorKey = UniqueKey();
+  StreamSubscription<RefreshCallLogEvent>? refreshCallLogSubscription;
+  StreamSubscription<CallAnalyticsUpdatedEvent>? callAnalyticsUpdatedSubscription;
 
   @override
   void initState() {
@@ -69,12 +68,11 @@ class _LogScreenState extends State<LogListScreen> {
       if (event == PlayerState.completed) {
         isPlaying = false;
         recordingFile = '';
-        setState(() {
-        });
+        setState(() {});
       }
     });
 
-    eventBus.registerTo<CallAnalyticsUpdatedEvent>(false).listen((event) async {
+    callAnalyticsUpdatedSubscription = eventBus.registerTo<CallAnalyticsUpdatedEvent>(false).listen((event) async {
       for (var callLog in provider.logList) {
         if (callLog.getRecordingFile().contains(event.recording_file)) {
           callLog.is_call_summary = event.is_call_summary;
@@ -84,7 +82,7 @@ class _LogScreenState extends State<LogListScreen> {
     });
 
 
-    eventBus.registerTo<RefreshCallLogEvent>(false).listen((event) {
+    refreshCallLogSubscription = eventBus.registerTo<RefreshCallLogEvent>(false).listen((event) {
       if (event.isUpdate) {
         Future.delayed(Duration(seconds: 2), () {
           provider.getNewCallLogs(selectedAccount.sipServer, mExtentionNumber);
@@ -105,6 +103,14 @@ class _LogScreenState extends State<LogListScreen> {
     });
   }
 
+  goToCallAnalytics(CallLogResponse cdrs) {
+    final selectedAccountId = context.read<AccountsModel>().selAccountId;
+    final selectedAccount = context.read<AccountsModel>().accounts.firstWhere(
+      (element) => element.myAccId == selectedAccountId,
+    );
+   launchUrl(Uri.parse("http://" + selectedAccount.sipServer + ":3000/call-analytics/" + cdrs.recordingfile.split("/").last));
+  }
+
   @override
   Widget build(BuildContext context) {
     
@@ -121,9 +127,7 @@ class _LogScreenState extends State<LogListScreen> {
           Consumer<LayoutProvider>(
             builder: (context, provider, _) {
               return Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Container(
+                child:  Container(
                       height: LayoutUtil.isMobile() ? null : 500,
                       width: double.infinity,
                       child:
@@ -138,11 +142,12 @@ class _LogScreenState extends State<LogListScreen> {
                                 provider,
                                 mCallProvider,
                               ),
-                    );
-                  },
-                ),
-              );
-            },
+                    )
+                  
+                );
+            }
+              
+            
           ),
         ],
       ),
@@ -152,7 +157,10 @@ class _LogScreenState extends State<LogListScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _scrollController.dispose();
     player.dispose();
+    refreshCallLogSubscription?.cancel();
+    callAnalyticsUpdatedSubscription?.cancel();
     super.dispose();
   }
 
@@ -210,11 +218,7 @@ class _LogScreenState extends State<LogListScreen> {
                         mCallProvider.phoneNumbCtrl.text = cdrs.src.toString();
                       }
                     },
-                    child: Text(
-                      cdrs.src == mExtentionNumber ||
-                              cdrs.channel.contains(mExtentionNumber)
-                          ? cdrs.dst
-                          : "${cdrs.cnam} (${cdrs.src})",
+                    child: Text(cdrs.getFormattedCallExtension(mExtentionNumber),
                       style: TextStyle(fontSize: 12),
                     ),
                   ),
@@ -267,11 +271,8 @@ class _LogScreenState extends State<LogListScreen> {
                 if (cdrs.is_call_summary)
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) =>
-                              ApiBoatWidget(mURL: cdrs.getRecordingFile()))
-                      );
+                      goToCallAnalytics(cdrs);
+                    
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
@@ -417,11 +418,8 @@ class _LogScreenState extends State<LogListScreen> {
                   Expanded(flex: 1,
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) =>
-                                  ApiBoatWidget(mURL: cdrs.getRecordingFile()))
-                          );
+                          goToCallAnalytics(cdrs);
+                        
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(

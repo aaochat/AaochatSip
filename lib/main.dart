@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:callingproject/src/Databased/calllog_history.dart';
 import 'package:callingproject/src/Providers/domain_provider.dart';
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/Providers/theme_provider.dart';
@@ -12,12 +11,12 @@ import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/splash_screen.dart';
 import 'package:callingproject/src/utils/Constants.dart';
+import 'package:callingproject/src/utils/app_settings.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:callingproject/src/widget/dialpad_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
@@ -33,10 +32,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefs.init();
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(CallLogHistoryAdapter());
-  await Hive.openBox<CallLogHistory>(Constants.TBL_CALLLOG);
-
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     await windowManager.ensureInitialized();
 
@@ -45,6 +40,8 @@ void main() async {
       minimumSize: Size(1200, 750),
       center: true,
       title: 'Aao VOIP',
+      backgroundColor: Colors.transparent,
+      titleBarStyle: TitleBarStyle.hidden,
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -165,6 +162,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  @override
   void initState() {
     super.initState();
     _initializeSiprix(context.read<LogsModel>());
@@ -172,11 +170,12 @@ class _MyAppState extends State<MyApp> {
     _readSavedState();
   }
 
-  static void _initializeSiprix([LogsModel? logsModel]) async {
+  static void _initializeSiprix(LogsModel? logsModel) async {
     debugPrint('_initializeSiprix');
     InitData iniData = InitData();
-    iniData.license = "LicensedTo[DeepFoodsInc]_Platforms[WIN_ANDR_IOS_OSX_LIN]_Features[V_MC_MA_MSG]_SupportTill[20251001]_UpdatesTill[20251001]_Key[MC0CFQCEL7qLQSA4k1sPKLRyU0j+YuLrZgIUYyyeXhz/XN1yLDIzOfEEUuyXxMs=]";
-    iniData.logLevelFile = LogLevel.debug;
+    iniData.brandName = "TeamLocus";
+    iniData.license = AppSettings.LICENSE_KEY;
+    iniData.logLevelFile = LogLevel.info;
     iniData.logLevelIde = LogLevel.info;
     await SiprixVoipSdk().initialize(iniData, logsModel);
   }

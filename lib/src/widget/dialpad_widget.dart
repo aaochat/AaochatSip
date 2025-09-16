@@ -8,18 +8,14 @@ import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
-
-import '../Databased/calllog_history.dart';
 import '../event/place_call_event.dart';
 import '../models/telephone_master.dart';
 import '../pages/settings_page.dart';
 import '../providers/call_logs_provider.dart';
-import '../utils/Constants.dart';
 import '../utils/shared_prefs.dart';
-import '../utils/showAppSnackBar.dart';
+import '../utils/snackbar_util.dart';
 
 class DialpadWidget extends StatefulWidget {
   const DialpadWidget(this.popUpMode, {super.key});
@@ -36,6 +32,8 @@ class _DialpadscreenState extends State<DialpadWidget> {
   EventTaxi eventBus = EventTaxiImpl.singleton();
   var _mCallProvider = CallProvider();
   List<SIPUser> allSipUsers = [];
+  
+  final phoneNumberController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -350,7 +348,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
         hideOnEmpty: true,
         debounceDuration: const Duration(milliseconds: 100), // live update
         suggestionsCallback: (search) {
-          return allSipUsers.where((element) => element.name.contains(search) || element.extension.contains(search)).take(10).toList();
+          return allSipUsers.where((element) => element.name.contains(search) || element.extension.contains(search)).take(5).toList();
         },
 
         itemBuilder: (context, SIPUser mSIPUser) {
@@ -520,18 +518,6 @@ class _DialpadscreenState extends State<DialpadWidget> {
             Text(acc.sipExtension),
           ],
         ));
-  }
-
-  Future<void> deleteCallLogBox() async {
-    // 1. Close the box if it's open
-    if (Hive.isBoxOpen(Constants.TBL_CALLLOG)) {
-      await Hive.box(Constants.TBL_CALLLOG).close();
-    }
-
-    // 2. Delete the box from disk
-    await Hive.deleteBoxFromDisk(Constants.TBL_CALLLOG);
-
-    print('${Constants.TBL_CALLLOG} deleted successfully');
   }
 
   void _onShowSettings() {

@@ -36,6 +36,8 @@ class _SplashscreenState extends State<Splashscreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Image.asset('assets/voip_logo.png',height: 150,width: 150,)));
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(child: Image.asset('assets/voip_logo.png',height: 150,width: 150,)));
   }
 }

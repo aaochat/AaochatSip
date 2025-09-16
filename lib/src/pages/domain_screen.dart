@@ -1,8 +1,9 @@
+import 'package:callingproject/src/widget/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/domain_provider.dart';
-import '../utils/showAppSnackBar.dart';
+import '../utils/snackbar_util.dart';
 import 'login_screen.dart';
 
 class Domainscreen extends StatefulWidget {
@@ -14,11 +15,13 @@ class Domainscreen extends StatefulWidget {
 
 class _DomainscreenState extends State<Domainscreen> {
   OutlineInputBorder border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(15),
+    borderRadius: BorderRadius.circular(5),
+    borderSide: BorderSide(color: Colors.grey),
   );
 
   OutlineInputBorder focusBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(15),
+    borderRadius: BorderRadius.circular(5),
+    borderSide: BorderSide(color: Colors.grey),
   );
 
   @override
@@ -26,14 +29,13 @@ class _DomainscreenState extends State<Domainscreen> {
     final mDomainProvider = Provider.of<DomainProvider>(context);
 
     return Scaffold(
+      appBar: ThemeAppBar(),
       body: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Container(
+        child:  Container(
               constraints: const BoxConstraints(maxWidth: 500),
               child: _buildMobileLayout(context, mDomainProvider),
-            );
-          },
+            
+          
         ),
       ),
     );
@@ -43,9 +45,10 @@ class _DomainscreenState extends State<Domainscreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(color: Colors.grey.shade900),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        // mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
             'assets/voip_logo.png',
@@ -54,14 +57,6 @@ class _DomainscreenState extends State<Domainscreen> {
             fit: BoxFit.contain,
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Welcome Back!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
           const Padding(
             padding: EdgeInsets.all(20.0),
             child: Text(
@@ -76,6 +71,7 @@ class _DomainscreenState extends State<Domainscreen> {
             constraints: BoxConstraints(maxWidth: 350),
             child: TextField(
               controller: provider.domainController,
+              autofocus: true,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.done,
               cursorColor: Colors.deepOrangeAccent,
@@ -101,7 +97,7 @@ class _DomainscreenState extends State<Domainscreen> {
                       backgroundColor: Colors.deepOrangeAccent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                     ),
                     child:

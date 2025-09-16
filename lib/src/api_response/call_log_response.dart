@@ -138,9 +138,10 @@ class CallLogResponse {
     DateTime localTime = DateTime.parse(calldate).toLocal();
     String formatted = DateFormat("dd MMM yy hh:mm a").format(localTime);
     return formatted;
-    // DateTime mDate =
-    // DateFormat('yyyy-MM-dd HH:mm:ss').parse(calldate, true).toLocal();
-    // return DateFormat('dd MMM yy hh:mm a').format(mDate);
+  }
+
+  String getFormattedCallExtension(String myExtension) {
+    return src == myExtension || channel.contains(myExtension) ? dst : cnam;
   }
 
   Icon getFormattedCallIcon(String extensionNumber) {
