@@ -31,7 +31,6 @@ class _LoginscreenState extends State<LoginScreen> {
 
   @override
   initState() {
-    
     ExtensionUtil.deleteAllAccounts(context);
     super.initState();
   }
@@ -110,7 +109,7 @@ class _LoginscreenState extends State<LoginScreen> {
             child: TextField(
                       cursorColor: Colors.deepOrangeAccent,
                       controller: mLoginProvider.mEmailController,
-autofocus: true,
+                      autofocus: true,
                       decoration: InputDecoration(
                         labelText: "Username",
                         enabledBorder: border,

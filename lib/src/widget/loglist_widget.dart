@@ -48,7 +48,6 @@ class _LogScreenState extends State<LogListScreen> {
       (element) => element.myAccId == selectedAccountId,
     );
     mExtentionNumber = selectedAccount.sipExtension;
-    // mExtentionNumber = jsonDecode(SharedPrefs().getValue(Constants.EXTENSION_NUMBER));
 
     final provider = Provider.of<LayoutProvider>(context, listen: false);
 

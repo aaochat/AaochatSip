@@ -363,11 +363,6 @@ class LayoutProvider extends ChangeNotifier {
     }
   }
 
-  void EventBusforUpdateCallLog(bool isUpdate) {
-    eventBus.fire(RefreshCallLogEvent(isUpdate: isUpdate));
-  }
-
-
   List<VoiceMailLog> _voicemailList = [];
 
   List<VoiceMailLog> get voiceMailList => _voicemailList;
@@ -391,6 +386,7 @@ class LayoutProvider extends ChangeNotifier {
       await SipRepository.getVoiceMailList(
         selectedAccount.sipServer,
         selectedAccount.sipExtension,
+
       );
       if (response.status == "success" && response.data != null) {
         final newItems = response.data ?? [];
