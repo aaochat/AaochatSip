@@ -34,8 +34,6 @@ class _DomainscreenState extends State<Domainscreen> {
         child:  Container(
               constraints: const BoxConstraints(maxWidth: 500),
               child: _buildMobileLayout(context, mDomainProvider),
-            
-          
         ),
       ),
     );
@@ -44,7 +42,7 @@ class _DomainscreenState extends State<Domainscreen> {
   Widget _buildMobileLayout(BuildContext context, DomainProvider provider) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(color: Colors.grey.shade900),
+      // decoration: BoxDecoration(color: Colors.white60),
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +60,7 @@ class _DomainscreenState extends State<Domainscreen> {
             child: Text(
               'Sign in to continue and manage your account.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.black),
             ),
           ),
           const SizedBox(height: 20),
@@ -74,13 +72,12 @@ class _DomainscreenState extends State<Domainscreen> {
               autofocus: true,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.done,
-              cursorColor: Colors.deepOrangeAccent,
+              cursorColor: Theme.of(context).primaryColorLight,
               decoration: InputDecoration(
                 labelText: "Domain Name",
                 enabledBorder: border,
                 focusedBorder: focusBorder,
               ),
-              style: TextStyle(color: Colors.white),
               onSubmitted: (_) => _onSubmit(provider),
             ),
           ),
@@ -94,7 +91,7 @@ class _DomainscreenState extends State<Domainscreen> {
                   child: ElevatedButton(
                     onPressed: () => _onSubmit(provider),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepOrangeAccent,
+                      backgroundColor: Theme.of(context).primaryColorLight,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),

@@ -321,7 +321,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       ),
       onPressed: onPressed,
       child: Center(
-          child: Icon(icon, size: eIconSize, color: color == null ? Colors.white54 : color)),
+          child: Icon(icon, size: eIconSize, color: color == null ? Colors.black : color)),
     );
 
     if (tooltipMessage != null && tooltipMessage.isNotEmpty) {
@@ -603,19 +603,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('1', style: TextStyle(color: Colors.white54)),
+              child: const Text('1', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("1");
               },
             ),
             OutlinedButton(
-              child: const Text('2', style: TextStyle(color: Colors.white54)),
+              child: const Text('2', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("2");
               },
             ),
             OutlinedButton(
-              child: const Text('3', style: TextStyle(color: Colors.white54)),
+              child: const Text('3', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("3");
               },
@@ -627,19 +627,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('4', style: TextStyle(color: Colors.white54)),
+              child: const Text('4', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("4");
               },
             ),
             OutlinedButton(
-              child: const Text('5', style: TextStyle(color: Colors.white54)),
+              child: const Text('5', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("5");
               },
             ),
             OutlinedButton(
-              child: const Text('6', style: TextStyle(color: Colors.white54)),
+              child: const Text('6', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("6");
               },
@@ -651,19 +651,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('7', style: TextStyle(color: Colors.white54)),
+              child: const Text('7', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("7");
               },
             ),
             OutlinedButton(
-              child: const Text('8', style: TextStyle(color: Colors.white54)),
+              child: const Text('8', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("8");
               },
             ),
             OutlinedButton(
-              child: const Text('9', style: TextStyle(color: Colors.white54)),
+              child: const Text('9', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("9");
               },
@@ -675,19 +675,19 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           spacing: spacing,
           children: <Widget>[
             OutlinedButton(
-              child: const Text('*', style: TextStyle(color: Colors.white54)),
+              child: const Text('*', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("*");
               },
             ),
             OutlinedButton(
-              child: const Text('0', style: TextStyle(color: Colors.white54)),
+              child: const Text('0', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("0");
               },
             ),
             OutlinedButton(
-              child: const Text('#', style: TextStyle(color: Colors.white54)),
+              child: const Text('#', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 _sendDtmf("#");
               },

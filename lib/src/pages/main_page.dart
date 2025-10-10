@@ -39,7 +39,8 @@ class _MainPageState extends State<MainPage> {
         Future.delayed(Duration(seconds: 2), () {
           WindowManager.instance.setAlwaysOnTop(false);
         });
-
+        final mprovider = Provider.of<LayoutProvider>(context, listen: false);
+        mprovider.toggleIncomingCallPage();
 
       } else if (Platform.isMacOS) {
         // MacOs specific code here
@@ -128,16 +129,23 @@ class _MainPageState extends State<MainPage> {
           height: MediaQuery.of(context).size.height,
           child: Row(
             children: [
-              Container(
-                // color: Colors.grey.withOpacity(0.1),
-                padding: const EdgeInsets.all(10),
-                constraints: BoxConstraints(maxWidth: 400),
-                child: CallPage(),
-              ),
+              if (provider.showCallPage)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: CallPage(),
+                ),
+
+              // Container(
+              //   // color: Colors.white,
+              //   padding: const EdgeInsets.all(10),
+              //   constraints: BoxConstraints(maxWidth: 400),
+              //   child: CallPage(),
+              // ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
+                    // color: Colors.white,
                     border: Border(
                       left: BorderSide(
                         color: Colors.black.withOpacity(1),
@@ -149,88 +157,109 @@ class _MainPageState extends State<MainPage> {
                     children: [
                       Container(
                         padding: EdgeInsets.all(16),
-                        color: Colors.grey.withOpacity(0.1),
+                        // color: Colors.white,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade900,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.1),
-                                ),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      provider.goToCallLogs();
-                                    },
-                                    child: Container(
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            provider.sideScreen == 'call-logs'
-                                                ? Colors.blueGrey
-                                                : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Call Logs',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color:
-                                                provider.sideScreen ==
-                                                        'call-logs'
-                                                    ? Colors.white
-                                                    : Colors.grey,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      provider.goToVoiceMails();
-                                    },
-                                    child: Container(
-                                      height: 35,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            provider.sideScreen == 'voice-mails'
-                                                ? Colors.blueGrey
-                                                : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Voice Mails',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color:
-                                                provider.sideScreen ==
-                                                        'voice-mails'
-                                                    ? Colors.white
-                                                    : Colors.grey,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            // Container(
+                            //   height: 35,
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.grey,
+                            //     borderRadius: BorderRadius.circular(24),
+                            //     border: Border.all(
+                            //       color: Colors.white.withOpacity(0.1),
+                            //     ),
+                            //   ),
+                            //   child: Row(
+                            //     crossAxisAlignment: CrossAxisAlignment.center,
+                            //     children: [
+                            //
+                            //       GestureDetector(
+                            //         onTap: () {
+                            //           provider.goToCallLogs();
+                            //         },
+                            //         child: Container(
+                            //           height: 35,
+                            //           decoration: BoxDecoration(
+                            //             color:
+                            //                 provider.sideScreen == 'call-logs'
+                            //                     ? Colors.blueGrey
+                            //                     : Colors.transparent,
+                            //             borderRadius: BorderRadius.circular(24),
+                            //           ),
+                            //           padding: EdgeInsets.symmetric(
+                            //             horizontal: 15,
+                            //           ),
+                            //           child: Center(
+                            //             child: Text(
+                            //               'Call Logs',
+                            //               style: TextStyle(
+                            //                 fontSize: 16,
+                            //                 color:
+                            //                     provider.sideScreen ==
+                            //                             'call-logs'
+                            //                         ? Colors.white
+                            //                         : Colors.grey.shade900,
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //       GestureDetector(
+                            //         onTap: () {
+                            //           provider.goToVoiceMails();
+                            //         },
+                            //         child: Container(
+                            //           height: 35,
+                            //           padding: EdgeInsets.symmetric(
+                            //             horizontal: 15,
+                            //           ),
+                            //           decoration: BoxDecoration(
+                            //             color:
+                            //                 provider.sideScreen == 'voice-mails'
+                            //                     ? Colors.blueGrey
+                            //                     : Colors.transparent,
+                            //             borderRadius: BorderRadius.circular(24),
+                            //           ),
+                            //           child: Center(
+                            //             child: Text(
+                            //               'Voice Mails',
+                            //               style: TextStyle(
+                            //                 fontSize: 16,
+                            //                 color:
+                            //                     provider.sideScreen ==
+                            //                             'voice-mails'
+                            //                         ? Colors.white
+                            //                         : Colors.grey.shade900,
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+
+                            Text(
+                              'Call Logs',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold
                               ),
                             ),
                             Spacer(),
+
+                            IconButton(
+                              onPressed: () {
+                                provider.toggleCallPage(); // 👈 this changes visibility
+                              },
+                              icon: Icon(
+                                provider.showCallPage
+                                    ? Icons.close_fullscreen
+                                    : Icons.open_in_full, // change icon
+                              ),
+                            ),
 
                             IconButton(
                               onPressed: () {
@@ -255,6 +284,8 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
               ),
+
+
             ],
           ),
         ),

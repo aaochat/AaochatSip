@@ -23,20 +23,112 @@ class SettingsPage extends StatefulWidget {
 typedef OnChangedCallback = void Function(int?);
 
 class _SettingsPageState extends State<SettingsPage> {
+
+  var _mCallProvider = CallProvider();
+
+  @override
+  void didChangeDependencies() {
+    _mCallProvider = Provider.of<CallProvider>(context);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     final devices = context.watch<DevicesModel>();
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     backgroundColor: Colors.grey.shade900,
+    //     surfaceTintColor: Colors.grey.shade900,
+    //     title: const Text('Settings'),
+    //   ),
+    //   body: Padding(
+    //     padding: const EdgeInsets.all(20),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.stretch,
+    //       children: _buildBody(devices),
+    //     ),
+    //   ),
+    // );
+
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade900,
-        surfaceTintColor: Colors.grey.shade900,
-        title: const Text('Settings'),
+        title: const Text("Settings"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: _buildBody(devices),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ---------- Device Settings ----------
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.white,
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Audio/Video Settings",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+
+                    // Playout device
+                    _buildPlayoutDevicesDropDown(devices),
+                    const SizedBox(height: 20),
+                    _buildRecordingDevicesDropDown(devices),
+                    const SizedBox(height: 20),
+                    _buildVideoDevicesDropDown(devices),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ---------- Account Actions ----------
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.white,
+              elevation: 3,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.privacy_tip, color: Colors.blue),
+                    title: const Text("Privacy Policy"),
+                    onTap: () {
+
+                    },
+                  ),
+                  const Divider(height: 1),
+
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.orange),
+                    title: const Text("Logout"),
+                    onTap: () {
+                      showLogoutDialog(context, _mCallProvider);
+                    },
+                  ),
+                  const Divider(height: 1),
+
+                  ListTile(
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    title: const Text("Delete Account"),
+                    onTap: () {
+                      ShowDeleteDialog();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -46,94 +138,59 @@ class _SettingsPageState extends State<SettingsPage> {
     mLogoutSession(context.read<CallProvider>());
   }
 
-  List<Widget> _buildBody(DevicesModel devices) {
-    // if (Platform.isIOS) {
-    //   return [const Text('iOS doesn\'t have settings yet')];
-    // } else if (Platform.isAndroid) {
-    //   return [
-    //     SwitchListTile(
-    //       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-    //       title: const Text('Run phone service in foreground mode'),
-    //       value: devices.foregroundModeEnabled,
-    //       onChanged: onSetForegroundMode,
-    //     ),
-    //   ];
-    // } else {
-      return [
-        _buildPlayoutDevicesDropDown(devices),
-        const SizedBox(height: 20),
-        _buildRecordingDevicesDropDown(devices),
-        const SizedBox(height: 20),
-        _buildVideoDevicesDropDown(devices),
-        const SizedBox(height: 20),
-        // DeleteAccountButton()
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: BorderSide(color: Colors.red),
-            ),
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text('Delete Account',
-                        style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    )),
-                    content: Text(
-                        'Are you sure you want to delete your account?',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        )),
-                    actions: [
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey.shade700,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel'),
-                      ),
+  void ShowDeleteDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) =>
+          AlertDialog(
+            title: Text('Delete Account',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                )),
+            content: Text(
+                'Are you sure you want to delete your account?',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                )),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade700,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
 
-                      // TextButton(
-                      //   onPressed: () {
-                      //     deleteAccount();
-                      //   },
-                      //   child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                      // ),
+              // TextButton(
+              //   onPressed: () {
+              //     deleteAccount();
+              //   },
+              //   child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              // ),
 
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          deleteAccount();
-                        },
-                        child: Text("Delete"),
-                      ),
-                    ],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-            );
-          },
-          child: const Text('Delete Account'),
-        ),
-      ];
-    // }
+                ),
+                onPressed: () {
+                  deleteAccount();
+                },
+                child: Text("Delete"),
+              ),
+            ],
+          ),
+    );
   }
 
   DropdownMenuItem<int> mediaDeviceItem(MediaDevice dvc) {
@@ -229,14 +286,83 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  // Future<void> mLogoutSession(CallProvider mCallProvider) async {
+  //   await mCallProvider.DeleteAccountApiCalling(context);
+  //   await ExtensionUtil.deleteAllAccounts(context);
+  //   await SharedPrefs().clear();
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => Domainscreen()),
+  //       ModalRoute.withName("/Login"),
+  //     );
+  // }
+
+  Future<void> showLogoutDialog(BuildContext context, CallProvider mCallProvider) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap a button
+      builder: (context) =>
+          AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            backgroundColor: Colors.white,
+            title: Row(
+              children: [
+                Icon(Icons.logout, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Text(
+                  "Confirm Logout",
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              "Are you sure you want to logout?",
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 15,
+              ),
+            ),
+            actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12,),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade700,
+                ),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  mLogoutSession(mCallProvider);
+                },
+                child: Text("Logout"),
+              ),
+            ],
+          ),
+    );
+  }
+
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
-    await mCallProvider.DeleteAccountApiCalling(context);
+    await mCallProvider.logout();
     await ExtensionUtil.deleteAllAccounts(context);
     await SharedPrefs().clear();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => Domainscreen()),
-        ModalRoute.withName("/Login"),
-      );
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Domainscreen(),
+      ),
+      ModalRoute.withName("/Login"),
+    );
   }
 }

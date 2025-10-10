@@ -44,7 +44,7 @@ class _LoginscreenState extends State<LoginScreen> {
       body: Center(
         child: Container(
           width: double.infinity,
-          color: Colors.grey.shade900,
+          color: Colors.white30,
           constraints: const BoxConstraints(maxWidth: 500,),
           child: Center(child: _buildMobileLayout(context, mLoginProvider)),
         ),
@@ -107,7 +107,7 @@ class _LoginscreenState extends State<LoginScreen> {
           Container(
             constraints: BoxConstraints(maxWidth: 350),
             child: TextField(
-                      cursorColor: Colors.deepOrangeAccent,
+                      cursorColor: Theme.of(context).primaryColorLight,
                       controller: mLoginProvider.mEmailController,
                       autofocus: true,
                       decoration: InputDecoration(
@@ -125,7 +125,7 @@ class _LoginscreenState extends State<LoginScreen> {
                       obscureText: _obscureText,
                       autocorrect: false,
                       textInputAction: TextInputAction.done,
-                      cursorColor: Colors.deepOrangeAccent,
+                      cursorColor: Theme.of(context).primaryColorLight,
                       decoration: InputDecoration(
                         labelText: "Password",
                         enabledBorder: border,
@@ -156,7 +156,7 @@ class _LoginscreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: () => _onSubmit(provider),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrangeAccent,
+                              backgroundColor: Theme.of(context).primaryColorLight,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
@@ -199,7 +199,7 @@ class _LoginscreenState extends State<LoginScreen> {
             child: Text(
               'Sign in to continue and manage your account.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],

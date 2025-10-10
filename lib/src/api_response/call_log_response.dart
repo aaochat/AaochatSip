@@ -1,10 +1,6 @@
-import 'package:callingproject/src/utils/constants.dart';
-import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../utils/app_settings.dart';
 
 @JsonSerializable()
 class CallLogResponse {
@@ -145,17 +141,16 @@ class CallLogResponse {
   }
 
   Icon getFormattedCallIcon(String extensionNumber) {
+    var greenColor = Colors.green.shade900;
+    var redColor = Colors.red.shade900;
     if (src == extensionNumber || channel.contains(extensionNumber)) {
       return disposition == 'ANSWERED'
-          ? const Icon(Icons.call_made_rounded, color: Colors.green)
-          : const Icon(Icons.call_missed_outgoing_rounded, color: Colors.red);
+          ? Icon(Icons.call_made_rounded, color: greenColor)
+          : Icon(Icons.call_missed_outgoing_rounded, color: redColor);
     } else {
       return disposition == 'ANSWERED'
-          ? const Icon(Icons.call_received_rounded, color: Colors.green)
-          : const Icon(
-        Icons.call_missed_rounded,
-        color: Colors.red,
-      );
+          ? Icon(Icons.call_received_rounded, color: greenColor)
+          : Icon(Icons.call_missed_rounded, color: redColor);
     }
   }
 

@@ -40,6 +40,7 @@ class LayoutProvider extends ChangeNotifier {
 
   DateFormat format = DateFormat("MMM dd yyyy, hh:mm:ss a");
 
+  bool showCallPage = false;
 
   connectToSocket(String sipServer) {
     String mBaseUrl = "http://" + sipServer + ":3000/";
@@ -151,6 +152,16 @@ class LayoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  toggleCallPage() {
+    showCallPage = !showCallPage;
+    notifyListeners();
+  }
+
+  toggleIncomingCallPage() {
+    showCallPage = true;
+    notifyListeners();
+  }
+
   goToDialPad() {
     _currentScreen = 'dialpad';
     notifyListeners();
@@ -195,9 +206,9 @@ class LayoutProvider extends ChangeNotifier {
 
   Color getCallLogColor(CallLogResponse cdr) {
     if (cdr.disposition == 'ANSWERED') {
-      return Colors.green;
+      return Colors.green.shade900;
     } else {
-      return Colors.red;
+      return Colors.red.shade900;
     }
   }
 

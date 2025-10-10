@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
+
 import '../event/place_call_event.dart';
 import '../models/telephone_master.dart';
 import '../pages/settings_page.dart';
@@ -91,8 +92,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
               .primaryColor
               .withOpacity(0.4))
           : null,
-      body: accounts.isEmpty ? _buildEmptyBody(mCallProvider) : _buildBody(
-          accounts, mCallProvider, mLayoutProvider),
+        body: Container(
+          color: widget.popUpMode ? Colors.white : null,
+          child: accounts.isEmpty ? _buildEmptyBody(mCallProvider) : _buildBody(
+              accounts, mCallProvider, mLayoutProvider),
+        )
     );
   }
 
@@ -165,14 +169,16 @@ class _DialpadscreenState extends State<DialpadWidget> {
       buttonSize = 72;
 
     const TextStyle numberStyle =
-    TextStyle(fontSize: 25, fontWeight: FontWeight.w400, color: Colors.white);
-    const TextStyle letterStyle = TextStyle(fontSize: 8, color: Colors.grey);
+    TextStyle(fontSize: 25, fontWeight: FontWeight.w400, color: Colors.black);
+    const TextStyle letterStyle = TextStyle(fontSize: 8, color: Colors.black);
 
     Widget buildKeypadButton(String number, String letters, VoidCallback onPressed) {
       return OutlinedButton(
         style: OutlinedButton.styleFrom(
           fixedSize: Size(buttonSize, buttonSize),
-          shape: const CircleBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8), // 0 for perfect square
+          ),
           side: BorderSide.none,
           backgroundColor: Colors.grey.withOpacity(0.1),
         ),
@@ -180,12 +186,13 @@ class _DialpadscreenState extends State<DialpadWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(number, style: numberStyle),
+            Text(number,
+                style: const TextStyle(
+                    fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black)),
             if (letters.isNotEmpty)
               Text(
                 letters,
-                style: letterStyle,
-                maxLines: 1,
+                style: const TextStyle(fontSize: 8, color: Colors.black54),
               ),
           ],
         ),
@@ -198,22 +205,45 @@ class _DialpadscreenState extends State<DialpadWidget> {
     else
       mCallbuttonSize = 62;
 
-    Widget buildCallButton(String number, VoidCallback onPressed) {
-      return OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          fixedSize: Size(mCallbuttonSize, mCallbuttonSize),
-          shape: const CircleBorder(),
-          side: BorderSide.none,
-          backgroundColor: Colors.green,
-          padding: EdgeInsets.zero,
-        ),
-        onPressed: onPressed,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(size: 30.0, Icons.dialer_sip, color: Colors.white)
-          ],
+    // Widget buildCallButton(String number, VoidCallback onPressed) {
+    //   return OutlinedButton(
+    //     style: OutlinedButton.styleFrom(
+    //       fixedSize: Size(mCallbuttonSize, mCallbuttonSize),
+    //       shape: const CircleBorder(),
+    //       side: BorderSide.none,
+    //       backgroundColor: Colors.green,
+    //       padding: EdgeInsets.zero,
+    //     ),
+    //     onPressed: onPressed,
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       crossAxisAlignment: CrossAxisAlignment.center,
+    //       children: [
+    //         Icon(size: 30.0, Icons.dialer_sip, color: Colors.white)
+    //       ],
+    //     ),
+    //   );
+    // }
+
+    Widget buildCallButton(VoidCallback onPressed) {
+      return InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(50),
+        child: Container(
+          width: mCallbuttonSize,
+          height: mCallbuttonSize,
+          decoration: BoxDecoration(
+            color: Colors.green,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: Offset(2, 2),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.phone, color: Colors.white, size: 30),
         ),
       );
     }
@@ -250,7 +280,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
             ]),
             const SizedBox(height: spacing * 2),
 
-            buildCallButton('Call', () {
+            buildCallButton(/*'Call', */ () {
               mCallProvider.mInvite(context, false, accounts);
               if (mCallProvider.errorText == null || mCallProvider.errorText == "") {
                 mCallProvider.clearText();
@@ -303,10 +333,13 @@ class _DialpadscreenState extends State<DialpadWidget> {
                         accounts.length, (index) => accMenuItem(accounts[index], index)),
                   ))),
           const SizedBox(width: 10),
+          Visibility(
+              visible: false,
+              child:
           IconButton(
               tooltip: 'Logout',
               onPressed: () => { showLogoutDialog(context, _mCallProvider)},
-              icon: const Icon(Icons.logout)),
+              icon: const Icon(Icons.logout))),
           IconButton(
               tooltip: 'Settings',
               onPressed: _onShowSettings,
@@ -369,7 +402,6 @@ class _DialpadscreenState extends State<DialpadWidget> {
                     mSIPUser.name ?? '',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -424,19 +456,24 @@ class _DialpadscreenState extends State<DialpadWidget> {
             child: TextField(
               focusNode: focusNode,
               controller: controller,
-              cursorColor: Colors.deepOrangeAccent,
+              cursorColor: Theme
+                  .of(context)
+                  .primaryColorLight,
               // textAlign: TextAlign.st,
               // style: TextStyle(fontSize: 18, color: textFieldColor),
               decoration: InputDecoration(
                 labelText: "Enter /Search phone number",
-                labelStyle: const TextStyle(color: Colors.white70),
-                floatingLabelStyle: const TextStyle(color: Colors.deepOrangeAccent),
+                floatingLabelStyle: TextStyle(color: Theme
+                    .of(context)
+                    .primaryColorLight),
                 filled: false,
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey), // default line
                 ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepOrangeAccent, width: 2),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Theme
+                      .of(context)
+                      .primaryColorLight, width: 2),
                 ),
 
                 suffixIcon: Padding(

@@ -5,7 +5,7 @@ class ThemeProvider extends ChangeNotifier {
   ThemeData? currentTheme;
 
   ThemeProvider() {
-    currentTheme = ThemeData.dark().copyWith(
+    currentTheme = ThemeData.light().copyWith(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
       primaryColor: Colors.deepOrange,
       primaryColorLight: Colors.deepOrangeAccent,

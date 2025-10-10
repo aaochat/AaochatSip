@@ -142,11 +142,8 @@ class _LogScreenState extends State<LogListScreen> {
                                 mCallProvider,
                               ),
                     )
-                  
                 );
             }
-              
-            
           ),
         ],
       ),
@@ -198,7 +195,7 @@ class _LogScreenState extends State<LogListScreen> {
           margin: EdgeInsets.only(bottom: 10),
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: Colors.grey.withOpacity(0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: IntrinsicHeight(
@@ -207,9 +204,11 @@ class _LogScreenState extends State<LogListScreen> {
                 cdrs.getFormattedCallIcon(mExtentionNumber),
                 SizedBox(width: 10),
                 Container(
-                  width: 90,
+                  width: 100,
                   child: InkWell(
                     onTap: () {
+                      final mprovider = Provider.of<LayoutProvider>(context, listen: false);
+                      mprovider.toggleIncomingCallPage();
                       if (cdrs.src == mExtentionNumber ||
                           cdrs.channel.contains(mExtentionNumber)) {
                         mCallProvider.phoneNumbCtrl.text = cdrs.dst.toString();
@@ -218,7 +217,7 @@ class _LogScreenState extends State<LogListScreen> {
                       }
                     },
                     child: Text(cdrs.getFormattedCallExtension(mExtentionNumber),
-                      style: TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -237,7 +236,7 @@ class _LogScreenState extends State<LogListScreen> {
                 SizedBox(width: 15),
                 Text(
                   cdrs.getFormattedCallDate(),
-                  style: TextStyle(color: Colors.white.withOpacity(1)),
+                  style: TextStyle(color: Colors.black.withOpacity(1), fontWeight: FontWeight.bold),
                 ),
 
                 // call button
@@ -278,7 +277,8 @@ class _LogScreenState extends State<LogListScreen> {
                       width: 30,
                       height: 30,
                       alignment: Alignment.center,
-                      child: Image.asset('assets/ai.png'),
+                      child: Image.asset('assets/ai.png', color: Colors.black,
+                          colorBlendMode: BlendMode.srcIn),
                     ),
                   ),
               ],
@@ -323,7 +323,7 @@ class _LogScreenState extends State<LogListScreen> {
           margin: EdgeInsets.only(bottom: 10),
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: Colors.grey.withOpacity(0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: IntrinsicHeight(
@@ -346,27 +346,27 @@ class _LogScreenState extends State<LogListScreen> {
                         }
                       },
                       child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
 
-                     Text(
-                          cdrs.src == mExtentionNumber || cdrs.channel.contains(mExtentionNumber)
-                              ? cdrs.dst
-                              : "${cdrs.cnam} (${cdrs.src})",
-                          style: TextStyle(fontSize: 14),
-                        ),
-
-                      Text(
-                          provider.getFormattedCallStatusName(cdrs),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: provider.getCallLogColor(cdrs),
+                          Text(
+                            cdrs.src == mExtentionNumber || cdrs.channel.contains(mExtentionNumber)
+                                ? cdrs.dst
+                                : "${cdrs.cnam} (${cdrs.src})",
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,),
                           ),
-                        ),
 
-                    ],
-                  ))
+                          Text(
+                            provider.getFormattedCallStatusName(cdrs),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: provider.getCallLogColor(cdrs),
+                            ),
+                          ),
+
+                        ],
+                      ))
                 ),
                 Expanded(
                   flex: 3,
@@ -376,7 +376,8 @@ class _LogScreenState extends State<LogListScreen> {
                     maxLines: 2,
                     style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(1)
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
                     ),
                   ),
                 ),
@@ -425,9 +426,10 @@ class _LogScreenState extends State<LogListScreen> {
                           width: 30,
                           height: 30,
                           alignment: Alignment.center,
-                          child: Image.asset('assets/ai.png'),
-                        ),
+                          child: Image.asset('assets/ai.png', color: Colors.black,
+                              colorBlendMode: BlendMode.srcIn),
                       )),
+                  ),
               ],
             ),
           ),
