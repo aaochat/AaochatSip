@@ -9,6 +9,7 @@ import 'package:callingproject/src/pages/login_screen.dart';
 import 'package:callingproject/src/pages/main_page.dart';
 import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
+import 'package:callingproject/src/providers/signup_provider.dart';
 import 'package:callingproject/src/splash_screen.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/app_settings.dart';
@@ -63,6 +64,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => DomainProvider()),
+        ChangeNotifierProvider(create: (_) => SignupProvider()),
 
         ChangeNotifierProvider(create: (_) => CallProvider()),
         ChangeNotifierProvider(create: (_) => LayoutProvider()),

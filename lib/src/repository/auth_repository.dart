@@ -41,6 +41,38 @@ class AuthRepository {
     }
   }
 
+  static Future<ApiResponse<String>> Signup(String fName,
+      String LName,
+      String email,
+      String password,) async {
+    try {
+      final response = await ApiClient.instance.request(
+        "https://beta-aaochat-sip-api.aaochat.com/master/auth/signup",
+        DioMethod.post,
+        param: {'fname': fName, 'lname': LName, 'email': email, 'password': password},
+      );
+      ApiResponse<String> apiResponse =
+      ApiResponse<String>.fromJsonString(
+        response.data,
+            (data) => data.toString(),
+      );
+
+      return apiResponse;
+    } on DioException catch (dioError) {
+      print(dioError);
+      return ApiResponse<String>(
+        status: 'error',
+        message: dioError.response?.data["message"],
+      );
+    } catch (e) {
+      print(e);
+      return ApiResponse<String>(
+        status: 'error',
+        message: 'Failed to process your request. Please try again.',
+      );
+    }
+  }
+
   static Future<ApiResponse<String>> validateDomain(String domainName) async {
     try {
       final response = await ApiClient.instance.request(

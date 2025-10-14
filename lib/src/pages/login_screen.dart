@@ -1,12 +1,15 @@
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/pages/main_page.dart';
+import 'package:callingproject/src/pages/signup_page.dart';
 import 'package:callingproject/src/utils/extension_util.dart';
-import 'package:callingproject/src/widget/appbar.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/layout_util.dart';
 import '../utils/snackbar_util.dart';
+import '../widget/appbar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -344,6 +347,35 @@ class _LoginscreenState extends State<LoginScreen> {
                                   onSubmitted: (_) => _onSubmit(mLoginProvider),
                                 )),
                             const SizedBox(height: 24),
+                            RichText(
+                              text: TextSpan(
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                                children: [
+                                  const TextSpan(
+                                    text:
+                                    "By Signing in, you Agree to our\n",
+                                  ),
+                                  TextSpan(
+                                    text: "Privacy Policy and Licence Agreement (EULA)",
+                                    style: const TextStyle(
+                                      color: Colors.blueAccent,
+                                      decoration: TextDecoration.underline,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = _launchPrivacyPolicy,
+                                  ),
+                                  const TextSpan(
+                                    text: ".",
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             Container(
                                 constraints: BoxConstraints(maxWidth: 350),
                                 child: Consumer<LoginProvider>(
@@ -399,6 +431,31 @@ class _LoginscreenState extends State<LoginScreen> {
                                     );
                                   },
                                 )),
+                            SizedBox(height: 30),
+                            Container(
+                              height: 45,
+                              child: Wrap(
+                                children: [
+                                  Text("Don't have an account?"),
+                                  SizedBox(width: 5),
+                                  InkWell(
+                                    onTap: () async {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => SignupPage()),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Register',
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ],
@@ -410,6 +467,16 @@ class _LoginscreenState extends State<LoginScreen> {
           ),
         )
     );
+  }
+
+
+  Future<void> _launchPrivacyPolicy() async {
+    final Uri url = Uri.parse('https://voip-api.aaochat.com/privacy-policy');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget _logoPanel(BuildContext context) {
