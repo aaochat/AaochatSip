@@ -3,6 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/devices_model.dart';
 import 'package:siprix_voip_sdk/siprix_voip_sdk.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/call_logs_provider.dart';
 import '../utils/Constants.dart';
@@ -35,21 +36,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final devices = context.watch<DevicesModel>();
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     backgroundColor: Colors.grey.shade900,
-    //     surfaceTintColor: Colors.grey.shade900,
-    //     title: const Text('Settings'),
-    //   ),
-    //   body: Padding(
-    //     padding: const EdgeInsets.all(20),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.stretch,
-    //       children: _buildBody(devices),
-    //     ),
-    //   ),
-    // );
-
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -91,7 +77,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
             const SizedBox(height: 24),
 
-            // ---------- Account Actions ----------
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -104,7 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     leading: const Icon(Icons.privacy_tip, color: Colors.blue),
                     title: const Text("Privacy Policy"),
                     onTap: () {
-
+                      launchUrl(Uri.parse("https://voip-api.aaochat.com/privacy-policy"));
                     },
                   ),
                   const Divider(height: 1),
@@ -134,6 +119,13 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void _openPrivacyPolicy() async {
+    final Uri url = Uri.parse('https://voip-api.aaochat.com/privacy-policy');
+    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+  }
+
   void deleteAccount() async {
     mLogoutSession(context.read<CallProvider>());
   }
@@ -144,6 +136,8 @@ class _SettingsPageState extends State<SettingsPage> {
       builder:
           (context) =>
           AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            backgroundColor: Colors.white,
             title: Text('Delete Account',
                 style: TextStyle(
                   color: Colors.black87,
@@ -154,7 +148,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 'Are you sure you want to delete your account?',
                 style: TextStyle(
                   color: Colors.black54,
-                  fontWeight: FontWeight.bold,
                   fontSize: 15,
                 )),
             actions: [
@@ -320,11 +313,11 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             content: Text(
-              "Are you sure you want to logout?",
-              style: TextStyle(
-                color: Colors.black54,
-                fontSize: 15,
-              ),
+                "Are you sure you want to logout?",
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15,
+                )
             ),
             actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12,),
             actions: [

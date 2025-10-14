@@ -26,7 +26,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  double _windowWidth = 1150;
   var _selectedPageIndex = 0;
   EventTaxi eventBus = EventTaxiImpl.singleton();
 
@@ -39,8 +38,8 @@ class _MainPageState extends State<MainPage> {
         Future.delayed(Duration(seconds: 2), () {
           WindowManager.instance.setAlwaysOnTop(false);
         });
-        final mprovider = Provider.of<LayoutProvider>(context, listen: false);
-        mprovider.toggleIncomingCallPage();
+        final mProvider = Provider.of<LayoutProvider>(context, listen: false);
+        mProvider.toggleIncomingCallPage();
 
       } else if (Platform.isMacOS) {
         // MacOs specific code here
@@ -95,7 +94,7 @@ class _MainPageState extends State<MainPage> {
               // : null,
       body: getBody(provider),
       bottomNavigationBar:
-          MediaQuery.sizeOf(context).width > _windowWidth
+      !LayoutUtil.isMobile()
               ? null
               : BottomNavigationBar(
                 currentIndex: _selectedPageIndex,
@@ -122,7 +121,7 @@ class _MainPageState extends State<MainPage> {
 
 
   getBody(LayoutProvider provider) {
-    if (MediaQuery.of(context).size.width > _windowWidth) {
+    if (!LayoutUtil.isMobile()) {
       return SizeChangedLayoutNotifier(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -135,13 +134,6 @@ class _MainPageState extends State<MainPage> {
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: CallPage(),
                 ),
-
-              // Container(
-              //   // color: Colors.white,
-              //   padding: const EdgeInsets.all(10),
-              //   constraints: BoxConstraints(maxWidth: 400),
-              //   child: CallPage(),
-              // ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -250,16 +242,19 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Spacer(),
 
+                            Visibility(
+                                visible: false,
+                                child:
                             IconButton(
                               onPressed: () {
-                                provider.toggleCallPage(); // 👈 this changes visibility
+                                provider.toggleCallPage(); // this changes visibility
                               },
                               icon: Icon(
                                 provider.showCallPage
                                     ? Icons.close_fullscreen
                                     : Icons.open_in_full, // change icon
                               ),
-                            ),
+                            )),
 
                             IconButton(
                               onPressed: () {
@@ -284,8 +279,6 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),

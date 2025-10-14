@@ -74,7 +74,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
     });
     
   }
-  
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,41 +118,12 @@ class _DialpadscreenState extends State<DialpadWidget> {
   Widget _buildBody(AccountsModel accounts,
       CallProvider mCallProvider,
       LayoutProvider mLayoutProvider) {
-    Color? textColor = Theme
-        .of(context)
-        .textTheme
-        .bodyMedium
-        ?.color;
-    Color? iconColor = Theme
-        .of(context)
-        .iconTheme
-        .color;
-    bool isDarkTheme = Theme
-        .of(context)
-        .brightness == Brightness.dark;
-
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      // Column(
-      //   crossAxisAlignment: CrossAxisAlignment.center,
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: _buildDialPad(accounts, mCallProvider, mLayoutProvider),
-      // ),
       Container(
-        // color: Theme.of(context).dialogBackgroundColor,
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
           child: Column(children: [
             _buildAccountsMenu(accounts, mCallProvider),
             const SizedBox(height: 15),
-            // Center(
-            //   child: Consumer<CallProvider>(
-            //     builder: (context, provider, child) {
-            //       return Text(
-            //         SharedPrefs().getValue(Constants.SIP_USERNAME) ?? '',
-            //         style: TextStyle(fontSize: 15, color: textColor),
-            //       );
-            //     },
-            //   ),
-            // ),
             const SizedBox(height: 20),
             _buildPhoneNumberField(mCallProvider),
           ])),
@@ -234,7 +205,8 @@ class _DialpadscreenState extends State<DialpadWidget> {
           height: mCallbuttonSize,
           decoration: BoxDecoration(
             color: Colors.green,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(8),
+            // shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),

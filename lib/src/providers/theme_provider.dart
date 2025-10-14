@@ -6,10 +6,10 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeProvider() {
     currentTheme = ThemeData.light().copyWith(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      primaryColor: Colors.deepOrange,
-      primaryColorLight: Colors.deepOrangeAccent,
-      primaryColorDark: Colors.deepOrange,
+      colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF232932)),
+      primaryColor: Color(0xFF232932),
+      primaryColorLight: Color(0xFF232932),
+      primaryColorDark: Color(0xFF232932),
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(color: Colors.grey),
         contentPadding: EdgeInsets.all(10.0),

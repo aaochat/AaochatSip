@@ -15,9 +15,6 @@ import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
-enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
-
-enum CdrAction { delete, deleteAll }
 
 class LogListScreen extends StatefulWidget {
   const LogListScreen({super.key});
@@ -264,23 +261,23 @@ class _LogScreenState extends State<LogListScreen> {
                     ),
                   ),
 
-                if (cdrs.is_call_summary)
-                  SizedBox(width: 15),
-                if (cdrs.is_call_summary)
-                  InkWell(
-                    onTap: () {
-                      goToCallAnalytics(cdrs);
-                    
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      child: Image.asset('assets/ai.png', color: Colors.black,
-                          colorBlendMode: BlendMode.srcIn),
-                    ),
-                  ),
+                // if (cdrs.is_call_summary)
+                //   SizedBox(width: 15),
+                // if (cdrs.is_call_summary)
+                //   InkWell(
+                //     onTap: () {
+                //       goToCallAnalytics(cdrs);
+                //
+                //     },
+                //     borderRadius: BorderRadius.circular(8),
+                //     child: Container(
+                //       width: 30,
+                //       height: 30,
+                //       alignment: Alignment.center,
+                //       child: Image.asset('assets/ai.png', color: Colors.black,
+                //           colorBlendMode: BlendMode.srcIn),
+                //     ),
+                //   ),
               ],
             ),
           ),
@@ -414,22 +411,22 @@ class _LogScreenState extends State<LogListScreen> {
                 else
                   Expanded(flex: 1, child: SizedBox()),
 
-                if (cdrs.is_call_summary)
-                  Expanded(flex: 1,
-                      child: InkWell(
-                        onTap: () {
-                          goToCallAnalytics(cdrs);
-                        
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          alignment: Alignment.center,
-                          child: Image.asset('assets/ai.png', color: Colors.black,
-                              colorBlendMode: BlendMode.srcIn),
-                      )),
-                  ),
+                // if (cdrs.is_call_summary)
+                //   Expanded(flex: 1,
+                //       child: InkWell(
+                //         onTap: () {
+                //           goToCallAnalytics(cdrs);
+                //
+                //         },
+                //         borderRadius: BorderRadius.circular(8),
+                //         child: Container(
+                //           width: 30,
+                //           height: 30,
+                //           alignment: Alignment.center,
+                //           child: Image.asset('assets/ai.png', color: Colors.black,
+                //               colorBlendMode: BlendMode.srcIn),
+                //       )),
+                //   ),
               ],
             ),
           ),

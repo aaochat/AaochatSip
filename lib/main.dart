@@ -76,7 +76,6 @@ void main() async {
         ChangeNotifierProvider(create: (context) => callsModel),
         ChangeNotifierProvider(create: (context) => cdrsModel),
         ChangeNotifierProvider(create: (context) => logsModel),
-        // ChangeNotifierProvider(create: (context) => mCallsModel),
       ],
       child: MyApp(),
     ),
@@ -173,7 +172,7 @@ class _MyAppState extends State<MyApp> {
   static void _initializeSiprix(LogsModel? logsModel) async {
     debugPrint('_initializeSiprix');
     InitData iniData = InitData();
-    iniData.brandName = "TeamLocus";
+    iniData.brandName = "AaoVOIP";
     iniData.license = AppSettings.LICENSE_KEY;
     iniData.logLevelFile = LogLevel.info;
     iniData.logLevelIde = LogLevel.info;

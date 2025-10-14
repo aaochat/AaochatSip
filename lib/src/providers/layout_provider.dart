@@ -40,7 +40,7 @@ class LayoutProvider extends ChangeNotifier {
 
   DateFormat format = DateFormat("MMM dd yyyy, hh:mm:ss a");
 
-  bool showCallPage = false;
+  bool showCallPage = true;
 
   connectToSocket(String sipServer) {
     String mBaseUrl = "http://" + sipServer + ":3000/";
@@ -63,30 +63,6 @@ class LayoutProvider extends ChangeNotifier {
     socket.connect();
   }
 
-
-
-  // List<CallLogHistory> filterTelephoneMaster(String search) {
-  //   if (search.isEmpty) {
-  //     return [];
-  //   }
-  //   return _box.values
-  //       .where((mCallLogHistory) =>
-  //   (mCallLogHistory.displName ?? '')
-  //       .toLowerCase()
-  //       .contains(search.toLowerCase()) ||
-  //       (mCallLogHistory.id ?? '')
-  //           .toLowerCase()
-  //           .contains(search.toLowerCase()) ||
-  //       (mCallLogHistory.home_no ?? '')
-  //           .toLowerCase()
-  //           .contains(search.toLowerCase()) ||
-  //       (mCallLogHistory.mob_no ?? '')
-  //           .toLowerCase()
-  //           .contains(search.toLowerCase()))
-  //       .toList();
-  // }
-
-
   playRingtone() async {
     player.setVolume(1);
     await player.play(AssetSource('ringtone.mp3'));
@@ -95,29 +71,6 @@ class LayoutProvider extends ChangeNotifier {
   stopRingtone() async {
     await player.stop();
   }
-
-  // getCallDestinationName(CallLog? callLog) {
-  //   String response = '${callLog?.dst}';
-  //   if (callLog?.outbound_cnam != null && callLog!.outbound_cnam.isNotEmpty) {
-  //     response += ' - ${callLog.outbound_cnam}';
-  //   } else if (allTelephoneMaster[callLog?.dst ?? ''] != null) {
-  //     response += ' - ${allTelephoneMaster[callLog?.dst ?? '']}';
-  //   }
-  //
-  //   return response;
-  // }
-
-  /*Todo Api Calling Pending*/
-  // getAllTelephoneMaster() async {
-  //   var response = await TeamlocusRepository.getAllTelephoneMaster();
-  //   if (response.status == 'ok') {
-  //     for (var item in response.response!) {
-  //       if (item.ext_no != null && item.ext_no!.isNotEmpty) {
-  //         allTelephoneMaster[item.ext_no!] = item.user_name ?? '';
-  //       }
-  //     }
-  //   }
-  // }
 
   void UpdateCallToLogList(BuildContext context, CdrsModel calls,AppCallsModel callsModel) {
     if (!calls.isEmpty) {
