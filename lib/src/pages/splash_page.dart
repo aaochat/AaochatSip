@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:callingproject/src/pages/main_page.dart';
-import 'package:callingproject/src/pages/domain_screen.dart';
+import 'package:callingproject/src/pages/dashboard_page.dart';
+import 'package:callingproject/src/pages/domain_page.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +28,7 @@ class _SplashscreenState extends State<Splashscreen> {
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Domainscreen()),
+          MaterialPageRoute(builder: (context) => DomainScreen()),
         );
       }
     });

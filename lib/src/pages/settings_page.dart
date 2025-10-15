@@ -10,7 +10,7 @@ import '../utils/Constants.dart';
 import '../utils/extension_util.dart';
 import '../utils/shared_prefs.dart';
 import '../utils/snackbar_util.dart';
-import 'domain_screen.dart';
+import 'domain_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -370,7 +370,7 @@ class _SettingsPageState extends State<SettingsPage> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (context) => Domainscreen(),
+        builder: (context) => DomainScreen(),
       ),
       ModalRoute.withName("/Login"),
     );

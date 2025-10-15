@@ -5,16 +5,16 @@ import 'package:provider/provider.dart';
 import '../Providers/domain_provider.dart';
 import '../utils/layout_util.dart';
 import '../utils/snackbar_util.dart';
-import 'login_screen.dart';
+import 'login_page.dart';
 
-class Domainscreen extends StatefulWidget {
-  const Domainscreen({super.key});
+class DomainScreen extends StatefulWidget {
+  const DomainScreen({super.key});
 
   @override
-  State<Domainscreen> createState() => _DomainscreenState();
+  State<DomainScreen> createState() => _DomainScreenState();
 }
 
-class _DomainscreenState extends State<Domainscreen> {
+class _DomainScreenState extends State<DomainScreen> {
   OutlineInputBorder border = OutlineInputBorder(
     borderRadius: BorderRadius.circular(5),
     borderSide: BorderSide(color: Colors.grey),

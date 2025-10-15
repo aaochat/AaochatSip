@@ -1,5 +1,5 @@
 import 'package:callingproject/src/Providers/login_provider.dart';
-import 'package:callingproject/src/pages/main_page.dart';
+import 'package:callingproject/src/pages/dashboard_page.dart';
 import 'package:callingproject/src/pages/signup_page.dart';
 import 'package:callingproject/src/utils/extension_util.dart';
 import 'package:flutter/gestures.dart';

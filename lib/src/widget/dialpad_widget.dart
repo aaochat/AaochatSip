@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:callingproject/src/models/sip_user_model.dart';
-import 'package:callingproject/src/pages/domain_screen.dart';
+import 'package:callingproject/src/pages/domain_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/repository/sip_repository.dart';
 import 'package:callingproject/src/utils/extension_util.dart';
@@ -605,7 +605,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => Domainscreen(),
+          builder: (context) => DomainScreen(),
         ),
         ModalRoute.withName("/Login"),
       );

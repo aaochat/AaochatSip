@@ -4,13 +4,13 @@ import 'package:callingproject/src/Providers/domain_provider.dart';
 import 'package:callingproject/src/Providers/login_provider.dart';
 import 'package:callingproject/src/Providers/theme_provider.dart';
 import 'package:callingproject/src/models/call_model.dart';
-import 'package:callingproject/src/pages/domain_screen.dart';
-import 'package:callingproject/src/pages/login_screen.dart';
-import 'package:callingproject/src/pages/main_page.dart';
+import 'package:callingproject/src/pages/domain_page.dart';
+import 'package:callingproject/src/pages/login_page.dart';
+import 'package:callingproject/src/pages/dashboard_page.dart';
 import 'package:callingproject/src/providers/call_logs_provider.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/providers/signup_provider.dart';
-import 'package:callingproject/src/splash_screen.dart';
+import 'package:callingproject/src/pages/splash_page.dart';
 import 'package:callingproject/src/utils/Constants.dart';
 import 'package:callingproject/src/utils/app_settings.dart';
 import 'package:callingproject/src/utils/shared_prefs.dart';
@@ -129,7 +129,7 @@ typedef PageContentBuilder = Widget Function(
 class _MyAppState extends State<MyApp> {
   Map<String, PageContentBuilder> routes = {
     '/': ([ Object? arguments]) => Splashscreen(),
-    '/domain': ([Object? arguments]) => Domainscreen(),
+    '/domain': ([Object? arguments]) => DomainScreen(),
     '/login': ([Object? arguments]) => LoginScreen(),
     '/callscreen': ([Object? arguments]) => MainPage(),
     DialpadWidget.routeName: ([Object? arguments]) =>
