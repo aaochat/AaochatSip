@@ -374,7 +374,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
               ),
               TextField(
                 controller: _transferController,
-                cursorColor: Colors.deepOrangeAccent,
+                cursorColor: Theme.of(context).primaryColorLight,
                 style: TextStyle(color: Colors.black87),
                 onSubmitted: (value) {
                   _transferBlind(value);
@@ -383,7 +383,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
                 decoration: InputDecoration(
                   labelText: "Extension number",
                   labelStyle: TextStyle(color: Colors.black54),
-                  floatingLabelStyle: TextStyle(color: Colors.deepOrangeAccent),
+                  floatingLabelStyle: TextStyle(color: Theme.of(context).primaryColorLight),
                   filled: false,
                   suffix: IconButton(
                     tooltip: "Transer Blind",

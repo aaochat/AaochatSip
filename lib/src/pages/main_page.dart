@@ -98,6 +98,7 @@ class _MainPageState extends State<MainPage> {
               ? null
               : BottomNavigationBar(
                 currentIndex: _selectedPageIndex,
+        backgroundColor: Colors.white,
                 onTap: _onTabTapped,
                 selectedItemColor: Theme.of(context).primaryColor,
                 items: [
@@ -287,8 +288,14 @@ class _MainPageState extends State<MainPage> {
     } else {
       return IndexedStack(
         index: _selectedPageIndex,
-        children: [CallPage(),
-          Column(children: [
+        children: [ /*CallPage(),*/
+          Container(
+            color: Colors.white,
+            child: CallPage(),
+          ),
+          Container(
+            color: Colors.white,
+            child: Column(children: [
             Align(alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: EdgeInsets.all(12),
@@ -298,8 +305,8 @@ class _MainPageState extends State<MainPage> {
                   ),
                 )),
             Expanded(child: LogListScreen()),
-          ]),
-          Column(children: [
+            ])),
+          Container(color: Colors.white, child: Column(children: [
             Align(alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: EdgeInsets.all(12),
@@ -309,8 +316,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 )),
             Expanded(child: VoicemailWidget()),
-          ],
-          )
+          ])),
         ],
       );
     }
