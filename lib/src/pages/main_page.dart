@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<LayoutProvider>(context);
     return Scaffold(
-       appBar: ThemeAppBar(),
+       appBar: Platform.isMacOS? null: ThemeAppBar(),
       // appBar:
       //     !Platform.isWindows && !Platform.isMacOS
       //         ? AppBar(
@@ -94,7 +94,7 @@ class _MainPageState extends State<MainPage> {
               // : null,
       body: getBody(provider),
       bottomNavigationBar:
-          MediaQuery.sizeOf(context).width > _windowWidth
+      !LayoutUtil.isMobile()
               ? null
               : BottomNavigationBar(
                 currentIndex: _selectedPageIndex,
@@ -121,7 +121,7 @@ class _MainPageState extends State<MainPage> {
 
 
   getBody(LayoutProvider provider) {
-    if (MediaQuery.of(context).size.width > _windowWidth) {
+    if (!LayoutUtil.isMobile()) {
       return SizeChangedLayoutNotifier(
         child: Container(
           width: MediaQuery.of(context).size.width,

@@ -32,16 +32,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefs.init();
 
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+  if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows|| 
+      defaultTargetPlatform == TargetPlatform.linux ||
+      defaultTargetPlatform == TargetPlatform.macOS)) {
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions = const WindowOptions(
+    WindowOptions windowOptions =  WindowOptions(
       size: Size(1200, 750),
       minimumSize: Size(1200, 750),
       center: true,
       title: 'Aao VOIP',
       backgroundColor: Colors.transparent,
-      titleBarStyle: TitleBarStyle.hidden,
+      titleBarStyle: Platform.isWindows? TitleBarStyle.hidden : TitleBarStyle.normal,
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
