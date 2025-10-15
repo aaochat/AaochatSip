@@ -438,7 +438,8 @@ class _DialpadscreenState extends State<DialpadWidget> {
                 floatingLabelStyle: TextStyle(color: Theme
                     .of(context)
                     .primaryColorLight),
-                filled: false,
+                filled: true, //if set background color that's why change this background color
+                fillColor: Colors.white,
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey), // default line
                 ),

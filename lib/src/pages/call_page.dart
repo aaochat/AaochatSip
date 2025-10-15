@@ -234,10 +234,10 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          // buildIconButton(
-          //   widget.myCall.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
-          //   _muteMic,
-          // ),
+          buildIconButton(
+            widget.myCall.isMicMuted ? 'assets/icons/mic_off.png' : 'assets/icons/mic.png',
+            _muteMic,
+          ),
 
           buildIconButton('assets/icons/dial_pad.png', isCallConnected ? _toggleSendDtmfMode : null),
 
@@ -274,7 +274,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           buildIconButton(
             tooltipMessage: "Record Call",
             color: _isRecording ? Colors.green : null,
-            _isRecording ? 'assets/icons/record.png' : 'assets/icons/stop_record.png',
+            _isRecording ? 'assets/icons/stop_record.png' : 'assets/icons/record.png',
             isCallConnected ? _handleRecord : null,
           ),
         ],
@@ -306,7 +306,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
     return children;
   }
 
-  static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 1.5;
+  static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 2;
 
   Widget buildIconButton(String icons, VoidCallback? onPressed,{String? tooltipMessage,Color? color}) {
     Widget button = OutlinedButton(
@@ -723,7 +723,30 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ],
         ),
         const SizedBox(height: spacing),
-        buildIconButton('assets/icons/close.png', _toggleSendDtmfMode),
+        // buildIconButton('assets/icons/close.png', _toggleSendDtmfMode),
+        Padding(
+          padding: const EdgeInsets.only(right: 5, bottom: 5),
+          child: Material(
+            color: const Color(0xFF1C1B1F), // dark background
+            shape: const CircleBorder(),
+            elevation: 4, // gives the shadow
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () => _toggleSendDtmfMode(),
+              child: const SizedBox(
+                width: 30,
+                height: 30,
+                child: Center(
+                  child: Icon(
+                    Icons.clear_outlined,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
       ],
     );
   }

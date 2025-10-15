@@ -132,12 +132,13 @@ class _MainPageState extends State<MainPage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   constraints: const BoxConstraints(maxWidth: 400),
+                  color: Colors.white,
                   child: CallPage(),
                 ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    // color: Colors.white,
+                    color: Colors.white,
                     border: Border(
                       left: BorderSide(
                         color: Colors.black.withOpacity(1),
