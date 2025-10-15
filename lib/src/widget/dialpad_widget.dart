@@ -360,6 +360,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
           return Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(
                 color: Colors.black
               ),
