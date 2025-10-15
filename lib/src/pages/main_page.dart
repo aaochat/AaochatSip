@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<LayoutProvider>(context);
     return Scaffold(
-       appBar: ThemeAppBar(),
+       appBar: Platform.isMacOS? null: ThemeAppBar(),
       // appBar:
       //     !Platform.isWindows && !Platform.isMacOS
       //         ? AppBar(

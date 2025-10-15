@@ -10,7 +10,7 @@ class ThemeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Platform.isWindows || Platform.isMacOS ? PreferredSize(
+    return Platform.isWindows ? PreferredSize(
           preferredSize: const Size(double.maxFinite, 50),
           child: DragToMoveArea(
             child: AppBar(
