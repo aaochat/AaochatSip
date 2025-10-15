@@ -234,15 +234,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          buildIconButton(
-            widget.myCall.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
-            _muteMic,
-          ),
-          buildIconButton(Icons.dialpad_rounded, isCallConnected ? _toggleSendDtmfMode : null),
+          // buildIconButton(
+          //   widget.myCall.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
+          //   _muteMic,
+          // ),
+
+          buildIconButton('assets/icons/dial_pad.png', isCallConnected ? _toggleSendDtmfMode : null),
 
           MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
-              return buildIconButton(Icons.volume_up, () {
+              return buildIconButton('assets/icons/volume.png', () {
                 if (controller.isOpen) {
                   controller.close();
                 } else {
@@ -264,16 +265,16 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
-          buildIconButton(Icons.add, _showAddCallPage),
+          buildIconButton('assets/icons/add.png', _showAddCallPage),
           buildIconButton(
-            widget.myCall.isLocalHold ? Icons.play_arrow : Icons.pause,
+            widget.myCall.isLocalHold ? 'assets/icons/play.png' : 'assets/icons/paush.png',
             (widget.myCall.state == CallState.holding) ? null : _holdCall,
           ),
 
           buildIconButton(
             tooltipMessage: "Record Call",
             color: _isRecording ? Colors.green : null,
-            _isRecording ? Icons.fiber_manual_record : Icons.fiber_manual_record_outlined,
+            _isRecording ? 'assets/icons/record.png' : 'assets/icons/stop_record.png',
             isCallConnected ? _handleRecord : null,
           ),
         ],
@@ -289,12 +290,12 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
         children: [
           buildIconButton(
             tooltipMessage: "Transfer Call",
-            Icons.forward_outlined,
+            'assets/icons/transfer.png',
             isCallConnected ? () => _openCallTransferPopup(context) : null,
           ),
 
           buildIconButton(
-            Icons.group_outlined,
+            'assets/icons/conference.png',
             isCallConnected ? _makeConference : null,
             tooltipMessage: "Make conference",
           ),
@@ -307,7 +308,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
 
   static double eBackgroundSizeMultiplication = Platform.isAndroid || Platform.isIOS ? 2 : 1.5;
 
-  Widget buildIconButton(IconData icon, VoidCallback? onPressed,{String? tooltipMessage,Color? color}) {
+  Widget buildIconButton(String icons, VoidCallback? onPressed,{String? tooltipMessage,Color? color}) {
     Widget button = OutlinedButton(
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.all(5),
@@ -315,13 +316,22 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           eIconSize * eBackgroundSizeMultiplication,
           eIconSize * eBackgroundSizeMultiplication,
         ),
-        shape: const CircleBorder(),
+       shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // 0 for perfect square
+        ),
         side: BorderSide.none,
         backgroundColor: Colors.grey.withOpacity(0.1),
       ),
       onPressed: onPressed,
       child: Center(
-          child: Icon(icon, size: eIconSize, color: color == null ? Colors.black : color)),
+          // child: Icon(icon, size: eIconSize, color: color == null ? Colors.black : color),
+          child:Image.asset(
+                      icons,
+                      width: 22,
+                      height: 22,
+                      // color: Colors.black
+                      color: color == null ? Colors.black : color
+                    )),
     );
 
     if (tooltipMessage != null && tooltipMessage.isNotEmpty) {
@@ -456,6 +466,11 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           onPressed: _rejectCall,
           icon: const Icon(Icons.call_end),
           style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                8,
+              ), // make corners slightly rounded
+            ),
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
           ),
@@ -466,6 +481,11 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           onPressed: _acceptCall,
           icon: const Icon(Icons.call),
           style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                8,
+              ), // make corners slightly rounded
+            ),
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
           ),
@@ -480,7 +500,15 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
       padding: EdgeInsets.all(eIconSize / 2.3),
       iconSize: eIconSize,
       icon: const Icon(Icons.call_end),
-      style: OutlinedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            8,
+          ), // make corners slightly rounded
+        ),
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+      ),
       onPressed: enabled ? _hangUpCall : null,
       color: Colors.red,
     );
@@ -695,7 +723,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
           ],
         ),
         const SizedBox(height: spacing),
-        buildIconButton(Icons.close, _toggleSendDtmfMode),
+        buildIconButton('assets/icons/close.png', _toggleSendDtmfMode),
       ],
     );
   }

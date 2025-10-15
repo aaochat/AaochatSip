@@ -86,11 +86,11 @@ class _DialpadscreenState extends State<DialpadWidget> {
       backgroundColor: Colors.transparent,
       appBar: widget.popUpMode
           ? AppBar(
-          title: const Text('Add Call'),
-          backgroundColor: Theme
-              .of(context)
-              .primaryColor
-              .withOpacity(0.4))
+          title: const Text('Add Call'))
+          // backgroundColor: Theme
+          //     .of(context)
+          //     .primaryColor
+          //     .withOpacity(0.4))
           : null,
         body: Container(
           color: widget.popUpMode ? Colors.white : null,

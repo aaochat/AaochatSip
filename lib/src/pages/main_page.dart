@@ -99,7 +99,7 @@ class _MainPageState extends State<MainPage> {
               : BottomNavigationBar(
                 currentIndex: _selectedPageIndex,
                 onTap: _onTabTapped,
-                selectedItemColor: Colors.orange,
+                selectedItemColor: Theme.of(context).primaryColor,
                 items: [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.dialpad_outlined),

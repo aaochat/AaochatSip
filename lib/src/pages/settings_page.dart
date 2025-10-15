@@ -95,7 +95,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   const Divider(height: 1),
 
                   ListTile(
-                    leading: const Icon(Icons.logout, color: Colors.orange),
+                    // leading: const Icon(Icons.logout, color: Colors.orange),
+                    leading:Image.asset(
+                      'assets/icons/logout.png',
+                      width: 22,
+                      height: 22,
+                      color: Colors.redAccent
+                    ),
                     title: const Text("Logout"),
                     onTap: () {
                       showLogoutDialog(context, _mCallProvider);
@@ -104,7 +110,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   const Divider(height: 1),
 
                   ListTile(
-                    leading: const Icon(Icons.delete, color: Colors.red),
+                    // leading: const Icon(Icons.delete, color: Colors.red),
+                    leading: Image.asset(
+                      'assets/icons/delete.png',
+                      width: 22,
+                      height: 22,
+                    ),
                     title: const Text("Delete Account"),
                     onTap: () {
                       ShowDeleteDialog();
@@ -300,7 +311,13 @@ class _SettingsPageState extends State<SettingsPage> {
             backgroundColor: Colors.white,
             title: Row(
               children: [
-                Icon(Icons.logout, color: Colors.redAccent),
+                // Icon(Icons.logout, color: Colors.redAccent),
+                Image.asset(
+                      'assets/icons/logout.png',
+                      width: 22,
+                      height: 22,
+                      color: Colors.redAccent,
+                    ),
                 SizedBox(width: 8),
                 Text(
                   "Confirm Logout",
