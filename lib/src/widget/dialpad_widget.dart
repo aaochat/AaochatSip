@@ -119,15 +119,14 @@ class _DialpadscreenState extends State<DialpadWidget> {
       CallProvider mCallProvider,
       LayoutProvider mLayoutProvider) {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const SizedBox(height: 20),
+      _buildPhoneNumberField(mCallProvider),
+      Expanded(child: Center(child: _buildKeypad(mCallProvider, accounts))),
       Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
           child: Column(children: [
             _buildAccountsMenu(accounts, mCallProvider),
-            const SizedBox(height: 15),
-            const SizedBox(height: 20),
-            _buildPhoneNumberField(mCallProvider),
           ])),
-      Expanded(child: Center(child: _buildKeypad(mCallProvider, accounts))),
     ]);
   }
 
@@ -518,12 +517,22 @@ class _DialpadscreenState extends State<DialpadWidget> {
         value: acc.myAccId,
         child: Row(
           children: [
-            Icon(
-              acc.regState == RegState.success||acc.regState == RegState.inProgress
-                  ? Icons.check_circle_outline
-                  : Icons.error_outline,
-              color:
-              acc.regState == RegState.success||acc.regState == RegState.inProgress ? Colors.green : Colors.red,
+            // Icon(
+            //   acc.regState == RegState.success||acc.regState == RegState.inProgress
+            //       ? Icons.check_circle_outline
+            //       : Icons.error_outline,
+            //   color:
+            //   acc.regState == RegState.success||acc.regState == RegState.inProgress ? Colors.green : Colors.red,
+            // ),
+
+            Image.asset(
+              acc.regState == RegState.success || acc.regState == RegState.inProgress
+                  ? 'assets/icons/right.png' : 'assets/icons/error.png',
+              width: 22,
+              height: 22,
+              // color: acc.regState == RegState.success || acc.regState == RegState.inProgress
+              //     ? Colors.green
+              //     : Colors.red,
             ),
             SizedBox(width: 10),
             Text(acc.sipExtension),

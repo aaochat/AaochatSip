@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:callingproject/src/event/refresh_call_log_event.dart';
 import 'package:callingproject/src/event/refresh_voice_mail_event.dart';
 import 'package:callingproject/src/models/call_model.dart';
+import 'package:callingproject/src/pages/PhoneBook_page.dart';
 import 'package:callingproject/src/pages/call_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
@@ -108,7 +109,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.call),
-                    label: 'Call Logs',
+                    label: 'Recent Calls',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.voice_chat),
@@ -155,97 +156,97 @@ class _MainPageState extends State<MainPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            // Container(
-                            //   height: 35,
-                            //   decoration: BoxDecoration(
-                            //     color: Colors.grey,
-                            //     borderRadius: BorderRadius.circular(24),
-                            //     border: Border.all(
-                            //       color: Colors.white.withOpacity(0.1),
-                            //     ),
-                            //   ),
-                            //   child: Row(
-                            //     crossAxisAlignment: CrossAxisAlignment.center,
-                            //     children: [
-                            //
-                            //       GestureDetector(
-                            //         onTap: () {
-                            //           provider.goToCallLogs();
-                            //         },
-                            //         child: Container(
-                            //           height: 35,
-                            //           decoration: BoxDecoration(
-                            //             color:
-                            //                 provider.sideScreen == 'call-logs'
-                            //                     ? Colors.blueGrey
-                            //                     : Colors.transparent,
-                            //             borderRadius: BorderRadius.circular(24),
-                            //           ),
-                            //           padding: EdgeInsets.symmetric(
-                            //             horizontal: 15,
-                            //           ),
-                            //           child: Center(
-                            //             child: Text(
-                            //               'Call Logs',
-                            //               style: TextStyle(
-                            //                 fontSize: 16,
-                            //                 color:
-                            //                     provider.sideScreen ==
-                            //                             'call-logs'
-                            //                         ? Colors.white
-                            //                         : Colors.grey.shade900,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //       GestureDetector(
-                            //         onTap: () {
-                            //           provider.goToVoiceMails();
-                            //         },
-                            //         child: Container(
-                            //           height: 35,
-                            //           padding: EdgeInsets.symmetric(
-                            //             horizontal: 15,
-                            //           ),
-                            //           decoration: BoxDecoration(
-                            //             color:
-                            //                 provider.sideScreen == 'voice-mails'
-                            //                     ? Colors.blueGrey
-                            //                     : Colors.transparent,
-                            //             borderRadius: BorderRadius.circular(24),
-                            //           ),
-                            //           child: Center(
-                            //             child: Text(
-                            //               'Voice Mails',
-                            //               style: TextStyle(
-                            //                 fontSize: 16,
-                            //                 color:
-                            //                     provider.sideScreen ==
-                            //                             'voice-mails'
-                            //                         ? Colors.white
-                            //                         : Colors.grey.shade900,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
+                            Container(
+                              height: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.1),
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
 
-                            Text(
-                              'Call Logs',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold
+                                  GestureDetector(
+                                    onTap: () {
+                                      provider.goToCallLogs();
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            provider.sideScreen == 'recent-call'
+                                                ? Theme.of(context).primaryColorLight
+                                                : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Recent Calls',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color:
+                                                provider.sideScreen ==
+                                                        'recent-call'
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      provider.goToPhoneBook();
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            provider.sideScreen == 'phone-book'
+                                                ? Theme.of(context).primaryColorLight
+                                                : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Phone Book',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color:
+                                                provider.sideScreen ==
+                                                        'phone-book'
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+
+                            // Text(
+                            //   'Recent Calls',
+                            //   style: TextStyle(
+                            //       fontSize: 16,
+                            //       color: Colors.black,
+                            //       fontWeight: FontWeight.bold
+                            //   ),
+                            // ),
                             Spacer(),
 
                             Visibility(
-                                visible: false,
+                                visible: true,
                                 child:
                             IconButton(
                               onPressed: () {
@@ -262,7 +263,7 @@ class _MainPageState extends State<MainPage> {
                               onPressed: () {
                                 if(provider.sideScreen == 'voice-mails'){
                                   eventBus.fire(RefreshVoiceMailEvent());
-                                } else if(provider.sideScreen == 'call-logs'){
+                                } else if(provider.sideScreen == 'recent-call'){
                                   eventBus.fire(RefreshCallLogEvent(isUpdate: true));
                                 }
                               },
@@ -275,8 +276,11 @@ class _MainPageState extends State<MainPage> {
                       if (provider.sideScreen == 'voice-mails')
                         Expanded(child: VoicemailWidget()),
 
-                      if (provider.sideScreen == 'call-logs')
+                      if (provider.sideScreen == 'recent-call')
                         Expanded(child: LogListScreen()),
+
+                      if (provider.sideScreen == 'phone-book')
+                        Expanded(child: PhonebookPage()),
                     ],
                   ),
                 ),
@@ -300,7 +304,7 @@ class _MainPageState extends State<MainPage> {
                 child: Padding(
                   padding: EdgeInsets.all(12),
                   child: Text(
-                    "Call Logs",
+                    "Recent Calls",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 )),

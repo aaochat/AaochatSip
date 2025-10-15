@@ -26,7 +26,7 @@ class LayoutProvider extends ChangeNotifier {
 
   String get currentScreen => _currentScreen;
 
-  String sideScreen = 'call-logs';
+  String sideScreen = 'recent-call';
   String callId = '';
   EventTaxi eventBus = EventTaxiImpl.singleton();
 
@@ -40,7 +40,7 @@ class LayoutProvider extends ChangeNotifier {
 
   DateFormat format = DateFormat("MMM dd yyyy, hh:mm:ss a");
 
-  bool showCallPage = true;
+  bool showCallPage = false;
 
   connectToSocket(String sipServer) {
     String mBaseUrl = "http://" + sipServer + ":3000/";
@@ -127,7 +127,13 @@ class LayoutProvider extends ChangeNotifier {
   }
 
   goToCallLogs() {
-    sideScreen = 'call-logs';
+    sideScreen = 'recent-call';
+    callId = '';
+    notifyListeners();
+  }
+
+  goToPhoneBook() {
+    sideScreen = 'phone-book';
     callId = '';
     notifyListeners();
   }
