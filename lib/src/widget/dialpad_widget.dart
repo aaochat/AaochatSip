@@ -311,10 +311,12 @@ class _DialpadscreenState extends State<DialpadWidget> {
               tooltip: 'Logout',
               onPressed: () => { showLogoutDialog(context, _mCallProvider)},
               icon: const Icon(Icons.logout))),
-          IconButton(
-              tooltip: 'Settings',
-              onPressed: _onShowSettings,
-              icon: const Icon(Icons.settings))
+          Visibility(
+              visible: false,
+              child: IconButton(
+                  tooltip: 'Settings',
+                  onPressed: _onShowSettings,
+                  icon: const Icon(Icons.settings)))
         ]));
   }
 

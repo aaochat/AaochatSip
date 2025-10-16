@@ -5,6 +5,7 @@ import 'package:callingproject/src/event/refresh_voice_mail_event.dart';
 import 'package:callingproject/src/models/call_model.dart';
 import 'package:callingproject/src/pages/PhoneBook_page.dart';
 import 'package:callingproject/src/pages/call_page.dart';
+import 'package:callingproject/src/pages/settings_page.dart';
 import 'package:callingproject/src/providers/layout_provider.dart';
 import 'package:callingproject/src/utils/layout_util.dart';
 import 'package:callingproject/src/widget/appbar.dart';
@@ -121,6 +122,15 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void _onShowSettings() {
+    setState(() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SettingsPage(),
+        ),
+      );
+    });
+  }
 
   getBody(LayoutProvider provider) {
     if (!LayoutUtil.isMobile()) {
@@ -258,6 +268,11 @@ class _MainPageState extends State<MainPage> {
                                     : Icons.open_in_full, // change icon
                               ),
                             )),
+
+                            IconButton(
+                                tooltip: 'Settings',
+                                onPressed: _onShowSettings,
+                                icon: const Icon(Icons.settings)),
 
                             IconButton(
                               onPressed: () {
