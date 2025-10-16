@@ -45,6 +45,8 @@ class _MainPageState extends State<MainPage> {
 
       } else if (Platform.isMacOS) {
         // MacOs specific code here
+         final mProvider = Provider.of<LayoutProvider>(context, listen: false);
+        mProvider.toggleIncomingCallPage();
         bringWindowToFront();
       } else if(LayoutUtil.isMobile()){
 
