@@ -47,11 +47,19 @@ class _PhonebookPageState extends State<PhonebookPage> {
     if (!hasDefault) {
       // Add default contact
       contacts.insert(
-        0, // Add at start
+        0,
         Contact(
-          name: 'John Doe',
-          phone: '+91 1234567890',
-          notes: 'Default contact',
+          name: 'Jigar Patel',
+          phone: '+91 9854756523',
+          notes: 'Good Listener',
+        ),
+      );
+      contacts.insert(
+        1,
+        Contact(
+          name: 'Keyur Shah',
+          phone: '+91 9987562140',
+          notes: 'He is Engineer',
         ),
       );
 
