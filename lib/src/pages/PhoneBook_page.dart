@@ -43,7 +43,7 @@ class _PhonebookPageState extends State<PhonebookPage> {
     }
 
     // Check if default contact already exists
-    bool hasDefault = contacts.any((c) => c.name == 'John Doe' && c.phone == '+91 1234567890');
+    bool hasDefault = contacts.any((c) => c.name == 'Jigar Patel' && c.phone == '+91 9854756523');
     if (!hasDefault) {
       // Add default contact
       contacts.insert(

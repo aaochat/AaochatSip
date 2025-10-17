@@ -40,7 +40,7 @@ class LayoutProvider extends ChangeNotifier {
 
   DateFormat format = DateFormat("MMM dd yyyy, hh:mm:ss a");
 
-  bool showCallPage = false;
+  bool showCallPage = true;
 
   connectToSocket(String sipServer) {
     String mBaseUrl = "http://" + sipServer + ":3000/";

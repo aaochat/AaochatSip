@@ -258,7 +258,7 @@ class _MainPageState extends State<MainPage> {
                             Spacer(),
 
                             Visibility(
-                                visible: true,
+                                visible: false,
                                 child:
                             IconButton(
                               onPressed: () {
