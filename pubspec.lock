@@ -913,58 +913,58 @@ packages:
     dependency: "direct main"
     description:
       name: siprix_voip_sdk
-      sha256: "3abf3e3d11ee3744ef8ef4ca1f809a87d9462b62e9c18106c4d17d83a6786900"
+      sha256: ca165c682896f695c1786c5b760d40e1307e86450eff8a4415c498f67edcd19c
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.19"
+    version: "1.0.37"
   siprix_voip_sdk_android:
     dependency: transitive
     description:
       name: siprix_voip_sdk_android
-      sha256: "713788d993fceef1f04a465a704ce9bca26345e64a9f600aba7ba8057ea6d86a"
+      sha256: "7456ede34f8489f77aca3be2de066829b8fac6deb8c158378a36e0bc290ae2d0"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.19"
+    version: "1.0.37"
   siprix_voip_sdk_ios:
     dependency: transitive
     description:
       name: siprix_voip_sdk_ios
-      sha256: c79ba80a257b2e6bdaed25cf70bb6a6124b34825f9c413fad5e03e9353d73b52
+      sha256: "97a5233fce539eee3b2fc0074087055ea2aca119021d98a69bc20fdb1391017c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.24"
+    version: "1.0.37"
   siprix_voip_sdk_linux:
     dependency: transitive
     description:
       name: siprix_voip_sdk_linux
-      sha256: "77ef3e48820c38b6a215f04d37257df07656c9c7395beda04ab606621f986819"
+      sha256: e31bd9e92e7670983defd9b1b5649602498b62089d50a94c13b1a1ac69f5ba65
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.14"
+    version: "1.0.37"
   siprix_voip_sdk_macos:
     dependency: transitive
     description:
       name: siprix_voip_sdk_macos
-      sha256: "4385d7fdb7754481e3f7ffb12114112f2bc878cd7b621781d0d76899b7c981cc"
+      sha256: "81ed16b91e9af31cc36c03571b34d627e9d4fffdb19350937beaa3786f08a4aa"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.14"
+    version: "1.0.37"
   siprix_voip_sdk_platform_interface:
     dependency: transitive
     description:
       name: siprix_voip_sdk_platform_interface
-      sha256: "9d18cecf09f328b9ca8c84569c830666384ae990a1a4e779a8b2a46978287c1d"
+      sha256: "1477ef9dc58afb09ebf521618fcc8f3b7ddb3feb1c245aa889d3aa466f80a07f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.12"
   siprix_voip_sdk_windows:
     dependency: transitive
     description:
       name: siprix_voip_sdk_windows
-      sha256: "2e610059d302da93315007a85138be1b9d68065858f7f134ad21d21dea8046a1"
+      sha256: "6b4043b3600a52a4e4e1f768b90be4d09827eae6f45d58980e0b77a4dbdd24fe"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.15"
+    version: "1.0.37"
   sky_engine:
     dependency: transitive
     description: flutter
