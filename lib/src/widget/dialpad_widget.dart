@@ -81,18 +81,16 @@ class _DialpadscreenState extends State<DialpadWidget> {
     final mCallProvider = Provider.of<CallProvider>(context);
     final mLayoutProvider = Provider.of<LayoutProvider>(context);
 
+    final theme = Theme.of(context);
+    final Color addCallBase =
+        theme.cardTheme.color ?? Colors.grey.shade900;
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: widget.popUpMode ? addCallBase : Colors.transparent,
       appBar: widget.popUpMode
-          ? AppBar(
-          title: const Text('Add Call'),
-          backgroundColor: Theme
-              .of(context)
-              .primaryColor
-              .withOpacity(0.4))
+          ? AppBar(title: const Text('Add Call'))
           : null,
       body: accounts.isEmpty ? _buildEmptyBody(mCallProvider) : _buildBody(
-          accounts, mCallProvider, mLayoutProvider),
+          accounts, mCallProvider, mLayoutProvider, addCallBase),
     );
   }
 
@@ -113,50 +111,60 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
   Widget _buildBody(AccountsModel accounts,
       CallProvider mCallProvider,
-      LayoutProvider mLayoutProvider) {
-    Color? textColor = Theme
-        .of(context)
-        .textTheme
-        .bodyMedium
-        ?.color;
-    Color? iconColor = Theme
-        .of(context)
-        .iconTheme
-        .color;
-    bool isDarkTheme = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+      LayoutProvider mLayoutProvider,
+      Color addCallBase) {
+    final theme = Theme.of(context);
+    final popup = widget.popUpMode;
+
+    final headerDecoration = popup
+        ? BoxDecoration(
+            color: Colors.grey.shade800,
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.primary.withOpacity(0.35),
+                width: 1,
+              ),
+            ),
+          )
+        : null;
+
+    final keypadBackdrop = popup
+        ? BoxDecoration(
+      color: Colors.black12.withValues(alpha: 0.14),
+            // gradient: LinearGradient(
+            //   begin: Alignment.topCenter,
+            //   end: Alignment.bottomCenter,
+            //   colors: [
+            //     theme.colorScheme.primary.withOpacity(0.14),
+            //     addCallBase,
+            //   ],
+            // ),
+          )
+        : null;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      // Column(
-      //   crossAxisAlignment: CrossAxisAlignment.center,
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: _buildDialPad(accounts, mCallProvider, mLayoutProvider),
-      // ),
       Container(
-        // color: Theme.of(context).dialogBackgroundColor,
+          decoration: headerDecoration,
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
           child: Column(children: [
             _buildAccountsMenu(accounts, mCallProvider),
             const SizedBox(height: 15),
-            // Center(
-            //   child: Consumer<CallProvider>(
-            //     builder: (context, provider, child) {
-            //       return Text(
-            //         SharedPrefs().getValue(Constants.SIP_USERNAME) ?? '',
-            //         style: TextStyle(fontSize: 15, color: textColor),
-            //       );
-            //     },
-            //   ),
-            // ),
             const SizedBox(height: 20),
             _buildPhoneNumberField(mCallProvider),
           ])),
-      Expanded(child: Center(child: _buildKeypad(mCallProvider, accounts))),
+      Expanded(
+        child: DecoratedBox(
+          decoration: keypadBackdrop ?? const BoxDecoration(),
+          child: Center(child: _buildKeypad(mCallProvider, accounts)),
+        ),
+      ),
     ]);
   }
 
   Widget _buildKeypad(CallProvider mCallProvider, AccountsModel accounts) {
+    final theme = Theme.of(context);
+    final popup = widget.popUpMode;
+
     const double spacing = 8;
     double buttonSize = 72;
     if (Platform.isAndroid || Platform.isIOS)
@@ -164,17 +172,30 @@ class _DialpadscreenState extends State<DialpadWidget> {
     else
       buttonSize = 72;
 
-    const TextStyle numberStyle =
-    TextStyle(fontSize: 25, fontWeight: FontWeight.w400, color: Colors.white);
-    const TextStyle letterStyle = TextStyle(fontSize: 8, color: Colors.grey);
+    final TextStyle numberStyle = const TextStyle(
+      fontSize: 25,
+      fontWeight: FontWeight.w400,
+      color: Colors.white,
+    );
+    final TextStyle letterStyle = TextStyle(
+      fontSize: 8,
+      color: popup ? Colors.grey.shade400 : Colors.grey,
+    );
 
     Widget buildKeypadButton(String number, String letters, VoidCallback onPressed) {
       return OutlinedButton(
         style: OutlinedButton.styleFrom(
           fixedSize: Size(buttonSize, buttonSize),
           shape: const CircleBorder(),
-          side: BorderSide.none,
-          backgroundColor: Colors.grey.withOpacity(0.1),
+          side: popup
+              ? BorderSide(
+                  color: theme.colorScheme.primary.withOpacity(0.35),
+                  width: 1,
+                )
+              : BorderSide.none,
+          backgroundColor:
+              popup ? Colors.grey.shade800 : Colors.grey.withOpacity(0.1),
+          foregroundColor: Colors.white,
         ),
         onPressed: onPressed,
         child: Column(
@@ -203,8 +224,10 @@ class _DialpadscreenState extends State<DialpadWidget> {
         style: OutlinedButton.styleFrom(
           fixedSize: Size(mCallbuttonSize, mCallbuttonSize),
           shape: const CircleBorder(),
-          side: BorderSide.none,
-          backgroundColor: Colors.green,
+          side: popup
+              ? BorderSide(color: Colors.green.shade300, width: 1.5)
+              : BorderSide.none,
+          backgroundColor: Colors.green.shade700,
           padding: EdgeInsets.zero,
         ),
         onPressed: onPressed,
@@ -287,13 +310,27 @@ class _DialpadscreenState extends State<DialpadWidget> {
   }
 
   Widget _buildAccountsMenu(AccountsModel accounts, CallProvider mCallProvider,) {
-    return Container(
-        child: Row(children: [
+    final popup = widget.popUpMode;
+    final dropdownChild = Row(children: [
           Expanded(
               child: ButtonTheme(
                   child: DropdownButtonFormField<int>(
-                    decoration: const InputDecoration(
+                    dropdownColor:
+                        popup ? Colors.grey.shade800 : null,
+                    style: popup
+                        ? const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          )
+                        : null,
+                    iconEnabledColor:
+                        popup ? Colors.white70 : null,
+                    decoration: InputDecoration(
                       border: InputBorder.none,
+                      filled: popup,
+                      fillColor:
+                          popup ? Colors.grey.shade800.withOpacity(0.65) : null,
                     ),
                     value: accounts.selAccountId,
                     onChanged: (int? accId) {
@@ -306,19 +343,35 @@ class _DialpadscreenState extends State<DialpadWidget> {
           IconButton(
               tooltip: 'Logout',
               onPressed: () => { showLogoutDialog(context, _mCallProvider)},
-              icon: const Icon(Icons.logout)),
+              icon: Icon(Icons.logout,
+                  color: popup ? Colors.white70 : null)),
           IconButton(
               tooltip: 'Settings',
               onPressed: _onShowSettings,
-              icon: const Icon(Icons.settings))
-        ]));
+              icon: Icon(Icons.settings,
+                  color: popup ? Colors.white70 : null))
+        ]);
+    if (!popup) {
+      return Container(child: dropdownChild);
+    }
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor: Colors.grey.shade800,
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+            ),
+      ),
+      child: Container(child: dropdownChild),
+    );
   }
 
   Widget _buildPhoneNumberField(CallProvider mCallProvider) {
+    final popup = widget.popUpMode;
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: popup ? Colors.grey.shade900.withOpacity(0.85) : Colors.transparent,
         borderRadius: BorderRadius.circular(5.0),
         boxShadow: [
           // BoxShadow(
@@ -420,11 +473,15 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
         builder: (context, controller, focusNode) {
           return Material(
-            // type: MaterialType.transparency,
+            color: popup ? Colors.grey.shade900.withOpacity(0.92) : null,
+            borderRadius: BorderRadius.circular(8),
             child: TextField(
               focusNode: focusNode,
               controller: controller,
               cursorColor: Colors.deepOrangeAccent,
+              style: popup
+                  ? const TextStyle(color: Colors.white, fontSize: 18)
+                  : null,
               // textAlign: TextAlign.st,
               // style: TextStyle(fontSize: 18, color: textFieldColor),
               decoration: InputDecoration(

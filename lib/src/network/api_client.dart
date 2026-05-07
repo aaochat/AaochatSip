@@ -1,5 +1,6 @@
 import 'package:callingproject/src/utils/constants.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../utils/shared_prefs.dart';
 
@@ -16,6 +17,20 @@ class ApiClient {
     Map<String, dynamic>? param,
     formData,
   }) async {
+    final interceptors = <Interceptor>[AuthInterceptor()];
+    if (kDebugMode) {
+      interceptors.add(
+        LogInterceptor(
+          requestHeader: false,
+          responseHeader: false,
+          requestBody: true,
+          responseBody: true,
+          error: true,
+          logPrint: (obj) => debugPrint(obj.toString()),
+        ),
+      );
+    }
+
     final dio = Dio(
       BaseOptions(
         contentType: Headers.jsonContentType,
@@ -25,9 +40,7 @@ class ApiClient {
           "Content-Type": "application/json",
         },
       ),
-    )
-      ..interceptors.addAll([AuthInterceptor()
-      ]);
+    )..interceptors.addAll(interceptors);
     switch (method) {
       case DioMethod.post:
         return dio.post(endpoint, data: param ?? formData);
@@ -37,8 +50,6 @@ class ApiClient {
         return dio.put(endpoint, data: param ?? formData);
       case DioMethod.delete:
         return dio.delete(endpoint, data: param ?? formData);
-      default:
-        return dio.post(endpoint, data: param ?? formData);
     }
   }
 }
