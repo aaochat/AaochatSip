@@ -1,10 +1,6 @@
-import 'package:callingproject/src/utils/constants.dart';
-import 'package:callingproject/src/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../utils/app_settings.dart';
 
 @JsonSerializable()
 class CallLogResponse {

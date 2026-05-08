@@ -15,6 +15,7 @@ import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
 import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
+import '../utils/app_settings.dart';
 enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
 
 enum CdrAction { delete, deleteAll }
@@ -107,7 +108,11 @@ class _LogScreenState extends State<LogListScreen> {
     final selectedAccount = context.read<AccountsModel>().accounts.firstWhere(
       (element) => element.myAccId == selectedAccountId,
     );
-   launchUrl(Uri.parse("http://" + selectedAccount.sipServer + ":3000/call-analytics/" + cdrs.recordingfile.split("/").last));
+    launchUrl(
+      Uri.parse(
+        "http://${selectedAccount.sipServer}:${AppSettings.sipHttpApiPort}/call-analytics/${cdrs.recordingfile.split('/').last}",
+      ),
+    );
   }
 
   @override

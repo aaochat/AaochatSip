@@ -12,6 +12,7 @@ import 'package:siprix_voip_sdk/video.dart';
 
 import '../../main.dart';
 import '../models/call_model.dart';
+import '../providers/call_logs_provider.dart';
 import '../providers/layout_provider.dart';
 import '../utils/snackbar_util.dart';
 import '../widget/dialpad_widget.dart';
@@ -583,6 +584,7 @@ class _SwitchedCallWidgetState extends State<SwitchedCallWidget> {
   }
 
   void _showAddCallPage() {
+    Provider.of<CallProvider>(context, listen: false).clearText();
     Navigator.of(context).pushNamed(DialpadWidget.routeName);
     final mprovider = Provider.of<LayoutProvider>(context, listen: false);
     mprovider.goToDialPad();

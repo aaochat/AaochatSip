@@ -13,12 +13,12 @@ import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/cdrs_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-
 import '../api_response/call_log_response.dart';
 import '../event/CallAnalyticsUpdatedEvent.dart';
 import '../event/refresh_call_log_event.dart';
 import '../models/voice_mail_log.dart';
 import '../utils/Constants.dart';
+import '../utils/app_settings.dart';
 import '../utils/shared_prefs.dart';
 
 class LayoutProvider extends ChangeNotifier {
@@ -42,7 +42,8 @@ class LayoutProvider extends ChangeNotifier {
 
 
   connectToSocket(String sipServer) {
-    String mBaseUrl = "http://" + sipServer + ":3000/";
+    String mBaseUrl =
+        "http://$sipServer:${AppSettings.sipHttpApiPort}/";
     print('connecting to socket');
     IO.Socket socket = IO.io(
         mBaseUrl,
