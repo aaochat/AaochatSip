@@ -31,11 +31,9 @@ class _DomainscreenState extends State<Domainscreen> {
     return Scaffold(
       appBar: ThemeAppBar(),
       body: Center(
-        child:  Container(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: _buildMobileLayout(context, mDomainProvider),
-            
-          
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: _buildMobileLayout(context, mDomainProvider),
         ),
       ),
     );
@@ -45,78 +43,88 @@ class _DomainscreenState extends State<Domainscreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(color: Colors.grey.shade900),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        // mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'assets/voip_logo.png',
-            height: 100,
-            width: MediaQuery.of(context).size.height * 0.3,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 20),
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              'Sign in to continue and manage your account.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Container(
-            constraints: BoxConstraints(maxWidth: 350),
-            child: TextField(
-              controller: provider.domainController,
-              autofocus: true,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.done,
-              cursorColor: Colors.deepOrangeAccent,
-              decoration: InputDecoration(
-                labelText: "Domain Name",
-                enabledBorder: border,
-                focusedBorder: focusBorder,
-              ),
-              style: TextStyle(color: Colors.white),
-              onSubmitted: (_) => _onSubmit(provider),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            constraints: BoxConstraints(maxWidth: 350),
-            child: Consumer<DomainProvider>(
-              builder: (context, provider, child) {
-                return SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _onSubmit(provider),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepOrangeAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/voip_logo.png',
+                      height: 100,
+                      width: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text(
+                        'Sign in to continue and manage your account.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white70),
                       ),
                     ),
-                    child:
-                        provider.isLoading
-                            ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+                    const SizedBox(height: 20),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 350),
+                      child: TextField(
+                        controller: provider.domainController,
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        cursorColor: Colors.deepOrangeAccent,
+                        decoration: InputDecoration(
+                          labelText: "Domain Name",
+                          enabledBorder: border,
+                          focusedBorder: focusBorder,
+                        ),
+                        style: TextStyle(color: Colors.white),
+                        onSubmitted: (_) => _onSubmit(provider),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 350),
+                      child: Consumer<DomainProvider>(
+                        builder: (context, provider, child) {
+                          return SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => _onSubmit(provider),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrangeAccent,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
                               ),
-                            )
-                            : const Text("Proceed"),
-                  ),
-                );
-              },
+                              child:
+                                  provider.isLoading
+                                      ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : const Text("Proceed"),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
