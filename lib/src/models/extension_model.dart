@@ -1,4 +1,4 @@
-import 'package:callingproject/main.dart';
+import 'package:aaochat_sip/main.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import 'package:siprix_voip_sdk/network_model.dart';
 

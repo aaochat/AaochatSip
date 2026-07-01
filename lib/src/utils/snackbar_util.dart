@@ -29,7 +29,6 @@ void showAppSnackBar(
       iconData = Icons.warning_amber_outlined;
       break;
     case SnackBarType.info:
-    default:
       backgroundColor = Colors.blueGrey.shade700;
       iconData = Icons.info_outline;
       break;

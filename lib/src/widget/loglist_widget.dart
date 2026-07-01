@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:callingproject/src/api_response/call_log_response.dart';
-import 'package:callingproject/src/utils/layout_util.dart';
+import 'package:aaochat_sip/src/utils/app_branding.dart';
+import 'package:aaochat_sip/src/api_response/call_log_response.dart';
+import 'package:aaochat_sip/src/utils/layout_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,11 +14,9 @@ import 'package:visibility_detector/visibility_detector.dart';
 import '../event/CallAnalyticsUpdatedEvent.dart';
 import '../event/place_call_event.dart';
 import '../event/refresh_call_log_event.dart';
-import '../providers/call_logs_provider.dart';
+import '../providers/call_provider.dart';
 import '../providers/layout_provider.dart';
 import '../utils/app_settings.dart';
-enum CallAction { accept, reject, switchTo, hangup, hold, redirect }
-
 enum CdrAction { delete, deleteAll }
 
 class LogListScreen extends StatefulWidget {
@@ -283,7 +282,11 @@ class _LogScreenState extends State<LogListScreen> {
                       width: 30,
                       height: 30,
                       alignment: Alignment.center,
-                      child: Image.asset('assets/ai.png'),
+                      child: Image.asset(
+                        AppBranding.resolveInsightsIcon(),
+                        errorBuilder: (_, __, ___) =>
+                            Image.asset(AppBranding.insightsIconFallback),
+                      ),
                     ),
                   ),
               ],
@@ -430,7 +433,11 @@ class _LogScreenState extends State<LogListScreen> {
                           width: 30,
                           height: 30,
                           alignment: Alignment.center,
-                          child: Image.asset('assets/ai.png'),
+                          child: Image.asset(
+                        AppBranding.resolveInsightsIcon(),
+                        errorBuilder: (_, __, ___) =>
+                            Image.asset(AppBranding.insightsIconFallback),
+                      ),
                         ),
                       )),
               ],

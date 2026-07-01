@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:callingproject/src/databased/calllog_history.dart';
-import 'package:callingproject/src/api_response/api_response.dart';
-import 'package:callingproject/src/models/call_model.dart';
-import 'package:callingproject/src/repository/sip_repository.dart';
+import 'package:aaochat_sip/src/api_response/api_response.dart';
+import 'package:aaochat_sip/src/models/call_model.dart';
+import 'package:aaochat_sip/src/repository/sip_repository.dart';
+import 'package:aaochat_sip/src/utils/app_branding.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +17,7 @@ import '../api_response/call_log_response.dart';
 import '../event/CallAnalyticsUpdatedEvent.dart';
 import '../event/refresh_call_log_event.dart';
 import '../models/voice_mail_log.dart';
-import '../utils/Constants.dart';
+import '../utils/constants.dart';
 import '../utils/app_settings.dart';
 import '../utils/shared_prefs.dart';
 
@@ -89,7 +89,7 @@ class LayoutProvider extends ChangeNotifier {
 
   playRingtone() async {
     player.setVolume(1);
-    await player.play(AssetSource('ringtone.mp3'));
+    await player.play(AssetSource(AppBranding.resolveRingtone().split('/').last));
   }
 
   stopRingtone() async {
@@ -119,29 +119,6 @@ class LayoutProvider extends ChangeNotifier {
   //   }
   // }
 
-  void UpdateCallToLogList(BuildContext context, CdrsModel calls,AppCallsModel callsModel) {
-    if (!calls.isEmpty) {
-      final callLog = CallLogHistory(
-        myCallId: calls[0].myCallId,
-        displName: callsModel[0].displName,
-        remoteExt: callsModel[0].remoteExt,
-        accUri: calls[0].accUri,
-        duration: callsModel[0].durationStr,
-        hasVideo: calls[0].hasVideo,
-        incoming: calls[0].incoming,
-        connected: calls[0].connected,
-        statusCode: calls[0].statusCode,
-        madeAtDate: calls[0].madeAtDate,
-      );
-      log("Call_Update_Log: ${callLog.toString()}");
-    }
-  }
-
-  goToCallScreen() {
-    _currentScreen = 'callscreen';
-    notifyListeners();
-  }
-
 
   clearCall(bool mIsUpdate) {
     eventBus.fire(RefreshCallLogEvent(isUpdate: mIsUpdate));
@@ -168,22 +145,6 @@ class LayoutProvider extends ChangeNotifier {
     callId = '';
     notifyListeners();
   }
-
-  String getFormattedCallStatus(CallLogHistory cdr) {
-    var mStatus = "";
-    if (cdr.connected!) {
-      mStatus = 'ANSWERED';
-      return 'ANSWERED';
-    } else if (cdr.incoming! && !cdr.connected!) {
-      mStatus = 'MISSED CALL';
-      return 'MISSED CALL';
-    } else if (!cdr.connected!) {
-      mStatus = 'NO ANSWER';
-      return 'NO ANSWER';
-    }
-    return mStatus.toUpperCase();
-  }
-
 
   String getFormattedCallStatusName(CallLogResponse cdr) {
     if (cdr.disposition == 'ANSWERED') {

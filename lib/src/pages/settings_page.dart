@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/devices_model.dart';
 import 'package:siprix_voip_sdk/siprix_voip_sdk.dart';
 
-import '../providers/call_logs_provider.dart';
-import '../utils/Constants.dart';
+import '../providers/call_provider.dart';
+import '../providers/theme_provider.dart';
+import '../utils/constants.dart';
 import '../utils/extension_util.dart';
 import '../utils/layout_util.dart';
 import '../utils/shared_prefs.dart';
@@ -13,9 +14,12 @@ import '../utils/snackbar_util.dart';
 import 'domain_screen.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.embedded = false});
 
   static const routeName = '/settings';
+
+  /// When true, omits scaffold app bar (used inside desktop navigation rail).
+  final bool embedded;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -35,10 +39,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor:
           isDesktop ? const Color(0xFF121212) : theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        elevation: isDesktop ? 0 : null,
-        title: const Text('Settings'),
-      ),
+      appBar: widget.embedded
+          ? null
+          : AppBar(
+              elevation: isDesktop ? 0 : null,
+              title: const Text('Settings'),
+            ),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -312,10 +318,10 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.deepOrangeAccent, width: 1.5),
+          borderSide: const BorderSide(color: ThemeProvider.accentTeal, width: 1.5),
         ),
         labelStyle: const TextStyle(color: Colors.white60),
-        floatingLabelStyle: const TextStyle(color: Colors.deepOrangeAccent),
+        floatingLabelStyle: const TextStyle(color: ThemeProvider.accentTeal),
       );
     }
 
@@ -416,7 +422,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> mLogoutSession(CallProvider mCallProvider) async {
-    await mCallProvider.DeleteAccountApiCalling(context);
+    await mCallProvider.deleteAccountApi(context);
     await ExtensionUtil.deleteAllAccounts(context);
     await SharedPrefs().clear();
     Navigator.pushAndRemoveUntil(

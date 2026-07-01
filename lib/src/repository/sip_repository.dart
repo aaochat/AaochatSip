@@ -1,9 +1,9 @@
-import 'package:callingproject/src/api_response/api_response.dart';
-import 'package:callingproject/src/api_response/call_log_response.dart';
-import 'package:callingproject/src/models/sip_user_model.dart';
-import 'package:callingproject/src/models/voice_mail_log.dart';
-import 'package:callingproject/src/network/api_client.dart';
-import 'package:callingproject/src/utils/app_settings.dart';
+import 'package:aaochat_sip/src/api_response/api_response.dart';
+import 'package:aaochat_sip/src/api_response/call_log_response.dart';
+import 'package:aaochat_sip/src/models/sip_user_model.dart';
+import 'package:aaochat_sip/src/models/voice_mail_log.dart';
+import 'package:aaochat_sip/src/network/api_client.dart';
+import 'package:aaochat_sip/src/utils/app_settings.dart';
 import 'package:dio/dio.dart';
 
 class SipRepository {

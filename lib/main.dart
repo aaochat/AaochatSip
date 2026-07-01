@@ -1,19 +1,22 @@
 import 'dart:io';
 
-import 'package:callingproject/src/Providers/domain_provider.dart';
-import 'package:callingproject/src/Providers/login_provider.dart';
-import 'package:callingproject/src/Providers/theme_provider.dart';
-import 'package:callingproject/src/models/call_model.dart';
-import 'package:callingproject/src/pages/domain_screen.dart';
-import 'package:callingproject/src/pages/login_screen.dart';
-import 'package:callingproject/src/pages/main_page.dart';
-import 'package:callingproject/src/providers/call_logs_provider.dart';
-import 'package:callingproject/src/providers/layout_provider.dart';
-import 'package:callingproject/src/splash_screen.dart';
-import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/app_settings.dart';
-import 'package:callingproject/src/utils/shared_prefs.dart';
-import 'package:callingproject/src/widget/dialpad_widget.dart';
+import 'package:aaochat_sip/src/models/call_model.dart';
+import 'package:aaochat_sip/src/pages/domain_screen.dart';
+import 'package:aaochat_sip/src/pages/login_screen.dart';
+import 'package:aaochat_sip/src/pages/main_page.dart';
+import 'package:aaochat_sip/src/pages/onboarding_flow.dart';
+import 'package:aaochat_sip/src/pages/settings_page.dart';
+import 'package:aaochat_sip/src/providers/call_provider.dart';
+import 'package:aaochat_sip/src/providers/domain_provider.dart';
+import 'package:aaochat_sip/src/providers/layout_provider.dart';
+import 'package:aaochat_sip/src/providers/login_provider.dart';
+import 'package:aaochat_sip/src/providers/theme_provider.dart';
+import 'package:aaochat_sip/src/splash_screen.dart';
+import 'package:aaochat_sip/src/utils/app_branding.dart';
+import 'package:aaochat_sip/src/utils/app_settings.dart';
+import 'package:aaochat_sip/src/utils/constants.dart';
+import 'package:aaochat_sip/src/utils/shared_prefs.dart';
+import 'package:aaochat_sip/src/widget/dialpad_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,18 +35,20 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefs.init();
 
-  if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows|| 
-      defaultTargetPlatform == TargetPlatform.linux ||
-      defaultTargetPlatform == TargetPlatform.macOS)) {
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.macOS)) {
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions =  WindowOptions(
-      size: Size(1200, 750),
-      minimumSize: Size(1200, 750),
+    final windowOptions = WindowOptions(
+      size: const Size(1200, 750),
+      minimumSize: const Size(900, 600),
       center: true,
-      title: 'Aao VOIP',
+      title: AppBranding.appName,
       backgroundColor: Colors.transparent,
-      titleBarStyle: Platform.isWindows? TitleBarStyle.hidden : TitleBarStyle.normal,
+      titleBarStyle:
+          Platform.isWindows ? TitleBarStyle.hidden : TitleBarStyle.normal,
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -52,12 +57,11 @@ void main() async {
     });
   }
 
-  LogsModel logsModel = LogsModel(true);
-  CdrsModel cdrsModel = CdrsModel();
-  AccountsModel accountsModel = AccountsModel(logsModel);
-  MessagesModel messagesModel = MessagesModel(accountsModel, logsModel);
-  AppCallsModel callsModel = AppCallsModel(accountsModel, logsModel, cdrsModel);
-  // CallsModel mCallsModel = CallsModel(accountsModel, logsModel, cdrsModel); //List of calls
+  final logsModel = LogsModel(true);
+  final cdrsModel = CdrsModel();
+  final accountsModel = AccountsModel(logsModel);
+  final messagesModel = MessagesModel(accountsModel, logsModel);
+  final callsModel = AppCallsModel(accountsModel, logsModel, cdrsModel);
 
   runApp(
     MultiProvider(
@@ -65,22 +69,17 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => DomainProvider()),
-
         ChangeNotifierProvider(create: (_) => CallProvider()),
         ChangeNotifierProvider(create: (_) => LayoutProvider()),
-        ChangeNotifierProvider(create: (_) => AccountsModel()),
-        ChangeNotifierProvider(
-          create: (context) => AccountsModel(logsModel),
-        ),
-        ChangeNotifierProvider(create: (context) => NetworkModel(logsModel)),
-        ChangeNotifierProvider(create: (context) => DevicesModel(logsModel)),
-        ChangeNotifierProvider(create: (context) => messagesModel),
-        ChangeNotifierProvider(create: (context) => callsModel),
-        ChangeNotifierProvider(create: (context) => cdrsModel),
-        ChangeNotifierProvider(create: (context) => logsModel),
-        // ChangeNotifierProvider(create: (context) => mCallsModel),
+        ChangeNotifierProvider(create: (_) => accountsModel),
+        ChangeNotifierProvider(create: (_) => NetworkModel(logsModel)),
+        ChangeNotifierProvider(create: (_) => DevicesModel(logsModel)),
+        ChangeNotifierProvider(create: (_) => messagesModel),
+        ChangeNotifierProvider(create: (_) => callsModel),
+        ChangeNotifierProvider(create: (_) => cdrsModel),
+        ChangeNotifierProvider(create: (_) => logsModel),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -88,67 +87,65 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static String _ringtonePath = "";
+  static String _ringtonePath = '';
 
   @override
   State<MyApp> createState() => _MyAppState();
 
-  /// Returns ringtone's path saved on device
   static String getRingtonePath() => _ringtonePath;
 
-  void writeRingtoneAsset() async {
-    _ringtonePath = await writeAssetAndGetFilePath("ringtone.mp3");
+  Future<void> writeRingtoneAsset() async {
+    for (final asset in [
+      AppBranding.ringtoneAsset,
+      AppBranding.ringtoneAssetFallback,
+    ]) {
+      try {
+        _ringtonePath = await writeAssetAndGetFilePath(asset);
+        if (File(_ringtonePath).existsSync()) return;
+      } catch (_) {}
+    }
   }
 
   static Future<String> writeAssetAndGetFilePath(String assetsFileName) async {
-    var homeFolder = await SiprixVoipSdk().homeFolder();
-    var filePath = '$homeFolder$assetsFileName';
+    final homeFolder = await SiprixVoipSdk().homeFolder();
+    final filePath = '$homeFolder${assetsFileName.split('/').last}';
 
-    var file = File(filePath);
-    var exists = file.existsSync();
-    debugPrint("writeAsset: '$filePath' exists:$exists");
-    if (exists) return filePath;
+    final file = File(filePath);
+    if (file.existsSync()) return filePath;
 
-    final byteData = await rootBundle.load('assets/$assetsFileName');
+    final byteData = await rootBundle.load(assetsFileName);
     await file.create(recursive: true);
-    file.writeAsBytes(byteData.buffer.asUint8List(), flush: true);
+    await file.writeAsBytes(byteData.buffer.asUint8List(), flush: true);
     return filePath;
   }
 
   static Future<String> getRecFilePathName(int callId) async {
-    String dateTime = DateFormat('yyyyMMdd_HHmmss_').format(DateTime.now());
-    var homeFolder = await SiprixVoipSdk().homeFolder();
-    var filePath = '$homeFolder$dateTime$callId.mp3';
-    return filePath;
+    final dateTime = DateFormat('yyyyMMdd_HHmmss_').format(DateTime.now());
+    final homeFolder = await SiprixVoipSdk().homeFolder();
+    return '$homeFolder$dateTime$callId.mp3';
   }
 }
-typedef PageContentBuilder = Widget Function(
-    [Object? arguments]);
+
+typedef PageContentBuilder = Widget Function([Object? arguments]);
 
 class _MyAppState extends State<MyApp> {
-  Map<String, PageContentBuilder> routes = {
-    '/': ([ Object? arguments]) => Splashscreen(),
-    '/domain': ([Object? arguments]) => Domainscreen(),
-    '/login': ([Object? arguments]) => LoginScreen(),
-    '/callscreen': ([Object? arguments]) => MainPage(),
-    DialpadWidget.routeName: ([Object? arguments]) =>
-    const DialpadWidget(true),
+  final Map<String, PageContentBuilder> routes = {
+    '/': ([Object? arguments]) => const Splashscreen(),
+    '/domain': ([Object? arguments]) => const Domainscreen(),
+    '/login': ([Object? arguments]) => const LoginScreen(),
+    MainPage.routeName: ([Object? arguments]) => const MainPage(),
+    OnboardingFlow.routeName: ([Object? arguments]) => const OnboardingFlow(),
+    DialpadWidget.routeName: ([Object? arguments]) => const DialpadWidget(true),
+    SettingsPage.routeName: ([Object? arguments]) => const SettingsPage(),
   };
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
-    final String? name = settings.name;
-    final PageContentBuilder? pageContentBuilder = routes[name!];
+    final name = settings.name;
+    final pageContentBuilder = routes[name];
     if (pageContentBuilder != null) {
-      if (settings.arguments != null) {
-        final Route route = MaterialPageRoute<Widget>(
-            builder: (context) =>
-                pageContentBuilder(settings.arguments));
-        return route;
-      } else {
-        final Route route = MaterialPageRoute<Widget>(
-            builder: (context) => pageContentBuilder());
-        return route;
-      }
+      return MaterialPageRoute<Widget>(
+        builder: (context) => pageContentBuilder(settings.arguments),
+      );
     }
     return null;
   }
@@ -156,7 +153,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Aao Voip',
+      title: AppBranding.appName,
       home: const Splashscreen(),
       theme: Provider.of<ThemeProvider>(context).currentTheme,
       debugShowCheckedModeBanner: false,
@@ -172,38 +169,33 @@ class _MyAppState extends State<MyApp> {
     _readSavedState();
   }
 
-  static void _initializeSiprix(LogsModel? logsModel) async {
-    debugPrint('_initializeSiprix');
-    InitData iniData = InitData();
-    iniData.brandName = "TeamLocus";
-    iniData.license = AppSettings.LICENSE_KEY;
-    iniData.logLevelFile = LogLevel.info;
-    iniData.logLevelIde = LogLevel.info;
+  static Future<void> _initializeSiprix(LogsModel? logsModel) async {
+    final iniData = InitData()
+      ..brandName = AppSettings.brandName
+      ..license = AppSettings.LICENSE_KEY
+      ..logLevelFile = LogLevel.info
+      ..logLevelIde = LogLevel.info;
     await SiprixVoipSdk().initialize(iniData, logsModel);
   }
 
   void _readSavedState() async {
-    debugPrint('_readSavedState');
-    String accJsonStr = await SharedPrefs().getValue(Constants.ACCOUNTS) ?? '';
-    String cdrsJsonStr = await SharedPrefs().getValue(Constants.CRDS) ?? '';
+    final accJsonStr = await SharedPrefs().getValue(Constants.ACCOUNTS) ?? '';
+    final cdrsJsonStr = await SharedPrefs().getValue(Constants.CRDS) ?? '';
+    if (!mounted) return;
     _loadModels(accJsonStr, cdrsJsonStr);
   }
 
   void _loadModels(String accJsonStr, String cdrsJsonStr) {
-    //Accounts
-    AccountsModel accsModel = context.read<AccountsModel>();
+    final accsModel = context.read<AccountsModel>();
     accsModel.onSaveChanges = _saveAccountChanges;
 
-    //CDRs (Call Details Records)
-    CdrsModel cdrs = context.read<CdrsModel>();
+    final cdrs = context.read<CdrsModel>();
     cdrs.onSaveChanges = _saveCdrsChanges;
 
-    //Load accounts, then other models
-    accsModel.loadFromJson(accJsonStr).then((val) {
+    accsModel.loadFromJson(accJsonStr).then((_) {
       cdrs.loadFromJson(cdrsJsonStr);
     });
 
-    //Load devices
     context.read<DevicesModel>().load();
   }
 

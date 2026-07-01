@@ -1,9 +1,9 @@
-import 'package:callingproject/src/api_response/api_response.dart';
-import 'package:callingproject/src/api_response/login_response.dart';
-import 'package:callingproject/src/network/api_client.dart';
-import 'package:callingproject/src/utils/Constants.dart';
-import 'package:callingproject/src/utils/app_settings.dart';
-import 'package:callingproject/src/utils/shared_prefs.dart';
+import 'package:aaochat_sip/src/api_response/api_response.dart';
+import 'package:aaochat_sip/src/api_response/login_response.dart';
+import 'package:aaochat_sip/src/network/api_client.dart';
+import 'package:aaochat_sip/src/utils/constants.dart';
+import 'package:aaochat_sip/src/utils/app_settings.dart';
+import 'package:aaochat_sip/src/utils/shared_prefs.dart';
 import 'package:dio/dio.dart';
 
 class AuthRepository {

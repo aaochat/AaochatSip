@@ -1,26 +1,26 @@
 import 'dart:io';
 
-import 'package:callingproject/src/models/sip_user_model.dart';
-import 'package:callingproject/src/pages/domain_screen.dart';
-import 'package:callingproject/src/providers/layout_provider.dart';
-import 'package:callingproject/src/repository/sip_repository.dart';
-import 'package:callingproject/src/utils/extension_util.dart';
+import 'package:aaochat_sip/src/providers/theme_provider.dart';
+import 'package:aaochat_sip/src/models/sip_user_model.dart';
+import 'package:aaochat_sip/src/pages/domain_screen.dart';
+import 'package:aaochat_sip/src/providers/layout_provider.dart';
+import 'package:aaochat_sip/src/repository/sip_repository.dart';
+import 'package:aaochat_sip/src/utils/extension_util.dart';
 import 'package:event_taxi/event_taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:siprix_voip_sdk/accounts_model.dart';
 import '../event/place_call_event.dart';
-import '../models/telephone_master.dart';
 import '../pages/settings_page.dart';
-import '../providers/call_logs_provider.dart';
+import '../providers/call_provider.dart';
 import '../utils/shared_prefs.dart';
 import '../utils/snackbar_util.dart';
 
 class DialpadWidget extends StatefulWidget {
   const DialpadWidget(this.popUpMode, {super.key});
 
-  static const routeName = "/addCall";
+  static const routeName = '/dialer';
   final bool popUpMode;
 
   @override
@@ -28,11 +28,10 @@ class DialpadWidget extends StatefulWidget {
 }
 
 class _DialpadscreenState extends State<DialpadWidget> {
-  List<TelephoneMaster> allTelephoneMaster = [];
-  EventTaxi eventBus = EventTaxiImpl.singleton();
-  var _mCallProvider = CallProvider();
   List<SIPUser> allSipUsers = [];
-  
+  EventTaxi eventBus = EventTaxiImpl.singleton();
+  late CallProvider _mCallProvider;
+
   final phoneNumberController = TextEditingController();
 
   @override
@@ -59,9 +58,9 @@ class _DialpadscreenState extends State<DialpadWidget> {
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
       _mCallProvider.phoneNumbCtrl.text =
-          event.phoneNumber.replaceAll(new RegExp(r'[^0-9]'), '');
+          event.phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
       if (event.placeCall) {
-        _mCallProvider.mInvite(context, false, context.read<AccountsModel>());
+        _mCallProvider.mInvite(context, false);
       }
     });
 
@@ -87,7 +86,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
     return Scaffold(
       backgroundColor: widget.popUpMode ? addCallBase : Colors.transparent,
       appBar: widget.popUpMode
-          ? AppBar(title: const Text('Add Call'))
+          ? AppBar(title: const Text('Place another call'))
           : null,
       body: accounts.isEmpty ? _buildEmptyBody(mCallProvider) : _buildBody(
           accounts, mCallProvider, mLayoutProvider, addCallBase),
@@ -99,7 +98,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text('Can\'t make calls. Required to add account'),
+            Text('No calling account configured. Please sign in again.'),
             TextButton(
                 onPressed: () {
                   mLogoutSession(mCallProvider);
@@ -274,7 +273,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
             const SizedBox(height: spacing * 2),
 
             buildCallButton('Call', () {
-              mCallProvider.mInvite(context, false, accounts);
+              mCallProvider.mInvite(context, false);
               if (mCallProvider.errorText == null || mCallProvider.errorText == "") {
                 mCallProvider.clearText();
                 if (widget.popUpMode) {
@@ -478,7 +477,7 @@ class _DialpadscreenState extends State<DialpadWidget> {
             child: TextField(
               focusNode: focusNode,
               controller: controller,
-              cursorColor: Colors.deepOrangeAccent,
+              cursorColor: ThemeProvider.accentTeal,
               style: popup
                   ? const TextStyle(color: Colors.white, fontSize: 18)
                   : null,
@@ -487,13 +486,13 @@ class _DialpadscreenState extends State<DialpadWidget> {
               decoration: InputDecoration(
                 labelText: "Enter /Search phone number",
                 labelStyle: const TextStyle(color: Colors.white70),
-                floatingLabelStyle: const TextStyle(color: Colors.deepOrangeAccent),
+                floatingLabelStyle: const TextStyle(color: ThemeProvider.accentTeal),
                 filled: false,
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey), // default line
                 ),
                 focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepOrangeAccent, width: 2),
+                  borderSide: BorderSide(color: ThemeProvider.accentTeal, width: 2),
                 ),
 
                 suffixIcon: Padding(
