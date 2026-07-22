@@ -24,6 +24,7 @@ class ExtensionUtil {
             .toList();
 
     for (int i = 0; i < extensions.length; i++) {
+      print(extensions[i].toAccountModel().toJson());
       await context.read<AccountsModel>().addAccount(
         extensions[i].toAccountModel(),
       );

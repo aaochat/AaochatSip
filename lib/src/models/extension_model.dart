@@ -36,12 +36,12 @@ class Extension {
     );
   }
 
+
   AccountModel toAccountModel() {
     AccountModel account = AccountModel();
-    account.sipServer = sipServer!.host!;
+    account.sipServer = sipServer!.host!+":"+sipServer!.port!.toString();
     account.sipExtension = extensionNumber;
     account.sipPassword = sipPassword;
-    account.port = sipServer!.port!;
     account.transport = sipServer!.protocol == "UDP" ? SipTransport.udp : SipTransport.tcp;
     account.ringTonePath = MyApp.getRingtonePath();
     return account;
