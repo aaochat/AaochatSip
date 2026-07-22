@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> {
           (element) => element.myAccId == selectedAccountId,
     );
 
-    context.read<LayoutProvider>().connectToSocket(selectedAccount.sipServer);
+    context.read<LayoutProvider>().connectToSocket(selectedAccount.sipServer.split(":")[0]);
 
     eventBus.registerTo<PlaceCallEvent>(false).listen((event) {
       setState(() {

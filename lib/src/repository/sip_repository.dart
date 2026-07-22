@@ -15,7 +15,7 @@ class SipRepository {
     try {
 
       final response = await ApiClient.instance.request(
-        "http://$sipServerHost:${AppSettings.sipHttpApiPort}/logs/$sipExtension",
+        "http://${sipServerHost.split(":")[0]}:${AppSettings.sipHttpApiPort}/logs/$sipExtension",
         DioMethod.get, param: data,
       );
       ApiResponse<List<CallLogResponse>> apiResponse =
@@ -45,7 +45,7 @@ class SipRepository {
   static Future<ApiResponse<List<VoiceMailLog>>> getVoiceMailList(String sipServerHost, String sipExtension) async {
     try {
       final response = await ApiClient.instance.request(
-        'http://$sipServerHost:${AppSettings.sipHttpApiPort}/voice-mails/$sipExtension',
+        'http://${sipServerHost.split(":")[0]}:${AppSettings.sipHttpApiPort}/voice-mails/$sipExtension',
         DioMethod.get,
       );
       ApiResponse<List<VoiceMailLog>> apiResponse = ApiResponse<List<VoiceMailLog>>.fromMap(
@@ -75,7 +75,7 @@ class SipRepository {
   static Future<ApiResponse<List<SIPUser>>> getAllSipUsers(String sipServerHost) async {
     try {
       final response = await ApiClient.instance.request(
-        'http://$sipServerHost:${AppSettings.sipHttpApiPort}/extensions',
+        'http://${sipServerHost.split(":")[0]}:${AppSettings.sipHttpApiPort}/extensions',
         DioMethod.get,
       );
       ApiResponse<List<SIPUser>> apiResponse = ApiResponse<List<SIPUser>>.fromMap(
