@@ -42,7 +42,7 @@ class LayoutProvider extends ChangeNotifier {
 
 
   connectToSocket(String sipServer) {
-    String mBaseUrl = "http://" + sipServer + ":3000/";
+    String mBaseUrl = "http://" + sipServer + ":3002/";
     print('connecting to socket');
     IO.Socket socket = IO.io(
         mBaseUrl,
